@@ -46,6 +46,14 @@ uv run aistock sweep --rank-by profit_factor --top 10
 uv run aistock portfolio --watchlist nifty500 --strategy trend --positions 10
 ```
 
+```bash
+# Paper-trade every journaled BUY forward (next-day open entry, preset exits, costs) vs NIFTY 50
+uv run aistock paper
+uv run aistock paper --strategy trend --since 2026-12-01
+```
+
+`paper` is the bias-free scorecard. Each signal was recorded before its outcome was known, and it includes the fundamental and news gates that backtests can't test. Repeat signals for a strategy and stock are ignored while a position is open. The daily GitHub run adds the report to its job summary.
+
 `scan` and `analyze` run every preset by default (`--strategy trend,breakout` to narrow it). A stock is BUY if any strategy says BUY, and the journal's `buys` column records which ones did.
 
 Backtest commands take `--watchlist nifty50|nifty500`. For large lists, `scan` fetches news only for stocks that could still reach BUY (`--news candidates`, the default above 60 stocks). Recent listings with under 200 sessions of history are skipped.
@@ -136,4 +144,4 @@ Only trend matches the equal-weight hold. On NIFTY 50, every preset loses money 
 - [ ] Chart-pattern detection
 - [ ] Local LLM (Ollama `qwen2.5:3b`) to write plain-English reports: explanations only, never trade decisions
 - [ ] Streamlit dashboard
-- [ ] Backtest the combined signal from the journal once history accumulates
+- [x] Paper-trade journaled signals forward (`aistock paper`)

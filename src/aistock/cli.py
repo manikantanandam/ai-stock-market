@@ -12,6 +12,7 @@ from aistock.data import fundamentals, prices, watchlists
 from aistock.data.prices import get_prices, market_phase
 from aistock.data.watchlists import WATCHLISTS
 from aistock.strategy import journal, signal, strategies
+from aistock.strategy import paper as paper_trading
 from aistock.strategy.strategies import PRESETS, Strategy
 from aistock.technical import rules
 from aistock.technical.indicators import add_indicators
@@ -130,6 +131,58 @@ def scan(
     print(f"Stocks: BUY {counts['BUY']}  WATCH {counts['WATCH']}  AVOID {counts['AVOID']}  · "
           f"news for {with_news}/{len(results)} · {logged}")
     _print_skipped(failed)
+
+
+@app.command()
+def paper(
+    strategy: str = typer.Option("all", "--strategy", "-s", help="'all' or comma-separated preset names"),
+    since: str = typer.Option(None, help="Only signals on/after this date (YYYY-MM-DD)"),
+    notional: float = typer.Option(100_000, help="INR per trade (costs include a flat DP charge)"),
+    show: int = typer.Option(15, help="Open and recently closed trades to list"),
+):
+    """Paper-trade the journal's BUY signals forward: the bias-free scorecard for each strategy."""
+    only = None if strategy == "all" else [st.name for st in _strategy_list(strategy)]
+    trades, pending = paper_trading.run(since, only, notional)
+    if trades.empty and pending.empty:
+        print("No BUY signals in the journal yet. Run `aistock scan` daily to build history.")
+        return
+    summ = paper_trading.summary(trades, pending)
+    opt_pct = lambda v: "-" if v is None or pd.isna(v) else pct(v)
+    table = Table(title=f"Paper trading · {notional:,.0f} INR per trade · after costs")
+    for col in ["Strategy", "Pending", "Open", "Closed", "Win rate", "Avg closed", "Avg open",
+                "Avg all", "vs NIFTY", "Avg days"]:
+        table.add_column(col, justify="left" if col == "Strategy" else "right")
+    for r in summ.to_dict("records"):
+        table.add_row(r["strategy"], str(r["pending"]), str(r["open"]), str(r["closed"]), opt_pct(r["win_rate"]),
+                      opt_pct(r["avg_closed"]), opt_pct(r["avg_open"]), opt_pct(r["avg_all"]),
+                      opt_pct(r["excess_vs_nifty"]),
+                      "-" if pd.isna(r["avg_days"]) else f"{r['avg_days']:.1f}")
+    print(table)
+
+    if not trades.empty:
+        for status, sort_col, title in [("open", "ret", "Open positions (best first)"),
+                                        ("closed", "exit_date", "Recently closed")]:
+            t = trades[trades.status == status].sort_values(sort_col, ascending=False).head(show)
+            if t.empty:
+                continue
+            tbl = Table(title=title)
+            price_col = "last" if status == "open" else "exit"
+            for col in ["Strategy", "Symbol", "Entry date", "Entry", price_col.capitalize(),
+                        "Stop", "Target", "Days", "Return", "vs NIFTY"] + (["Exit"] if status == "closed" else []):
+                tbl.add_column(col, justify="left" if col in ("Strategy", "Symbol", "Exit") else "right")
+            for r in t.to_dict("records"):
+                tbl.add_row(r["strategy"], r["symbol"], r["entry_date"], f"{r['entry']:.2f}",
+                            f"{r[price_col]:.2f}", f"{r['stop']:.2f}",
+                            "-" if r["target"] is None or pd.isna(r["target"]) else f"{r['target']:.2f}",
+                            str(r["days"]), pct(r["ret"]), pct(r["excess"]),
+                            *([f"{r['reason']} {r['exit_date']}"] if status == "closed" else []))
+            print(tbl)
+        universe.REPORTS.mkdir(exist_ok=True)
+        path = universe.REPORTS / "paper_trades.csv"
+        trades.to_csv(path, index=False)
+        print(f"All trades saved to {path}")
+    if not pending.empty:
+        print(f"{len(pending)} signals waiting for the next session's open")
 
 
 @app.command("update-watchlists")

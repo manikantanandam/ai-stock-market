@@ -17,6 +17,7 @@ Target hardware is an M1 with 8GB RAM, so only small local models work: FinBERT 
 - Watchlists are committed CSV snapshots in `src/aistock/data/watchlists/`; refresh with `uv run aistock update-watchlists`
 - Prices are batch-downloaded via `prices.prefetch` (`yf.download`) before per-symbol `get_prices` reads; fundamentals have a 7-day cache
 - Daily scan also runs on GitHub Actions (`.github/workflows/daily-scan.yml`, 11:00 UTC weekdays) and commits the journal, so `git pull` before local scans. Linux uses CPU-only torch via `[tool.uv.sources]` in `pyproject.toml`.
+- Paper trading: `uv run aistock paper` replays journal BUYs through `engine.run` (`strategy/paper.py`); the daily CI run adds its report to the job summary
 - Strategies: presets live in `strategy/strategies.py` (`uv run aistock strategies`); `uv run aistock compare` backtests all presets side by side
 - Backtests: `uv run aistock backtest <SYMBOL>`, `backtest-all`, `portfolio` take `--strategy <preset>`; `--rule/--regime/--stop-atr/...` override the preset. `sweep` grid-searches rules independently of presets (all take `--rule score:0.4|pullback|breakout`, `--regime`, ATR exit options; outputs CSVs to `reports/`)
 - Ollama (installed via Homebrew): `brew services start ollama`, then `ollama pull qwen2.5:3b`

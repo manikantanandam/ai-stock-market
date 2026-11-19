@@ -54,6 +54,14 @@ jobs:
           uv run aistock scan --watchlist nifty500 --top 50 | tee scan.txt
           { echo '```'; cat scan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Paper trading report
+        env:
+          NO_COLOR: "1"
+          COLUMNS: "140"
+        run: |
+          uv run aistock paper --show 20 | tee paper.txt
+          { echo '## Paper trading'; echo '```'; cat paper.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Commit journal
         run: |
           git config user.name "github-actions[bot]"
