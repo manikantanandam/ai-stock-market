@@ -31,16 +31,22 @@ uv run aistock scan --watchlist nifty500 --news candidates --top 20
 # Refresh index constituents from niftyindices.com (NSE rebalances twice a year)
 uv run aistock update-watchlists
 
-# Backtest an entry rule: one stock, or pooled across the watchlist
-uv run aistock backtest INFY
-uv run aistock backtest-all --rule breakout --regime --stop-atr 3 --target-atr 0 --max-hold 40
+# Strategy presets (swing, trend, breakout, pullback, ema-cross)
+uv run aistock strategies
+uv run aistock compare --watchlist nifty500            # all presets side by side, portfolio backtest
+
+# Backtest a strategy: one stock, or pooled across the watchlist (options override the preset)
+uv run aistock backtest INFY --strategy trend
+uv run aistock backtest-all --strategy breakout --max-hold 40
 
 # Grid search over rules, market filter and exits
 uv run aistock sweep --rank-by profit_factor --top 10
 
 # Shared-capital portfolio (N slots) vs NIFTY 50 and an equal-weight hold of the watchlist
-uv run aistock portfolio --watchlist nifty500 --stop-atr 3 --target-atr 0 --max-hold 90 --positions 10
+uv run aistock portfolio --watchlist nifty500 --strategy trend --positions 10
 ```
+
+`scan` and `analyze` run every preset by default (`--strategy trend,breakout` to narrow it). A stock is BUY if any strategy says BUY, and the journal's `buys` column records which ones did.
 
 Backtest commands take `--watchlist nifty50|nifty500`. For large lists, `scan` fetches news only for stocks that could still reach BUY (`--news candidates`, the default above 60 stocks). Recent listings with under 200 sessions of history are skipped.
 
@@ -55,9 +61,19 @@ Symbols are bare NSE tickers (`INFY`, `M&M`); `.NS` is added internally. Run `uv
 | Technical | yfinance daily OHLCV, pandas-ta (SMA 50/200, RSI, MACD, ATR, volume) | score in [-1, 1] + reasons |
 | Fundamental | yfinance ratios (ROE, debt/equity, growth, margins, P/E) | score in [-1, 1] + reasons |
 | Sentiment | Google News RSS (+ filtered Yahoo news), FinBERT, recency-weighted (3-day half-life) | score in [-1, 1] + top headlines |
-| Signal | weighted 50 / 30 / 20 | BUY if combined ≥ 0.4, technical ≥ 0.4 and no negative-news veto |
+| Combined | weighted 50 / 30 / 20 | used for ranking, AVOID, and the swing gate |
 
-Stops and targets are ATR-based (2× / 3× ATR by default). Position size risks 1% of capital if the stop hits.
+**Strategies** (`src/aistock/strategy/strategies.py`): each preset is an entry rule, an optional market filter (NIFTY 50 above its 200-day SMA), ATR-based exits, and live gates. A preset says BUY when its rule fires on the latest bar, its gates pass (swing: combined ≥ 0.4; others: fundamental ≥ 0), and news isn't clearly negative.
+
+| Preset | Entry | Exits |
+|---|---|---|
+| swing | technical score ≥ 0.4 | 2 ATR stop, 3 ATR target, 20 days |
+| trend | technical score ≥ 0.4, market filter | 3 ATR stop, no target, 90 days |
+| breakout | close > 20-day high on 1.5× volume, SMA50 > SMA200, market filter | 3 ATR stop, no target, 90 days |
+| pullback | uptrend with RSI < 40 | 2 ATR stop, 3 ATR target, 20 days |
+| ema-cross | EMA100 crosses above EMA200 | 3 ATR stop, no target, 90 days |
+
+Position size risks 1% of capital if the stop hits.
 
 **Backtester:** long-only, daily bars, next-day-open entries, gap-aware stop/target fills, optional trailing stop, and Indian delivery costs (STT, stamp duty, exchange fees, GST, DP charge, slippage). Every run is split into in-sample (first 70%) and out-of-sample (last 30%). The sweep ranks on in-sample only and then re-tests the top picks out-of-sample.
 
@@ -96,7 +112,20 @@ Wider stops and longer holds clearly help per trade, and the edge survives out-o
 | NIFTY 50 | 23.5% → 3.6% | 17.3% → -3.6% | 13.0% → 5.4% | 24.6% → 11.3% |
 | NIFTY 500 | 40.7% → 9.5% | 37.8% → 14.3% | 13.0% → 5.4% | 26.6% → 13.9% |
 
-On NIFTY 500 the strategy beats the NIFTY 50 index, but not an equal-weight hold of the same stocks. That comparison shares the survivorship bias, so it is the fair test. Today's NIFTY 500 is partly made up of stocks that joined *because* they rallied. Swapping a single NIFTY 50 constituent (WIPRO → BSE) moved the NIFTY 50 results by several points. Conclusion so far: **no demonstrated edge**, so the live signal still uses the original exits.
+On NIFTY 500 the strategy beats the NIFTY 50 index, but not an equal-weight hold of the same stocks. That comparison shares the survivorship bias, so it is the fair test. Today's NIFTY 500 is partly made up of stocks that joined *because* they rallied. Swapping a single NIFTY 50 constituent (WIPRO → BSE) moved the NIFTY 50 results by several points. Conclusion so far: **no demonstrated edge**.
+
+**Strategy comparison** (`aistock compare --watchlist nifty500`, 10 slots). CAGR, in-sample → out-of-sample (2024–2026), and the out-of-sample margin vs an equal-weight hold:
+
+| Preset | CAGR | vs EW hold (OOS) | OOS max DD |
+|---|---|---|---|
+| swing | 14.7% → -10.8% | -24.6% | -39.0% |
+| trend | 37.8% → 14.3% | +0.4% | -24.5% |
+| breakout | 33.6% → 9.3% | -4.6% | -21.1% |
+| pullback | -0.1% → 4.5% | -9.3% | -8.2% |
+| ema-cross | 20.3% → -1.0% | -14.8% | -25.5% |
+| *EW hold of NIFTY 500* | 26.6% → 13.9% | | -21.2% |
+
+Only trend matches the equal-weight hold. On NIFTY 50, every preset loses money out-of-sample.
 
 ## Roadmap
 

@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import date
 
 import pandas as pd
@@ -10,7 +11,8 @@ from aistock.backtest import engine, portfolio, sweep, universe
 from aistock.data import fundamentals, prices, watchlists
 from aistock.data.prices import get_prices, market_phase
 from aistock.data.watchlists import WATCHLISTS
-from aistock.strategy import journal, signal
+from aistock.strategy import journal, signal, strategies
+from aistock.strategy.strategies import PRESETS, Strategy
 from aistock.technical import rules
 from aistock.technical.indicators import add_indicators
 
@@ -25,41 +27,69 @@ def main():
 COLORS = {"BUY": "green", "WATCH": "yellow", "AVOID": "red"}
 
 
+def _strategy_list(names: str) -> list[Strategy]:
+    """'all' or a comma-separated list of preset names."""
+    if names == "all":
+        return list(PRESETS.values())
+    try:
+        return [strategies.get(n.strip()) for n in names.split(",") if n.strip()]
+    except ValueError as e:
+        raise typer.BadParameter(str(e))
+
+
+@app.command("strategies")
+def list_strategies():
+    """List the strategy presets."""
+    table = Table(title="Strategy presets")
+    for col in ["Name", "Entry and exits", "Live gates", "Description"]:
+        table.add_column(col)
+    for st in PRESETS.values():
+        gates = [f"combined >= {st.min_combined}" if st.min_combined is not None else "",
+                 f"fundamental >= {st.min_fundamental}" if st.min_fundamental is not None else "",
+                 "no news veto"]
+        table.add_row(st.name, st.describe(), ", ".join(g for g in gates if g), st.description)
+    print(table)
+
+
 @app.command()
 def analyze(
     symbol: str,
     capital: float = typer.Option(100_000, help="Account size in INR, for position sizing"),
     no_news: bool = typer.Option(False, "--no-news", help="Skip news/FinBERT"),
+    strategy: str = typer.Option("all", "--strategy", "-s", help="'all' or comma-separated preset names"),
 ):
-    """Combined technical + fundamental + news signal for one stock."""
-    s = signal.evaluate(symbol, signal.Config(capital=capital), news="none" if no_news else "all")
-    color = COLORS[s.action]
-    print(f"[bold]{s.symbol}[/bold] {s.name} ({s.sector})  close {s.close:.2f}")
-    print(f"[bold {color}]{s.action}[/]  combined {s.combined:+.2f}")
+    """Technical + fundamental + news scores for one stock, and each strategy's verdict."""
+    s = signal.evaluate(symbol, signal.Config(capital=capital), news="none" if no_news else "all",
+                        strategies=_strategy_list(strategy))
+    print(f"[bold]{s.symbol}[/bold] {s.name} ({s.sector})  close {s.close:.2f}  ATR {s.atr:.2f}  as of {s.as_of}")
+    print(f"[bold {COLORS[s.action]}]{s.action}[/]  combined {s.combined:+.2f}")
     for part, value in [("technical", s.technical), ("fundamental", s.fundamental), ("sentiment", s.sentiment)]:
         print(f"\n[bold]{part.capitalize()}[/bold] {_score(value)}")
         for w in s.reasons[part]:
             print(f" - {w}")
-    print("\n[bold]Decision[/bold]")
-    for w in s.reasons["decision"]:
-        print(f" - {w}")
-    if s.action == "BUY":
-        print(f"\nPlan: buy ~{s.shares} shares near {s.close:.2f}, stop {s.stop:.2f}, target {s.target:.2f} (1.5R)")
-    else:
-        print(f"\nIf it turns BUY: stop {s.stop:.2f}, target {s.target:.2f}")
+
+    table = Table(title="Strategies")
+    for col in ["Strategy", "Action", "Stop", "Target", "Qty", "Why"]:
+        table.add_column(col, justify="right" if col in ("Stop", "Target", "Qty") else "left")
+    for r in s.strategies.values():
+        table.add_row(r.strategy, f"[{COLORS[r.action]}]{r.action}[/]", f"{r.stop:.2f}",
+                      "-" if r.target is None else f"{r.target:.2f}", str(r.shares), "; ".join(r.why))
+    print(table)
 
 
 @app.command()
 def scan(
     watchlist: str = typer.Option("nifty50", help=f"One of: {', '.join(WATCHLISTS)}"),
     symbols: str = typer.Option("", help="Comma-separated symbols instead of a watchlist"),
+    strategy: str = typer.Option("all", "--strategy", "-s", help="'all' or comma-separated preset names"),
     capital: float = typer.Option(100_000),
-    news: str = typer.Option("auto", help="all, candidates (only stocks that could reach BUY), none; "
+    news: str = typer.Option("auto", help="all, candidates (only stocks a strategy could BUY), none; "
                                           "auto = all for <= 60 stocks, else candidates"),
     top: int = typer.Option(15, help="Rows to show"),
 ):
-    """Rank a watchlist by combined score and log the signals to journal/signals.csv."""
+    """Run every strategy over a watchlist, list BUYs first, and log to journal/signals.csv."""
     names = [x.strip().upper() for x in symbols.split(",") if x.strip()] or WATCHLISTS[watchlist]
+    chosen = _strategy_list(strategy)
     if news == "auto":
         news = "all" if len(names) <= 60 else "candidates"
     if news not in signal.NEWS_MODES:
@@ -67,31 +97,37 @@ def scan(
     print(f"Downloading prices and fundamentals for {len(names)} stocks...")
     prices.prefetch(names, years=2)
     fundamentals.prefetch(names)
+    market = signal.market_ok()
+    print(f"Market filter: NIFTY 50 {'above' if market else 'BELOW'} its 200-day SMA")
     cfg, results, failed = signal.Config(capital=capital), [], []
     for sym in track(names, description="Scanning"):
         try:
-            results.append(signal.evaluate(sym, cfg, news=news))
+            results.append(signal.evaluate(sym, cfg, news=news, strategies=chosen, market=market))
         except Exception as e:  # one bad ticker shouldn't stop the scan
             failed.append(f"{sym} ({e})")
     if not results:
         print("[red]No symbols could be evaluated[/red]")
         raise typer.Exit(1)
     # Mid-session bars are partial, so only completed sessions go in the journal
-    phase = market_phase()
-    logged = f"logged to {journal.record(results)}" if phase != "live" else "not logged (market open)"
-    results.sort(key=lambda s: s.combined, reverse=True)
+    logged = f"logged to {journal.record(results)}" if market_phase() != "live" else "not logged (market open)"
+    results.sort(key=lambda s: (len(s.buys), s.combined), reverse=True)
 
     table = Table(title=f"Scan: {len(results)} stocks, as of {results[0].as_of}")
-    for col in ["Symbol", "Action", "Combined", "Tech", "Fund", "News", "Close", "Stop", "Target", "Qty"]:
-        table.add_column(col, justify="left" if col in ("Symbol", "Action") else "right")
+    for col in ["Symbol", "Action", "Strategies", "Combined", "Tech", "Fund", "News", "Close", "Stop", "Target", "Qty"]:
+        table.add_column(col, justify="left" if col in ("Symbol", "Action", "Strategies") else "right")
     for s in results[:top]:
-        table.add_row(s.symbol, f"[{COLORS[s.action]}]{s.action}[/]", f"{s.combined:+.2f}",
-                      f"{s.technical:+.2f}", f"{s.fundamental:+.2f}", _score(s.sentiment),
-                      f"{s.close:.2f}", f"{s.stop:.2f}", f"{s.target:.2f}", str(s.shares))
+        # stop/target shown for the first strategy that says BUY (preset order), else the first chosen
+        r = s.strategies[s.buys[0] if s.buys else chosen[0].name]
+        table.add_row(s.symbol, f"[{COLORS[s.action]}]{s.action}[/]", ", ".join(s.buys) or "-",
+                      f"{s.combined:+.2f}", f"{s.technical:+.2f}", f"{s.fundamental:+.2f}", _score(s.sentiment),
+                      f"{s.close:.2f}", f"{r.stop:.2f}", "-" if r.target is None else f"{r.target:.2f}",
+                      str(r.shares))
     print(table)
+    per_strategy = "  ".join(f"{st.name} {sum(st.name in s.buys for s in results)}" for st in chosen)
     counts = {a: sum(s.action == a for s in results) for a in COLORS}
     with_news = sum(s.sentiment is not None for s in results)
-    print(f"BUY {counts['BUY']}  WATCH {counts['WATCH']}  AVOID {counts['AVOID']}  · "
+    print(f"BUY by strategy: {per_strategy}")
+    print(f"Stocks: BUY {counts['BUY']}  WATCH {counts['WATCH']}  AVOID {counts['AVOID']}  · "
           f"news for {with_news}/{len(results)} · {logged}")
     _print_skipped(failed)
 
@@ -117,14 +153,15 @@ def _print_skipped(skipped: list[str], limit: int = 10):
 pct = lambda v: f"{v * 100:.1f}%"
 num = lambda v: f"{v:.2f}"
 
-# Shared backtest options; the default rule matches the BUY gate's technical threshold.
+# Shared backtest options: --strategy picks a preset; the rest override it when given.
+STRATEGY = typer.Option(strategies.DEFAULT, "--strategy", "-s", help=f"One of: {', '.join(PRESETS)}")
 YEARS = typer.Option(10, help="Years of daily history")
-RULE = typer.Option(f"score:{signal.Config().buy_technical}", help="score:<threshold>, pullback or breakout")
-REGIME = typer.Option(False, "--regime", help="Only enter when NIFTY 50 is above its 200-day SMA")
-STOP_ATR = typer.Option(2.0)
-TARGET_ATR = typer.Option(3.0, help="0 = no fixed target")
-TRAIL_ATR = typer.Option(0.0, help="Trailing stop distance in ATR; 0 = off")
-MAX_HOLD = typer.Option(20, help="Max bars in a trade")
+RULE = typer.Option(None, help=f"Override entry rule: score:<threshold>, {', '.join(rules.RULES)}")
+REGIME = typer.Option(None, "--regime/--no-regime", help="Override the NIFTY 50 > SMA200 market filter")
+STOP_ATR = typer.Option(None, help="Override stop distance in ATR")
+TARGET_ATR = typer.Option(None, help="Override target in ATR; 0 = no fixed target")
+TRAIL_ATR = typer.Option(None, help="Override trailing stop in ATR; 0 = off")
+MAX_HOLD = typer.Option(None, help="Override max days in a trade")
 OOS = typer.Option(0.3, help="Fraction of history held out as out-of-sample")
 WATCHLIST = typer.Option("nifty50", help=f"One of: {', '.join(WATCHLISTS)}")
 
@@ -133,6 +170,20 @@ POOLED_ROWS = [("stocks", str), ("trades", str), ("win_rate", pct), ("avg_trade"
                ("exit_target", pct), ("exit_time", pct), ("median_cagr", pct), ("median_buy_hold_cagr", pct),
                ("median_max_dd", pct), ("median_sharpe", num), ("exposure", pct),
                ("profitable_stocks", pct), ("beat_buy_hold", pct)]
+
+
+def _resolve(strategy, rule, regime, stop_atr, target_atr, trail_atr, max_hold) -> Strategy:
+    """The preset with any CLI overrides applied (renamed '<preset>*' if changed)."""
+    try:
+        st = strategies.get(strategy)
+    except ValueError as e:
+        raise typer.BadParameter(str(e))
+    overrides = {k: v for k, v in {"rule": rule, "regime": regime, "stop_atr": stop_atr, "max_hold": max_hold,
+                                   "target_atr": target_atr, "trail_atr": trail_atr}.items() if v is not None}
+    for k in ("target_atr", "trail_atr"):  # 0 means off
+        if overrides.get(k) == 0:
+            overrides[k] = None
+    return replace(st, name=f"{st.name}*", **overrides) if overrides else st
 
 
 def _metric_table(title: str, columns: dict[str, dict], rows: list[tuple]) -> Table:
@@ -145,55 +196,43 @@ def _metric_table(title: str, columns: dict[str, dict], rows: list[tuple]) -> Ta
     return table
 
 
-def _params(stop_atr, target_atr, trail_atr, max_hold) -> engine.Params:
-    return engine.Params(stop_atr=stop_atr, target_atr=target_atr or None,
-                         trail_atr=trail_atr or None, max_hold=max_hold)
-
-
-def _describe(rule, regime, stop_atr, target_atr, trail_atr, max_hold) -> str:
-    parts = [rule, "regime" if regime else "no regime", f"stop {stop_atr} ATR",
-             f"target {target_atr} ATR" if target_atr else "no target"]
-    if trail_atr:
-        parts.append(f"trail {trail_atr} ATR")
-    return ", ".join(parts + [f"max {max_hold} bars"])
-
-
 @app.command()
-def backtest(symbol: str, years: int = YEARS, rule: str = RULE, regime: bool = REGIME,
+def backtest(symbol: str, strategy: str = STRATEGY, years: int = YEARS, rule: str = RULE, regime: bool = REGIME,
              stop_atr: float = STOP_ATR, target_atr: float = TARGET_ATR, trail_atr: float = TRAIL_ATR,
              max_hold: int = MAX_HOLD, oos: float = OOS):
-    """Backtest an entry rule on one stock with Indian delivery costs."""
+    """Backtest a strategy on one stock with Indian delivery costs."""
+    st = _resolve(strategy, rule, regime, stop_atr, target_atr, trail_atr, max_hold)
     symbol = symbol.upper()
     data, skipped = universe.load([symbol], years)
     if not data:
         print(f"[red]{skipped[0]}[/red]")
         raise typer.Exit(1)
-    entries = universe.build_entries(data, rule, universe.regime(years) if regime else None)
-    p = _params(stop_atr, target_atr, trail_atr, max_hold)
+    entries = universe.build_entries(data, st.rule, universe.regime(years) if st.regime else None)
     ind = data[symbol]
-    runs = {seg: engine.run(i, e, p).stats for seg, (i, e) in universe.segments(ind, entries[symbol], oos).items()}
+    runs = {seg: engine.run(i, e, st.params()).stats
+            for seg, (i, e) in universe.segments(ind, entries[symbol], oos).items()}
     rows = [("trades", str), ("win_rate", pct), ("avg_trade_pct", pct), ("total_return", pct),
             ("cagr", pct), ("max_drawdown", pct), ("sharpe", num), ("exposure", pct), ("buy_hold", pct)]
     split = ind.index[int(len(ind) * (1 - oos))]
-    print(_metric_table(f"{symbol}: {_describe(rule, regime, stop_atr, target_atr, trail_atr, max_hold)}\n"
+    print(_metric_table(f"{symbol} · {st.name}: {st.describe()}\n"
                         f"{ind.index[0]:%Y-%m-%d} to {ind.index[-1]:%Y-%m-%d}, split {split:%Y-%m-%d}", runs, rows))
 
 
 @app.command("backtest-all")
-def backtest_all(watchlist: str = WATCHLIST, years: int = YEARS, rule: str = RULE, regime: bool = REGIME,
-                 stop_atr: float = STOP_ATR, target_atr: float = TARGET_ATR, trail_atr: float = TRAIL_ATR,
-                 max_hold: int = MAX_HOLD, oos: float = OOS):
-    """Backtest an entry rule on every stock in a watchlist; per-stock results saved to reports/."""
+def backtest_all(watchlist: str = WATCHLIST, strategy: str = STRATEGY, years: int = YEARS, rule: str = RULE,
+                 regime: bool = REGIME, stop_atr: float = STOP_ATR, target_atr: float = TARGET_ATR,
+                 trail_atr: float = TRAIL_ATR, max_hold: int = MAX_HOLD, oos: float = OOS):
+    """Backtest a strategy on every stock in a watchlist; per-stock results saved to reports/."""
+    st = _resolve(strategy, rule, regime, stop_atr, target_atr, trail_atr, max_hold)
     data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
-    entries = universe.build_entries(data, rule, universe.regime(years) if regime else None)
-    stats, trades = universe.run_universe(data, entries, _params(stop_atr, target_atr, trail_atr, max_hold), oos)
+    entries = universe.build_entries(data, st.rule, universe.regime(years) if st.regime else None)
+    stats, trades = universe.run_universe(data, entries, st.params(), oos)
     if trades.empty:
         print("[red]No trades generated[/red]")
         raise typer.Exit(1)
     path = universe.save(stats, trades, watchlist)
     pooled = {seg: universe.pooled(stats, trades, seg) for seg in universe.SEGMENTS}
-    print(_metric_table(f"{watchlist}: {_describe(rule, regime, stop_atr, target_atr, trail_atr, max_hold)}",
-                        pooled, POOLED_ROWS))
+    print(_metric_table(f"{watchlist} · {st.name}: {st.describe()}", pooled, POOLED_ROWS))
 
     oos_stats = stats[stats.segment == "Out-of-sample"].sort_values("total_return")
     show = lambda d: ", ".join(f"{r.symbol} {r.total_return * 100:+.0f}%" for r in d.itertuples())
@@ -203,33 +242,77 @@ def backtest_all(watchlist: str = WATCHLIST, years: int = YEARS, rule: str = RUL
     _print_skipped(skipped)
 
 
-@app.command("portfolio")
-def portfolio_cmd(watchlist: str = WATCHLIST, years: int = YEARS, rule: str = RULE, regime: bool = REGIME,
-                  stop_atr: float = STOP_ATR, target_atr: float = TARGET_ATR, trail_atr: float = TRAIL_ATR,
-                  max_hold: int = MAX_HOLD, oos: float = OOS,
-                  positions: int = typer.Option(10, help="Max concurrent positions; each gets 1/N of equity")):
-    """Shared-capital portfolio backtest across a watchlist, vs holding NIFTY 50."""
-    data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
-    index = add_indicators(get_prices(universe.INDEX, years))
-    entries = universe.build_entries(data, rule, rules.market_regime(index) if regime else None)
-    p = _params(stop_atr, target_atr, trail_atr, max_hold)
+def _portfolio_runs(data, index, st: Strategy, positions: int, oos: float) -> tuple[dict, list[pd.Series]]:
+    """Portfolio backtest per segment; returns ({segment label: stats}, equity curves)."""
+    entries = universe.build_entries(data, st.rule, rules.market_regime(index) if st.regime else None)
     dates = index.index[index.sma200.notna()]  # start once SMA200 is warm everywhere
     split = int(len(dates) * (1 - oos))
     columns, curves = {}, []
     for seg, d in zip(universe.SEGMENTS, (dates[:split], dates[split:])):
-        eq, invested, trades = portfolio.run(data, entries, d, p, positions)
+        eq, invested, trades = portfolio.run(data, entries, d, st.params(), positions)
         columns[f"{seg} ({d[0]:%Y-%m} to {d[-1]:%Y-%m})"] = portfolio.stats(
             eq, invested, trades, index.Close, portfolio.equal_weight(data, d))
-        curves.append(eq.rename(seg))
+        curves.append(eq.rename(f"{st.name} {seg}"))
+    return columns, curves
+
+
+POSITIONS = typer.Option(10, help="Max concurrent positions; each gets 1/N of equity")
+
+
+@app.command("portfolio")
+def portfolio_cmd(watchlist: str = WATCHLIST, strategy: str = STRATEGY, years: int = YEARS, rule: str = RULE,
+                  regime: bool = REGIME, stop_atr: float = STOP_ATR, target_atr: float = TARGET_ATR,
+                  trail_atr: float = TRAIL_ATR, max_hold: int = MAX_HOLD, oos: float = OOS,
+                  positions: int = POSITIONS):
+    """Shared-capital portfolio backtest of a strategy, vs NIFTY 50 and an equal-weight hold of the watchlist."""
+    st = _resolve(strategy, rule, regime, stop_atr, target_atr, trail_atr, max_hold)
+    data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
+    index = add_indicators(get_prices(universe.INDEX, years))
+    columns, curves = _portfolio_runs(data, index, st, positions, oos)
     rows = [("cagr", pct), ("nifty_cagr", pct), ("universe_cagr", pct), ("excess_cagr", pct),
             ("excess_vs_universe", pct), ("max_drawdown", pct), ("nifty_max_drawdown", pct),
             ("universe_max_drawdown", pct), ("sharpe", num), ("nifty_sharpe", num), ("exposure", pct),
             ("trades", str), ("trades_per_year", lambda v: f"{v:.0f}"), ("win_rate", pct),
             ("avg_trade", pct), ("profit_factor", num), ("avg_bars", lambda v: f"{v:.1f}")]
-    print(_metric_table(f"{watchlist} portfolio, {positions} slots: "
-                        f"{_describe(rule, regime, stop_atr, target_atr, trail_atr, max_hold)}", columns, rows))
+    print(_metric_table(f"{watchlist} portfolio, {positions} slots · {st.name}: {st.describe()}", columns, rows))
     universe.REPORTS.mkdir(exist_ok=True)
-    path = universe.REPORTS / f"portfolio_{watchlist}_{date.today()}.csv"
+    path = universe.REPORTS / f"portfolio_{watchlist}_{st.name.rstrip('*')}_{date.today()}.csv"
+    pd.concat(curves, axis=1).to_csv(path)
+    print(f"Equity curves saved to {path}")
+    _print_skipped(skipped)
+
+
+@app.command()
+def compare(watchlist: str = WATCHLIST, strategy: str = typer.Option("all", "--strategy", "-s",
+                                                                     help="'all' or comma-separated preset names"),
+            years: int = YEARS, oos: float = OOS, positions: int = POSITIONS):
+    """Portfolio backtest of several strategies side by side, with both benchmarks."""
+    chosen = _strategy_list(strategy)
+    data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
+    index = add_indicators(get_prices(universe.INDEX, years))
+    runs, curves = {}, []
+    for st in track(chosen, description="Backtesting strategies"):
+        runs[st.name], c = _portfolio_runs(data, index, st, positions, oos)
+        curves += c
+
+    is_label, oos_label = list(next(iter(runs.values())))
+    table = Table(title=f"{watchlist}: strategy comparison, {positions} slots. Out-of-sample = {oos_label}")
+    for col in ["Strategy", "IS CAGR", "OOS CAGR", "OOS vs EW hold", "OOS max DD", "OOS Sharpe",
+                "OOS PF", "OOS trades/yr", "OOS win"]:
+        table.add_column(col, justify="left" if col == "Strategy" else "right")
+    for name, cols in runs.items():
+        i, o = cols[is_label], cols[oos_label]
+        table.add_row(name, pct(i["cagr"]), pct(o["cagr"]), pct(o["excess_vs_universe"]), pct(o["max_drawdown"]),
+                      num(o["sharpe"]), num(o["profit_factor"]), f"{o['trades_per_year']:.0f}", pct(o["win_rate"]))
+    any_run = next(iter(runs.values()))
+    i, o = any_run[is_label], any_run[oos_label]
+    table.add_row("NIFTY 50 index", pct(i["nifty_cagr"]), pct(o["nifty_cagr"]), "", pct(o["nifty_max_drawdown"]),
+                  num(o["nifty_sharpe"]), "", "", "", style="dim")
+    table.add_row(f"Equal-weight {watchlist}", pct(i["universe_cagr"]), pct(o["universe_cagr"]), "",
+                  pct(o["universe_max_drawdown"]), "", "", "", "", style="dim")
+    print(table)
+    universe.REPORTS.mkdir(exist_ok=True)
+    path = universe.REPORTS / f"compare_{watchlist}_{date.today()}.csv"
     pd.concat(curves, axis=1).to_csv(path)
     print(f"Equity curves saved to {path}")
     _print_skipped(skipped)

@@ -17,7 +17,8 @@ Target hardware is an M1 with 8GB RAM, so only small local models work: FinBERT 
 - Watchlists are committed CSV snapshots in `src/aistock/data/watchlists/`; refresh with `uv run aistock update-watchlists`
 - Prices are batch-downloaded via `prices.prefetch` (`yf.download`) before per-symbol `get_prices` reads; fundamentals have a 7-day cache
 - Daily scan also runs on GitHub Actions (`.github/workflows/daily-scan.yml`, 11:00 UTC weekdays) and commits the journal, so `git pull` before local scans. Linux uses CPU-only torch via `[tool.uv.sources]` in `pyproject.toml`.
-- Backtests: `uv run aistock backtest <SYMBOL>`, `uv run aistock backtest-all`, `uv run aistock sweep`, `uv run aistock portfolio` (all take `--rule score:0.4|pullback|breakout`, `--regime`, ATR exit options; outputs CSVs to `reports/`)
+- Strategies: presets live in `strategy/strategies.py` (`uv run aistock strategies`); `uv run aistock compare` backtests all presets side by side
+- Backtests: `uv run aistock backtest <SYMBOL>`, `backtest-all`, `portfolio` take `--strategy <preset>`; `--rule/--regime/--stop-atr/...` override the preset. `sweep` grid-searches rules independently of presets (all take `--rule score:0.4|pullback|breakout`, `--regime`, ATR exit options; outputs CSVs to `reports/`)
 - Ollama (installed via Homebrew): `brew services start ollama`, then `ollama pull qwen2.5:3b`
 
 There are no tests or linters configured yet.
@@ -26,11 +27,13 @@ There are no tests or linters configured yet.
 
 Package `src/aistock/` (uv `--package` layout; the console script `aistock` maps to `aistock.cli:app`, a Typer app):
 
-- `data/`: data fetching. `prices.get_prices` pulls yfinance daily OHLCV, strips the timezone, and caches to `.cache/prices/<SYMBOL>_<date>.parquet` (one file per day, so data refreshes daily).
-- `technical/`: `add_indicators` adds columns to the OHLCV frame. `technical_score` returns `(score in [-1, 1], reasons)` for the latest bar.
-- `cli.py`: commands compose the modules. ATR-based stop (2×ATR) and target (3×ATR) are computed here.
+- `data/`: yfinance prices, cached in `.cache/prices/` per IST date and market phase (`pre`/`live`/`close`), so intraday partial bars are never reused after the close. Also fundamentals, Google News headlines, and watchlist CSVs.
+- `technical/`: `add_indicators` adds indicator columns. `score_series`/`technical_score` give a per-bar or latest technical score. `rules.py` holds entry rules: bool Series, True = enter at the next bar's open.
+- `fundamental/`, `sentiment/`: each returns `(score in [-1, 1], reasons)`; sentiment runs FinBERT.
+- `strategy/`: `strategies.PRESETS` (rule + market filter + exits + live gates). `signal.evaluate` scores a stock once and gives each preset a BUY/WATCH verdict. `journal` keeps one row per (session date, symbol), keyed by the last bar's date, with a union of columns as the schema evolves.
+- `backtest/`: `engine.run` (single stock) and `portfolio.run` (shared capital, N slots: entries at the open use only yesterday's cash, then intraday exits). Both use the same exit rules and `costs.CostModel`. `universe` loads data and splits in-sample/out-of-sample; `sweep` grid-searches.
 
-Planned modules follow the same pattern: each analysis area (`fundamental/`, `sentiment/`) exposes a score in [-1, 1] plus human-readable reasons, `strategy/` merges them, `backtest/` validates rules including Indian costs (brokerage, STT, slippage), and `llm/` + `report/` write the output, with a Streamlit `app/` after the CLI.
+Only rules, market filter and exits are backtestable; fundamentals and news have no free history. Portfolio results are judged against an equal-weight hold of the same watchlist, because today's constituents carry survivorship bias.
 
 ## Design rules
 

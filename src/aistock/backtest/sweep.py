@@ -14,7 +14,7 @@ import pandas as pd
 from aistock.backtest import engine, universe
 
 GRID = {
-    "rule": ["score:0.4", "score:0.6", "pullback", "breakout"],
+    "rule": ["score:0.4", "score:0.6", "pullback", "breakout", "ema_cross"],
     "regime": [False, True],
     "stop_atr": [1.5, 2.0, 3.0],
     "target_atr": [2.0, 3.0, 5.0, None],

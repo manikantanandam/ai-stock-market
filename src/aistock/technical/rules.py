@@ -24,12 +24,21 @@ def breakout(ind: pd.DataFrame) -> pd.Series:
     return (ind.Close > prior_high) & (ind.sma50 > ind.sma200) & (ind.Volume > 1.5 * ind.vol_avg20)
 
 
+def ema_cross(ind: pd.DataFrame) -> pd.Series:
+    """EMA100 crosses above EMA200 on this bar (a slow 'golden cross')."""
+    above = ind.ema100 > ind.ema200
+    return above & ~above.shift(1, fill_value=True)
+
+
+RULES = {"pullback": pullback, "breakout": breakout, "ema_cross": ema_cross}
+
+
 def build(name: str) -> Rule:
-    """'score:0.4' (technical score >= 0.4), 'pullback' or 'breakout'."""
+    """'score:0.4' (technical score >= 0.4) or a name in RULES."""
     if name.startswith("score:"):
         threshold = float(name.split(":", 1)[1])
         return lambda ind: score_series(ind) >= threshold
-    return {"pullback": pullback, "breakout": breakout}[name]
+    return RULES[name]
 
 
 def market_regime(index_ind: pd.DataFrame) -> pd.Series:

@@ -8,6 +8,8 @@ def add_indicators(df: pd.DataFrame) -> pd.DataFrame:
     out["sma20"] = ta.sma(out.Close, 20)
     out["sma50"] = ta.sma(out.Close, 50)
     out["sma200"] = ta.sma(out.Close, 200)
+    out["ema100"] = ta.ema(out.Close, 100)
+    out["ema200"] = ta.ema(out.Close, 200)
     out["rsi14"] = ta.rsi(out.Close, 14)
     macd = ta.macd(out.Close)
     out["macd_hist"] = macd.iloc[:, 1]

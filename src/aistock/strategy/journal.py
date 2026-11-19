@@ -17,13 +17,17 @@ def record(signals: list[Signal]) -> Path:
     JOURNAL.parent.mkdir(parents=True, exist_ok=True)
     rows = [{"date": s.as_of, **s.row()} for s in signals]
     new_keys = {(r["date"], r["symbol"]) for r in rows}
+    old, fields = [], []
     if JOURNAL.exists():  # one row per symbol per session: a re-run replaces it
         with JOURNAL.open() as fh:
-            old = [r for r in csv.DictReader(fh) if (r["date"], r["symbol"]) not in new_keys]
-    else:
-        old = []
+            reader = csv.DictReader(fh)
+            fields = list(reader.fieldnames or [])
+            old = [r for r in reader if (r["date"], r["symbol"]) not in new_keys]
+    # Columns change as the signal evolves; keep the union so old rows stay
+    # intact and missing values are left blank
+    fields += [k for k in rows[0] if k not in fields]
     with JOURNAL.open("w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
+        w = csv.DictWriter(fh, fieldnames=fields, restval="")
         w.writeheader()
         w.writerows(old + rows)
     return JOURNAL
