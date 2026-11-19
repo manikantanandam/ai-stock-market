@@ -1,12 +1,17 @@
+from datetime import date
+
 import pandas as pd
 import typer
 from rich import print
 from rich.progress import track
 from rich.table import Table
 
-from aistock.backtest import engine, sweep, universe
+from aistock.backtest import engine, portfolio, sweep, universe
+from aistock.data.prices import get_prices, market_phase
 from aistock.data.watchlists import WATCHLISTS
 from aistock.strategy import journal, signal
+from aistock.technical import rules
+from aistock.technical.indicators import add_indicators
 
 app = typer.Typer(help="Local AI stock assistant (NSE swing trading)", no_args_is_help=True)
 
@@ -62,10 +67,12 @@ def scan(
     if not results:
         print("[red]No symbols could be evaluated[/red]")
         raise typer.Exit(1)
-    path = journal.record(results)
+    # Mid-session bars are partial, so only completed sessions go in the journal
+    phase = market_phase()
+    logged = f"logged to {journal.record(results)}" if phase != "live" else "not logged (market open)"
     results.sort(key=lambda s: s.combined, reverse=True)
 
-    table = Table(title=f"Scan: {len(results)} stocks")
+    table = Table(title=f"Scan: {len(results)} stocks, as of {results[0].as_of}")
     for col in ["Symbol", "Action", "Combined", "Tech", "Fund", "News", "Close", "Stop", "Target", "Qty"]:
         table.add_column(col, justify="left" if col in ("Symbol", "Action") else "right")
     for s in results[:top]:
@@ -74,7 +81,7 @@ def scan(
                       f"{s.close:.2f}", f"{s.stop:.2f}", f"{s.target:.2f}", str(s.shares))
     print(table)
     counts = {a: sum(s.action == a for s in results) for a in COLORS}
-    print(f"BUY {counts['BUY']}  WATCH {counts['WATCH']}  AVOID {counts['AVOID']}  · logged to {path}")
+    print(f"BUY {counts['BUY']}  WATCH {counts['WATCH']}  AVOID {counts['AVOID']}  · {logged}")
     if failed:
         print(f"[yellow]Skipped: {', '.join(failed)}[/yellow]")
 
@@ -165,6 +172,37 @@ def backtest_all(watchlist: str = WATCHLIST, years: int = YEARS, rule: str = RUL
     print(f"OOS best:  {show(oos_stats.tail(5).iloc[::-1])}")
     print(f"OOS worst: {show(oos_stats.head(5))}")
     print(f"Saved per-stock stats and trades next to {path}")
+    if skipped:
+        print(f"[yellow]Skipped: {', '.join(skipped)}[/yellow]")
+
+
+@app.command("portfolio")
+def portfolio_cmd(watchlist: str = WATCHLIST, years: int = YEARS, rule: str = RULE, regime: bool = REGIME,
+                  stop_atr: float = STOP_ATR, target_atr: float = TARGET_ATR, trail_atr: float = TRAIL_ATR,
+                  max_hold: int = MAX_HOLD, oos: float = OOS,
+                  positions: int = typer.Option(10, help="Max concurrent positions; each gets 1/N of equity")):
+    """Shared-capital portfolio backtest across a watchlist, vs holding NIFTY 50."""
+    data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
+    index = add_indicators(get_prices(universe.INDEX, years))
+    entries = universe.build_entries(data, rule, rules.market_regime(index) if regime else None)
+    p = _params(stop_atr, target_atr, trail_atr, max_hold)
+    dates = index.index[index.sma200.notna()]  # start once SMA200 is warm everywhere
+    split = int(len(dates) * (1 - oos))
+    columns, curves = {}, []
+    for seg, d in zip(universe.SEGMENTS, (dates[:split], dates[split:])):
+        eq, invested, trades = portfolio.run(data, entries, d, p, positions)
+        columns[f"{seg} ({d[0]:%Y-%m} to {d[-1]:%Y-%m})"] = portfolio.stats(eq, invested, trades, index.Close)
+        curves.append(eq.rename(seg))
+    rows = [("cagr", pct), ("nifty_cagr", pct), ("excess_cagr", pct), ("max_drawdown", pct),
+            ("nifty_max_drawdown", pct), ("sharpe", num), ("nifty_sharpe", num), ("exposure", pct),
+            ("trades", str), ("trades_per_year", lambda v: f"{v:.0f}"), ("win_rate", pct),
+            ("avg_trade", pct), ("profit_factor", num), ("avg_bars", lambda v: f"{v:.1f}")]
+    print(_metric_table(f"{watchlist} portfolio, {positions} slots: "
+                        f"{_describe(rule, regime, stop_atr, target_atr, trail_atr, max_hold)}", columns, rows))
+    universe.REPORTS.mkdir(exist_ok=True)
+    path = universe.REPORTS / f"portfolio_{watchlist}_{date.today()}.csv"
+    pd.concat(curves, axis=1).to_csv(path)
+    print(f"Equity curves saved to {path}")
     if skipped:
         print(f"[yellow]Skipped: {', '.join(skipped)}[/yellow]")
 

@@ -1,0 +1,139 @@
+"""Portfolio backtest: one pool of capital shared across a watchlist.
+
+Each day, yesterday's entry signals are filled at today's open into the slots
+free at yesterday's close; then positions opened earlier are checked for
+exits on today's bar (same rules as engine.run: stop, target, trailing stop,
+max hold, gap-aware fills). Cash from an intraday exit is only reusable the
+next day, matching the single-stock engine. Each
+new position gets 1/max_positions of current equity. When more stocks signal
+than there are free slots, the highest technical score wins, with 126-day
+momentum as the tie-break.
+
+Benchmark: NIFTY 50 price index (^NSEI), which excludes dividends (~1-1.5%/yr),
+so it slightly understates buy-and-hold.
+"""
+from dataclasses import dataclass
+
+import numpy as np
+import pandas as pd
+
+from aistock.backtest.engine import Params
+from aistock.technical.indicators import score_series
+
+
+@dataclass
+class Position:
+    sym: str
+    shares: int
+    entry_i: int
+    entry_px: float
+    cost_basis: float  # cash spent including buy costs
+    stop: float
+    target: float
+    atr: float
+    highest: float
+
+
+def _panel(data: dict[str, pd.DataFrame], dates: pd.DatetimeIndex, col: str) -> np.ndarray:
+    return np.column_stack([data[s][col].reindex(dates).to_numpy(dtype=float) for s in data])
+
+
+def run(data: dict[str, pd.DataFrame], entries: dict[str, pd.Series], dates: pd.DatetimeIndex,
+        p: Params, max_positions: int) -> tuple[pd.Series, pd.Series, pd.DataFrame]:
+    """Returns (daily equity, fraction of equity invested, trades).
+    `dates` is the trading calendar (e.g. the index's)."""
+    syms = list(data)
+    o, h, l, c, atr = (_panel(data, dates, k) for k in ("Open", "High", "Low", "Close", "atr14"))
+    ent = np.column_stack([entries[s].astype(bool).reindex(dates, fill_value=False).to_numpy() for s in syms])
+    score = np.column_stack([score_series(data[s]).reindex(dates).to_numpy(dtype=float) for s in syms])
+    mom = np.column_stack([data[s].Close.pct_change(126, fill_method=None).reindex(dates).to_numpy(dtype=float)
+                           for s in syms])
+    last_close = pd.DataFrame(c).ffill().to_numpy()
+
+    cash, positions, trades, equity, invested = p.capital, {}, [], [], []
+
+    def close(j: int, i: int, px: float, reason: str):
+        nonlocal cash
+        pos = positions.pop(j)
+        fill = px * (1 - p.costs.slippage)
+        proceeds = pos.shares * fill - p.costs.sell_cost(pos.shares * fill)
+        cash += proceeds
+        trades.append({"symbol": pos.sym, "entry_date": dates[pos.entry_i], "exit_date": dates[i],
+                       "entry": pos.entry_px, "exit": fill, "bars": i - pos.entry_i + 1, "reason": reason,
+                       "pnl": proceeds - pos.cost_basis, "ret": proceeds / pos.cost_basis - 1})
+
+    for i in range(len(dates)):
+        # 1. entries at today's open from yesterday's signals, using only the
+        #    slots and cash available before today's exits (those happen intraday)
+        free = max_positions - len(positions)
+        if i > 0 and free > 0:
+            cand = [j for j in np.flatnonzero(ent[i - 1])
+                    if j not in positions and not np.isnan(o[i, j]) and not np.isnan(atr[i - 1, j])]
+            cand.sort(key=lambda j: (score[i - 1, j], np.nan_to_num(mom[i - 1, j], nan=-1)), reverse=True)
+            mark = cash + sum(pos.shares * last_close[i - 1, j] for j, pos in positions.items())
+            for j in cand[:free]:
+                px = o[i, j] * (1 + p.costs.slippage)
+                budget = min(mark / max_positions, cash)
+                n = int(budget / (px * (1 + 0.0012)))  # leave room for buy costs
+                if n <= 0:
+                    continue
+                cost = n * px + p.costs.buy_cost(n * px)
+                cash -= cost
+                stop = px - p.stop_atr * atr[i - 1, j]
+                target = px + p.target_atr * atr[i - 1, j] if p.target_atr else np.inf
+                positions[j] = Position(syms[j], n, i, px, cost, stop, target, atr[i - 1, j], h[i, j])
+                if l[i, j] <= stop:  # stopped out on the entry bar
+                    close(j, i, stop, "stop")
+
+        # 2. exits on today's bar for positions opened before today
+        for j in [j for j, pos in positions.items() if pos.entry_i < i]:
+            if np.isnan(o[i, j]):
+                continue  # no bar today (suspension)
+            pos = positions[j]
+            if l[i, j] <= pos.stop:
+                close(j, i, min(o[i, j], pos.stop), "stop")
+            elif h[i, j] >= pos.target:
+                close(j, i, max(o[i, j], pos.target), "target")
+            elif i - pos.entry_i + 1 >= p.max_hold:
+                close(j, i, c[i, j], "time")
+            elif p.trail_atr:
+                pos.highest = max(pos.highest, h[i, j])
+                pos.stop = max(pos.stop, pos.highest - p.trail_atr * pos.atr)
+
+        held = sum(pos.shares * last_close[i, j] for j, pos in positions.items())
+        equity.append(cash + held)
+        invested.append(held / (cash + held))
+
+    for j in list(positions):  # liquidate at the end
+        close(j, len(dates) - 1, last_close[-1, j], "end")
+    equity[-1] = cash
+    return pd.Series(equity, index=dates), pd.Series(invested, index=dates), pd.DataFrame(trades)
+
+
+def stats(eq: pd.Series, invested: pd.Series, trades: pd.DataFrame, bench: pd.Series) -> dict:
+    """Strategy vs benchmark over the same dates."""
+    def curve(s: pd.Series) -> dict:
+        years = max((s.index[-1] - s.index[0]).days / 365.25, 1e-9)
+        daily = s.pct_change().dropna()
+        return {"cagr": (s.iloc[-1] / s.iloc[0]) ** (1 / years) - 1,
+                "max_drawdown": float((s / s.cummax() - 1).min()),
+                "sharpe": float(daily.mean() / daily.std() * np.sqrt(252)) if daily.std() > 0 else 0.0}
+
+    s, b = curve(eq), curve(bench.reindex(eq.index).ffill())
+    n = len(trades)
+    wins, losses = (trades.ret[trades.ret > 0].sum(), -trades.ret[trades.ret <= 0].sum()) if n else (0, 0)
+    return {
+        **s,
+        "total_return": eq.iloc[-1] / eq.iloc[0] - 1,
+        "trades": n,
+        "trades_per_year": n / max((eq.index[-1] - eq.index[0]).days / 365.25, 1e-9),
+        "win_rate": float((trades.ret > 0).mean()) if n else 0.0,
+        "avg_trade": float(trades.ret.mean()) if n else 0.0,
+        "profit_factor": wins / losses if losses else float("inf"),
+        "avg_bars": float(trades.bars.mean()) if n else 0.0,
+        "exposure": float(invested.mean()),
+        "nifty_cagr": b["cagr"],
+        "nifty_max_drawdown": b["max_drawdown"],
+        "nifty_sharpe": b["sharpe"],
+        "excess_cagr": s["cagr"] - b["cagr"],
+    }

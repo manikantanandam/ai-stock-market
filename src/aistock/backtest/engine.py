@@ -85,7 +85,7 @@ def run(ind: pd.DataFrame, entries: pd.Series, p: Params = Params()) -> Result:
 
 def _stats(eq: pd.Series, tr: pd.DataFrame, close: np.ndarray, capital: float) -> dict:
     years = max((eq.index[-1] - eq.index[0]).days / 365.25, 1e-9)
-    daily = eq.pct_change().dropna()
+    daily = eq.pct_change(fill_method=None).dropna()
     n = len(tr)
     return {
         "trades": n,

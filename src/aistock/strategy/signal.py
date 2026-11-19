@@ -45,11 +45,13 @@ class Signal:
     target: float
     shares: int
     reasons: dict[str, list[str]] = field(default_factory=dict)
+    as_of: str = ""  # date of the price bar the signal is based on
 
     def row(self) -> dict:
-        """Flat dict for the journal / tables (no reasons)."""
+        """Flat dict for the journal / tables (no reasons or as_of)."""
         d = asdict(self)
         d.pop("reasons")
+        d.pop("as_of")
         return d
 
 
@@ -90,4 +92,5 @@ def evaluate(symbol: str, c: Config = Config(), use_news: bool = True) -> Signal
         round(combined, 3), round(t_score, 3), round(f_score, 3), round(s_score, 3),
         round(float(last.Close), 2), round(float(stop), 2), round(float(target), 2), shares,
         {"technical": t_why, "fundamental": f_why, "sentiment": s_why, "decision": d_why},
+        as_of=f"{last.name:%Y-%m-%d}",
     )

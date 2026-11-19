@@ -14,7 +14,8 @@ Target hardware is an M1 with 8GB RAM, so only small local models work: FinBERT 
 - Add a dependency: `uv add <pkg>`
 - Run the CLI: `uv run aistock analyze <SYMBOL>` (bare NSE symbol, e.g. `INFY`; `.NS` is appended internally; `^`-prefixed index tickers like `^NSEI` are passed through)
 - Daily watchlist scan (appends to `journal/signals.csv`): `uv run aistock scan [--no-news]`
-- Backtests: `uv run aistock backtest <SYMBOL>`, `uv run aistock backtest-all`, `uv run aistock sweep` (all take `--rule score:0.4|pullback|breakout`, `--regime`, ATR exit options; outputs CSVs to `reports/`)
+- Daily scan also runs on GitHub Actions (`.github/workflows/daily-scan.yml`, 11:00 UTC weekdays) and commits the journal, so `git pull` before local scans. Linux uses CPU-only torch via `[tool.uv.sources]` in `pyproject.toml`.
+- Backtests: `uv run aistock backtest <SYMBOL>`, `uv run aistock backtest-all`, `uv run aistock sweep`, `uv run aistock portfolio` (all take `--rule score:0.4|pullback|breakout`, `--regime`, ATR exit options; outputs CSVs to `reports/`)
 - Ollama (installed via Homebrew): `brew services start ollama`, then `ollama pull qwen2.5:3b`
 
 There are no tests or linters configured yet.

@@ -26,3 +26,13 @@ aistock = "aistock.cli:app"
 [build-system]
 requires = ["uv_build>=0.13.9,<0.14.0"]
 build-backend = "uv_build"
+
+# CI runs on Linux: use CPU-only torch there (the default wheel pulls ~3GB of CUDA libs).
+# macOS keeps the regular PyPI wheel.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

@@ -19,7 +19,7 @@ GRID = {
     "stop_atr": [1.5, 2.0, 3.0],
     "target_atr": [2.0, 3.0, 5.0, None],
     "trail_atr": [None, 3.0],
-    "max_hold": [20, 40],
+    "max_hold": [20, 40, 60, 90],
 }
 BASELINE = {"rule": "score:0.4", "regime": False, "stop_atr": 2.0,
             "target_atr": 3.0, "trail_atr": None, "max_hold": 20}

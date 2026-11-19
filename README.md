@@ -34,7 +34,12 @@ uv run aistock backtest-all --rule breakout --regime --stop-atr 3 --target-atr 0
 
 # Grid search over rules, market filter and exits
 uv run aistock sweep --rank-by profit_factor --top 10
+
+# Shared-capital portfolio (N slots) vs holding NIFTY 50
+uv run aistock portfolio --stop-atr 3 --target-atr 0 --max-hold 90 --positions 10
 ```
+
+**Daily scan on GitHub Actions:** `.github/workflows/daily-scan.yml` runs `aistock scan` at 16:30 IST on weekdays and commits `journal/signals.csv`. Run `git pull` before running `scan` locally to avoid journal conflicts. You can also trigger it from the Actions tab (`workflow_dispatch`).
 
 Symbols are bare NSE tickers (`INFY`, `M&M`); `.NS` is added internally. Run `uv run aistock <command> --help` for all options.
 
@@ -78,6 +83,8 @@ NIFTY 50, 10 years of daily data. Out-of-sample = the last 30% (~3 years):
 | Best sweep family (3 ATR stop, no target, 40 bars, market filter) | 442 | 1.61 | +1.8% | 1.3% | 11.7% |
 
 Wider stops and longer holds clearly help per trade, and the edge survives out-of-sample. Each stock is only invested ~35% of the time, though, so per-stock returns still trail buy-and-hold. Results are optimistic because the watchlist uses today's index constituents (survivorship bias).
+
+**Portfolio test** (shared capital, 10 slots, 3 ATR stop, no target, 90 bars): 21.3% CAGR vs NIFTY's 13.0% in-sample (2017–2024), but **-1.4% vs +5.4% out-of-sample** (2024–2026). The edge doesn't hold up on unseen data, so the live signal still uses the original exits.
 
 ## Roadmap
 
