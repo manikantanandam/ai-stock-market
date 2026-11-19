@@ -39,7 +39,7 @@ class Signal:
     combined: float
     technical: float
     fundamental: float
-    sentiment: float
+    sentiment: float | None  # None when news was not fetched
     close: float
     stop: float
     target: float
@@ -55,7 +55,14 @@ class Signal:
         return d
 
 
-def decide(t: float, f: float, s: float, c: Config) -> tuple[float, str, list[str]]:
+def could_buy(t: float, f: float, c: Config) -> bool:
+    """Whether the best possible sentiment (+1) could still make this a BUY."""
+    return t >= c.buy_technical and c.w_technical * t + c.w_fundamental * f + c.w_sentiment >= c.buy_combined
+
+
+def decide(t: float, f: float, s: float | None, c: Config) -> tuple[float, str, list[str]]:
+    """Missing sentiment counts as neutral (0) and cannot veto."""
+    s = 0.0 if s is None else s
     combined = c.w_technical * t + c.w_fundamental * f + c.w_sentiment * s
     if combined >= c.buy_combined and t >= c.buy_technical and s > c.veto_sentiment:
         return combined, "BUY", ["all gates passed"]
@@ -71,16 +78,25 @@ def decide(t: float, f: float, s: float, c: Config) -> tuple[float, str, list[st
     return combined, "WATCH", why
 
 
-def evaluate(symbol: str, c: Config = Config(), use_news: bool = True) -> Signal:
+NEWS_MODES = ("all", "candidates", "none")
+MIN_HISTORY = 201
+
+
+def evaluate(symbol: str, c: Config = Config(), news: str = "all") -> Signal:
+    """news: 'all' fetches headlines for every stock, 'candidates' only where
+    sentiment could still change the outcome to BUY (keeps large scans fast and
+    under Google News rate limits), 'none' skips news."""
     symbol = symbol.upper()
     df = get_prices(symbol)
+    if len(df) < MIN_HISTORY:  # SMA200 needs 200 sessions; recent listings can't be scored
+        raise ValueError(f"only {len(df)} sessions of history, need {MIN_HISTORY}")
     f = get_fundamentals(symbol)
     t_score, t_why = technical_score(df)
     f_score, f_why = fundamental_score(f)
-    if use_news:
+    if news == "all" or (news == "candidates" and could_buy(t_score, f_score, c)):
         s_score, s_why = sentiment_score(get_news(symbol, f.get("longName")))
     else:
-        s_score, s_why = 0.0, ["skipped"]
+        s_score, s_why = None, ["not fetched" + (" (cannot reach BUY)" if news == "candidates" else "")]
     combined, action, d_why = decide(t_score, f_score, s_score, c)
 
     last = add_indicators(df).iloc[-1]
@@ -89,7 +105,7 @@ def evaluate(symbol: str, c: Config = Config(), use_news: bool = True) -> Signal
     shares = min(int(c.capital * c.risk_per_trade / (last.Close - stop)), int(c.capital / last.Close))
     return Signal(
         symbol, f.get("longName") or symbol, f.get("sector") or "n/a", action,
-        round(combined, 3), round(t_score, 3), round(f_score, 3), round(s_score, 3),
+        round(combined, 3), round(t_score, 3), round(f_score, 3), None if s_score is None else round(s_score, 3),
         round(float(last.Close), 2), round(float(stop), 2), round(float(target), 2), shares,
         {"technical": t_why, "fundamental": f_why, "sentiment": s_why, "decision": d_why},
         as_of=f"{last.name:%Y-%m-%d}",

@@ -11,7 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 from aistock.backtest import engine
-from aistock.data.prices import get_prices
+from aistock.data.prices import get_prices, prefetch
 from aistock.technical import rules
 from aistock.technical.indicators import add_indicators
 
@@ -23,6 +23,7 @@ SEGMENTS = ("In-sample", "Out-of-sample")
 
 def load(symbols: list[str], years: int, progress=iter) -> tuple[dict[str, pd.DataFrame], list[str]]:
     """Indicator frames per symbol, skipping ones that fail or are too short."""
+    prefetch(symbols, years)
     data, skipped = {}, []
     for sym in progress(symbols):
         try:

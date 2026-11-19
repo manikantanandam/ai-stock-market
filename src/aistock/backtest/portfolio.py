@@ -110,8 +110,9 @@ def run(data: dict[str, pd.DataFrame], entries: dict[str, pd.Series], dates: pd.
     return pd.Series(equity, index=dates), pd.Series(invested, index=dates), pd.DataFrame(trades)
 
 
-def stats(eq: pd.Series, invested: pd.Series, trades: pd.DataFrame, bench: pd.Series) -> dict:
-    """Strategy vs benchmark over the same dates."""
+def stats(eq: pd.Series, invested: pd.Series, trades: pd.DataFrame, bench: pd.Series,
+          universe: pd.Series) -> dict:
+    """Strategy vs the index (bench) and equal-weight watchlist (universe) over the same dates."""
     def curve(s: pd.Series) -> dict:
         years = max((s.index[-1] - s.index[0]).days / 365.25, 1e-9)
         daily = s.pct_change().dropna()
@@ -119,7 +120,7 @@ def stats(eq: pd.Series, invested: pd.Series, trades: pd.DataFrame, bench: pd.Se
                 "max_drawdown": float((s / s.cummax() - 1).min()),
                 "sharpe": float(daily.mean() / daily.std() * np.sqrt(252)) if daily.std() > 0 else 0.0}
 
-    s, b = curve(eq), curve(bench.reindex(eq.index).ffill())
+    s, b, u = curve(eq), curve(bench.reindex(eq.index).ffill()), curve(universe.reindex(eq.index).ffill())
     n = len(trades)
     wins, losses = (trades.ret[trades.ret > 0].sum(), -trades.ret[trades.ret <= 0].sum()) if n else (0, 0)
     return {
@@ -136,4 +137,15 @@ def stats(eq: pd.Series, invested: pd.Series, trades: pd.DataFrame, bench: pd.Se
         "nifty_max_drawdown": b["max_drawdown"],
         "nifty_sharpe": b["sharpe"],
         "excess_cagr": s["cagr"] - b["cagr"],
+        "universe_cagr": u["cagr"],
+        "universe_max_drawdown": u["max_drawdown"],
+        "excess_vs_universe": s["cagr"] - u["cagr"],
     }
+
+
+def equal_weight(data: dict[str, pd.DataFrame], dates: pd.DatetimeIndex) -> pd.Series:
+    """Daily-rebalanced equal-weight buy-and-hold of the watchlist (no costs).
+    It shares the strategy's survivorship bias, so beating it is the fairer test."""
+    close = pd.DataFrame({s: d.Close for s, d in data.items()}).reindex(dates)
+    daily = close.pct_change(fill_method=None).mean(axis=1).fillna(0.0)
+    return (1 + daily).cumprod()

@@ -7,6 +7,7 @@ from rich.progress import track
 from rich.table import Table
 
 from aistock.backtest import engine, portfolio, sweep, universe
+from aistock.data import fundamentals, prices, watchlists
 from aistock.data.prices import get_prices, market_phase
 from aistock.data.watchlists import WATCHLISTS
 from aistock.strategy import journal, signal
@@ -31,12 +32,12 @@ def analyze(
     no_news: bool = typer.Option(False, "--no-news", help="Skip news/FinBERT"),
 ):
     """Combined technical + fundamental + news signal for one stock."""
-    s = signal.evaluate(symbol, signal.Config(capital=capital), use_news=not no_news)
+    s = signal.evaluate(symbol, signal.Config(capital=capital), news="none" if no_news else "all")
     color = COLORS[s.action]
     print(f"[bold]{s.symbol}[/bold] {s.name} ({s.sector})  close {s.close:.2f}")
     print(f"[bold {color}]{s.action}[/]  combined {s.combined:+.2f}")
     for part, value in [("technical", s.technical), ("fundamental", s.fundamental), ("sentiment", s.sentiment)]:
-        print(f"\n[bold]{part.capitalize()}[/bold] {value:+.2f}")
+        print(f"\n[bold]{part.capitalize()}[/bold] {_score(value)}")
         for w in s.reasons[part]:
             print(f" - {w}")
     print("\n[bold]Decision[/bold]")
@@ -53,15 +54,23 @@ def scan(
     watchlist: str = typer.Option("nifty50", help=f"One of: {', '.join(WATCHLISTS)}"),
     symbols: str = typer.Option("", help="Comma-separated symbols instead of a watchlist"),
     capital: float = typer.Option(100_000),
-    no_news: bool = typer.Option(False, "--no-news", help="Skip news/FinBERT (faster)"),
+    news: str = typer.Option("auto", help="all, candidates (only stocks that could reach BUY), none; "
+                                          "auto = all for <= 60 stocks, else candidates"),
     top: int = typer.Option(15, help="Rows to show"),
 ):
     """Rank a watchlist by combined score and log the signals to journal/signals.csv."""
     names = [x.strip().upper() for x in symbols.split(",") if x.strip()] or WATCHLISTS[watchlist]
+    if news == "auto":
+        news = "all" if len(names) <= 60 else "candidates"
+    if news not in signal.NEWS_MODES:
+        raise typer.BadParameter(f"news must be auto or one of {signal.NEWS_MODES}")
+    print(f"Downloading prices and fundamentals for {len(names)} stocks...")
+    prices.prefetch(names, years=2)
+    fundamentals.prefetch(names)
     cfg, results, failed = signal.Config(capital=capital), [], []
     for sym in track(names, description="Scanning"):
         try:
-            results.append(signal.evaluate(sym, cfg, use_news=not no_news))
+            results.append(signal.evaluate(sym, cfg, news=news))
         except Exception as e:  # one bad ticker shouldn't stop the scan
             failed.append(f"{sym} ({e})")
     if not results:
@@ -77,13 +86,32 @@ def scan(
         table.add_column(col, justify="left" if col in ("Symbol", "Action") else "right")
     for s in results[:top]:
         table.add_row(s.symbol, f"[{COLORS[s.action]}]{s.action}[/]", f"{s.combined:+.2f}",
-                      f"{s.technical:+.2f}", f"{s.fundamental:+.2f}", f"{s.sentiment:+.2f}",
+                      f"{s.technical:+.2f}", f"{s.fundamental:+.2f}", _score(s.sentiment),
                       f"{s.close:.2f}", f"{s.stop:.2f}", f"{s.target:.2f}", str(s.shares))
     print(table)
     counts = {a: sum(s.action == a for s in results) for a in COLORS}
-    print(f"BUY {counts['BUY']}  WATCH {counts['WATCH']}  AVOID {counts['AVOID']}  · {logged}")
-    if failed:
-        print(f"[yellow]Skipped: {', '.join(failed)}[/yellow]")
+    with_news = sum(s.sentiment is not None for s in results)
+    print(f"BUY {counts['BUY']}  WATCH {counts['WATCH']}  AVOID {counts['AVOID']}  · "
+          f"news for {with_news}/{len(results)} · {logged}")
+    _print_skipped(failed)
+
+
+@app.command("update-watchlists")
+def update_watchlists():
+    """Refresh index constituent CSVs from niftyindices.com (NSE rebalances twice a year)."""
+    for name, n in watchlists.update().items():
+        print(f"{name}: {n} stocks")
+    print("Review with git diff, then commit src/aistock/data/watchlists/")
+
+
+def _score(v: float | None) -> str:
+    return "-" if v is None else f"{v:+.2f}"
+
+
+def _print_skipped(skipped: list[str], limit: int = 10):
+    if skipped:
+        more = f" (+{len(skipped) - limit} more)" if len(skipped) > limit else ""
+        print(f"[yellow]Skipped {len(skipped)}: {', '.join(skipped[:limit])}{more}[/yellow]")
 
 
 pct = lambda v: f"{v * 100:.1f}%"
@@ -172,8 +200,7 @@ def backtest_all(watchlist: str = WATCHLIST, years: int = YEARS, rule: str = RUL
     print(f"OOS best:  {show(oos_stats.tail(5).iloc[::-1])}")
     print(f"OOS worst: {show(oos_stats.head(5))}")
     print(f"Saved per-stock stats and trades next to {path}")
-    if skipped:
-        print(f"[yellow]Skipped: {', '.join(skipped)}[/yellow]")
+    _print_skipped(skipped)
 
 
 @app.command("portfolio")
@@ -191,10 +218,12 @@ def portfolio_cmd(watchlist: str = WATCHLIST, years: int = YEARS, rule: str = RU
     columns, curves = {}, []
     for seg, d in zip(universe.SEGMENTS, (dates[:split], dates[split:])):
         eq, invested, trades = portfolio.run(data, entries, d, p, positions)
-        columns[f"{seg} ({d[0]:%Y-%m} to {d[-1]:%Y-%m})"] = portfolio.stats(eq, invested, trades, index.Close)
+        columns[f"{seg} ({d[0]:%Y-%m} to {d[-1]:%Y-%m})"] = portfolio.stats(
+            eq, invested, trades, index.Close, portfolio.equal_weight(data, d))
         curves.append(eq.rename(seg))
-    rows = [("cagr", pct), ("nifty_cagr", pct), ("excess_cagr", pct), ("max_drawdown", pct),
-            ("nifty_max_drawdown", pct), ("sharpe", num), ("nifty_sharpe", num), ("exposure", pct),
+    rows = [("cagr", pct), ("nifty_cagr", pct), ("universe_cagr", pct), ("excess_cagr", pct),
+            ("excess_vs_universe", pct), ("max_drawdown", pct), ("nifty_max_drawdown", pct),
+            ("universe_max_drawdown", pct), ("sharpe", num), ("nifty_sharpe", num), ("exposure", pct),
             ("trades", str), ("trades_per_year", lambda v: f"{v:.0f}"), ("win_rate", pct),
             ("avg_trade", pct), ("profit_factor", num), ("avg_bars", lambda v: f"{v:.1f}")]
     print(_metric_table(f"{watchlist} portfolio, {positions} slots: "
@@ -203,8 +232,7 @@ def portfolio_cmd(watchlist: str = WATCHLIST, years: int = YEARS, rule: str = RU
     path = universe.REPORTS / f"portfolio_{watchlist}_{date.today()}.csv"
     pd.concat(curves, axis=1).to_csv(path)
     print(f"Equity curves saved to {path}")
-    if skipped:
-        print(f"[yellow]Skipped: {', '.join(skipped)}[/yellow]")
+    _print_skipped(skipped)
 
 
 @app.command("sweep")
@@ -236,8 +264,7 @@ def sweep_cmd(watchlist: str = WATCHLIST, years: int = YEARS, oos: float = OOS,
             style="dim" if r["baseline"] else None)
     print(table)
     print(f"{len(results)} combos x {len(data)} stocks; all in-sample results saved to {path}")
-    if skipped:
-        print(f"[yellow]Skipped: {', '.join(skipped)}[/yellow]")
+    _print_skipped(skipped)
 
 
 if __name__ == "__main__":

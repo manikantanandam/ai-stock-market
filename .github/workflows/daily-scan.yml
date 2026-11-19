@@ -1,4 +1,4 @@
-# Daily NIFTY 50 scan after the NSE close; commits the signal journal back to the repo.
+# Daily NIFTY 500 scan after the NSE close; commits the signal journal back to the repo.
 # GitHub cron is UTC and can start late under load: 11:00 UTC = 16:30 IST.
 # Journal rows are keyed by the price bar's session date, so a late run still
 # lands on the right day.
@@ -19,7 +19,7 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -33,6 +33,16 @@ jobs:
           path: ~/.cache/huggingface
           key: hf-prosusai-finbert
 
+      # Fundamentals have a 7-day TTL; carry them between runs so ~500 Yahoo
+      # .info calls happen about once a week, not daily. A new key each run
+      # saves the refreshed files; restore-keys picks up the latest one.
+      - name: Cache fundamentals
+        uses: actions/cache@v4
+        with:
+          path: .cache/fundamentals
+          key: fundamentals-${{ github.run_id }}
+          restore-keys: fundamentals-
+
       - name: Install
         run: uv sync --locked
 
@@ -41,7 +51,7 @@ jobs:
           NO_COLOR: "1"
           COLUMNS: "120"
         run: |
-          uv run aistock scan --top 50 | tee scan.txt
+          uv run aistock scan --watchlist nifty500 --top 50 | tee scan.txt
           { echo '```'; cat scan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit journal

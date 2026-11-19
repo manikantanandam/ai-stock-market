@@ -1,3 +1,4 @@
+import logging
 import time
 from datetime import datetime
 from datetime import time as dtime
@@ -29,17 +30,54 @@ def get_prices(symbol: str, years: int = 2) -> pd.DataFrame:
     partial bar for today) is never reused after the close; live data is
     refreshed every 15 minutes.
     """
-    CACHE.mkdir(parents=True, exist_ok=True)
-    phase = market_phase()
-    path = CACHE / f"{symbol}_{years}y_{datetime.now(IST).date()}_{phase}.parquet"
-    if path.exists() and (phase != "live" or time.time() - path.stat().st_mtime < LIVE_TTL_SECONDS):
+    path = _path(symbol, years)
+    if _fresh(path):
         return pd.read_parquet(path)
-    ticker = symbol if symbol.startswith("^") else f"{symbol}.NS"
-    df = yf.Ticker(ticker).history(period=f"{years}y", auto_adjust=True)
+    raw = yf.Ticker(_ticker(symbol)).history(period=f"{years}y", auto_adjust=True)
+    df = _clean(raw) if not raw.empty else raw
     if df.empty:
-        raise ValueError(f"No price data for {ticker}")
+        raise ValueError(f"no price data for {_ticker(symbol)}")
+    df.to_parquet(path)
+    return df
+
+
+def prefetch(symbols: list[str], years: int, chunk: int = 100) -> None:
+    """Batch-download uncached symbols with yf.download (threaded), which is far
+    faster than one request per symbol for large watchlists. Symbols that come
+    back empty are left for get_prices to retry and report."""
+    todo = [s for s in symbols if not _fresh(_path(s, years))]
+    logging.getLogger("yfinance").setLevel(logging.CRITICAL)  # failures surface via get_prices
+    for start in range(0, len(todo), chunk):
+        batch = todo[start:start + chunk]
+        raw = yf.download([_ticker(s) for s in batch], period=f"{years}y", auto_adjust=True,
+                          group_by="ticker", threads=True, progress=False)
+        for sym in batch:
+            if _ticker(sym) not in raw.columns.get_level_values(0):
+                continue
+            df = _clean(raw[_ticker(sym)])
+            if not df.empty:
+                df.to_parquet(_path(sym, years))
+
+
+def _ticker(symbol: str) -> str:
+    return symbol if symbol.startswith("^") else f"{symbol}.NS"
+
+
+def _path(symbol: str, years: int) -> Path:
+    CACHE.mkdir(parents=True, exist_ok=True)
+    return CACHE / f"{symbol}_{years}y_{datetime.now(IST).date()}_{market_phase()}.parquet"
+
+
+def _fresh(path: Path) -> bool:
+    if not path.exists():
+        return False
+    return not path.stem.endswith("_live") or time.time() - path.stat().st_mtime < LIVE_TTL_SECONDS
+
+
+def _clean(df: pd.DataFrame) -> pd.DataFrame:
     # Yahoo sometimes returns a placeholder row with NaN prices for the latest session
     df = df[["Open", "High", "Low", "Close", "Volume"]].dropna(subset=["Open", "High", "Low", "Close"])
-    df.index = df.index.tz_localize(None)
-    df.to_parquet(path)
+    if df.index.tz is not None:
+        df.index = df.index.tz_localize(None)
+    df.index.name = "Date"
     return df

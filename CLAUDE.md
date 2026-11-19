@@ -13,7 +13,9 @@ Target hardware is an M1 with 8GB RAM, so only small local models work: FinBERT 
 - Install/sync deps: `uv sync` (Python 3.12 is pinned, because `pandas-ta` requires >=3.12)
 - Add a dependency: `uv add <pkg>`
 - Run the CLI: `uv run aistock analyze <SYMBOL>` (bare NSE symbol, e.g. `INFY`; `.NS` is appended internally; `^`-prefixed index tickers like `^NSEI` are passed through)
-- Daily watchlist scan (appends to `journal/signals.csv`): `uv run aistock scan [--no-news]`
+- Daily watchlist scan (appends to `journal/signals.csv`): `uv run aistock scan [--watchlist nifty500] [--news all|candidates|none]`
+- Watchlists are committed CSV snapshots in `src/aistock/data/watchlists/`; refresh with `uv run aistock update-watchlists`
+- Prices are batch-downloaded via `prices.prefetch` (`yf.download`) before per-symbol `get_prices` reads; fundamentals have a 7-day cache
 - Daily scan also runs on GitHub Actions (`.github/workflows/daily-scan.yml`, 11:00 UTC weekdays) and commits the journal, so `git pull` before local scans. Linux uses CPU-only torch via `[tool.uv.sources]` in `pyproject.toml`.
 - Backtests: `uv run aistock backtest <SYMBOL>`, `uv run aistock backtest-all`, `uv run aistock sweep`, `uv run aistock portfolio` (all take `--rule score:0.4|pullback|breakout`, `--regime`, ATR exit options; outputs CSVs to `reports/`)
 - Ollama (installed via Homebrew): `brew services start ollama`, then `ollama pull qwen2.5:3b`

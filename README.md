@@ -24,9 +24,12 @@ The first command that uses news downloads FinBERT (~440MB) to the Hugging Face 
 uv run aistock analyze INFY
 uv run aistock analyze RELIANCE --capital 500000 --no-news
 
-# Rank the NIFTY 50 (or --symbols TCS,INFY) and log today's signals to journal/signals.csv
+# Rank a watchlist (nifty50 default, nifty500, or --symbols TCS,INFY) and log signals to journal/signals.csv
 uv run aistock scan
-uv run aistock scan --no-news --top 20
+uv run aistock scan --watchlist nifty500 --news candidates --top 20
+
+# Refresh index constituents from niftyindices.com (NSE rebalances twice a year)
+uv run aistock update-watchlists
 
 # Backtest an entry rule: one stock, or pooled across the watchlist
 uv run aistock backtest INFY
@@ -35,11 +38,13 @@ uv run aistock backtest-all --rule breakout --regime --stop-atr 3 --target-atr 0
 # Grid search over rules, market filter and exits
 uv run aistock sweep --rank-by profit_factor --top 10
 
-# Shared-capital portfolio (N slots) vs holding NIFTY 50
-uv run aistock portfolio --stop-atr 3 --target-atr 0 --max-hold 90 --positions 10
+# Shared-capital portfolio (N slots) vs NIFTY 50 and an equal-weight hold of the watchlist
+uv run aistock portfolio --watchlist nifty500 --stop-atr 3 --target-atr 0 --max-hold 90 --positions 10
 ```
 
-**Daily scan on GitHub Actions:** `.github/workflows/daily-scan.yml` runs `aistock scan` at 16:30 IST on weekdays and commits `journal/signals.csv`. Run `git pull` before running `scan` locally to avoid journal conflicts. You can also trigger it from the Actions tab (`workflow_dispatch`).
+Backtest commands take `--watchlist nifty50|nifty500`. For large lists, `scan` fetches news only for stocks that could still reach BUY (`--news candidates`, the default above 60 stocks). Recent listings with under 200 sessions of history are skipped.
+
+**Daily scan on GitHub Actions:** `.github/workflows/daily-scan.yml` runs `aistock scan --watchlist nifty500` at 16:30 IST on weekdays and commits `journal/signals.csv`. Run `git pull` before running `scan` locally to avoid journal conflicts. You can also trigger it from the Actions tab (`workflow_dispatch`).
 
 Symbols are bare NSE tickers (`INFY`, `M&M`); `.NS` is added internally. Run `uv run aistock <command> --help` for all options.
 
@@ -62,7 +67,7 @@ Only the technical layer can be backtested: there is no free history of fundamen
 
 ```
 src/aistock/
-  data/         prices, fundamentals, news (cached daily in .cache/), watchlists
+  data/         prices, fundamentals (7-day cache), news (cached in .cache/), watchlist CSVs
   technical/    indicators, technical score, entry rules (score, pullback, breakout, market regime)
   fundamental/  fundamental score
   sentiment/    FinBERT headline scoring
@@ -84,12 +89,21 @@ NIFTY 50, 10 years of daily data. Out-of-sample = the last 30% (~3 years):
 
 Wider stops and longer holds clearly help per trade, and the edge survives out-of-sample. Each stock is only invested ~35% of the time, though, so per-stock returns still trail buy-and-hold. Results are optimistic because the watchlist uses today's index constituents (survivorship bias).
 
-**Portfolio test** (shared capital, 10 slots, 3 ATR stop, no target, 90 bars): 21.3% CAGR vs NIFTY's 13.0% in-sample (2017–2024), but **-1.4% vs +5.4% out-of-sample** (2024–2026). The edge doesn't hold up on unseen data, so the live signal still uses the original exits.
+**Portfolio test** (shared capital, 10 slots, 3 ATR stop, no target, 90 bars). CAGR, in-sample (2017–2024) → out-of-sample (2024–2026):
+
+| Watchlist | Strategy | Strategy + market filter | NIFTY 50 index | Equal-weight hold of watchlist |
+|---|---|---|---|---|
+| NIFTY 50 | 23.5% → 3.6% | 17.3% → -3.6% | 13.0% → 5.4% | 24.6% → 11.3% |
+| NIFTY 500 | 40.7% → 9.5% | 37.8% → 14.3% | 13.0% → 5.4% | 26.6% → 13.9% |
+
+On NIFTY 500 the strategy beats the NIFTY 50 index, but not an equal-weight hold of the same stocks. That comparison shares the survivorship bias, so it is the fair test. Today's NIFTY 500 is partly made up of stocks that joined *because* they rallied. Swapping a single NIFTY 50 constituent (WIPRO → BSE) moved the NIFTY 50 results by several points. Conclusion so far: **no demonstrated edge**, so the live signal still uses the original exits.
 
 ## Roadmap
 
-- [ ] Portfolio simulation: shared capital across the watchlist, benchmarked against NIFTY 50
-- [ ] Longer holding periods in the sweep (40 bars sits at the edge of the grid)
+- [x] Portfolio simulation: shared capital, benchmarked against NIFTY 50 and equal-weight watchlist
+- [x] Longer holding periods in the sweep (60/90 bars)
+- [x] NIFTY 500 watchlist
+- [ ] Point-in-time index constituents to remove survivorship bias
 - [ ] Chart-pattern detection
 - [ ] Local LLM (Ollama `qwen2.5:3b`) to write plain-English reports: explanations only, never trade decisions
 - [ ] Streamlit dashboard
