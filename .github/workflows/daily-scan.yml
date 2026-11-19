@@ -1,4 +1,4 @@
-# Daily NIFTY 500 scan after the NSE close; commits the signal journal back to the repo.
+# Daily NIFTY 500 scan after the NSE close; merges the signal journal into main via a PR.
 # GitHub cron is UTC and can start late under load: 11:00 UTC = 16:30 IST.
 # Journal rows are keyed by the price bar's session date, so a late run still
 # lands on the right day.
@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: daily-scan
@@ -62,15 +63,24 @@ jobs:
           uv run aistock paper --show 20 | tee paper.txt
           { echo '## Paper trading'; echo '```'; cat paper.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Commit journal
+      # main is protected (PR required), so the journal update goes through a
+      # PR that this job opens and squash-merges itself
+      - name: Merge journal via PR
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add journal/signals.csv
           if git diff --cached --quiet; then
             echo "Journal unchanged"
-          else
-            git commit -m "Daily scan $(TZ=Asia/Kolkata date +%Y-%m-%d)"
-            git pull --rebase
-            git push
+            exit 0
           fi
+          day=$(TZ=Asia/Kolkata date +%Y-%m-%d)
+          branch="daily-scan/${day}-${{ github.run_id }}"
+          git switch -c "$branch"
+          git commit -m "Daily scan ${day}"
+          git push -u origin "$branch"
+          gh pr create --base main --head "$branch" --title "Daily scan ${day}" \
+            --body "Automated journal update from [run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
+          gh pr merge "$branch" --squash --delete-branch
