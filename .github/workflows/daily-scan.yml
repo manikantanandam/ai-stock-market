@@ -1,0 +1,58 @@
+# Daily NIFTY 50 scan after the NSE close; commits the signal journal back to the repo.
+# GitHub cron is UTC and can start late under load: 11:00 UTC = 16:30 IST.
+# Journal rows are keyed by the price bar's session date, so a late run still
+# lands on the right day.
+name: Daily scan
+
+on:
+  schedule:
+    - cron: "0 11 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Cache FinBERT model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-prosusai-finbert
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: Scan
+        env:
+          NO_COLOR: "1"
+          COLUMNS: "120"
+        run: |
+          uv run aistock scan --top 50 | tee scan.txt
+          { echo '```'; cat scan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit journal
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add journal/signals.csv
+          if git diff --cached --quiet; then
+            echo "Journal unchanged"
+          else
+            git commit -m "Daily scan $(TZ=Asia/Kolkata date +%Y-%m-%d)"
+            git pull --rebase
+            git push
+          fi
