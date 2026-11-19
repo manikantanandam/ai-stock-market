@@ -42,11 +42,14 @@ def run(ind: pd.DataFrame, entries: pd.Series, p: Params = Params()) -> Result:
         nonlocal cash, shares
         fill = px * (1 - p.costs.slippage)
         value = shares * fill
-        cash += value - p.costs.sell_cost(value)
+        proceeds = value - p.costs.sell_cost(value)
+        cash += proceeds
+        # ret is on the money invested (incl. buy costs), matching portfolio.run;
+        # cash left over from rounding to whole shares doesn't dilute it
         trades.append({"entry_date": ind.index[entry_i], "exit_date": ind.index[i],
                        "entry": entry_px, "exit": fill, "bars": i - entry_i + 1,
-                       "reason": reason, "pnl": cash - trades_start_cash,
-                       "ret": cash / trades_start_cash - 1})
+                       "reason": reason, "pnl": proceeds - cost_basis,
+                       "ret": proceeds / cost_basis - 1})
         shares = 0
 
     for i in range(len(ind)):
@@ -64,9 +67,9 @@ def run(ind: pd.DataFrame, entries: pd.Series, p: Params = Params()) -> Result:
             entry_px = o[i] * (1 + p.costs.slippage)
             n = int(cash / (entry_px * (1 + 0.0012)))  # leave room for buy costs
             if n > 0:
-                trades_start_cash = cash
                 value = n * entry_px
-                cash -= value + p.costs.buy_cost(value)
+                cost_basis = value + p.costs.buy_cost(value)
+                cash -= cost_basis
                 shares, entry_i, entry_atr, highest = n, i, atr[i - 1], h[i]
                 stop = entry_px - p.stop_atr * entry_atr
                 target = entry_px + p.target_atr * entry_atr if p.target_atr else np.inf

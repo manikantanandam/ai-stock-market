@@ -22,7 +22,9 @@ Target hardware is an M1 with 8GB RAM, so only small local models work: FinBERT 
 - Backtests: `uv run aistock backtest <SYMBOL>`, `backtest-all`, `portfolio` take `--strategy <preset>`; `--rule/--regime/--stop-atr/...` override the preset. `sweep` grid-searches rules independently of presets. Outputs CSVs to `reports/`
 - Ollama (installed via Homebrew): `brew services start ollama`, then `ollama pull qwen2.5:3b`
 
-There are no tests or linters configured yet.
+- Tests: `uv run pytest` (all offline, synthetic data; ~3s). Single test: `uv run pytest tests/test_engine.py::test_gap_down_fills_at_open_not_stop`. `tests/conftest.py` has `bars()` for exact OHLC scenarios and `random_walk()` for frames with indicators.
+
+No linter is configured.
 
 ## Architecture
 
@@ -38,7 +40,7 @@ Only rules, market filter and exits are backtestable; fundamentals and news have
 
 ## Git workflow
 
-- `main` is protected by a GitHub ruleset: changes only through PRs (no direct or force pushes, no bypass). Work on a branch, push it, and open a PR with `gh pr create`. The user reviews and merges PRs on GitHub; Claude does not merge them.
+- `main` is protected by a GitHub ruleset: changes only through PRs that pass the `pytest` check (Tests workflow), with no direct or force pushes and no bypass. Work on a branch, push it, and open a PR with `gh pr create`. The user reviews and merges PRs on GitHub; Claude does not merge them.
 - CI owns `journal/signals.csv`. Local `scan` runs modify it; don't commit those changes (`git checkout journal/signals.csv` before committing) to avoid conflicting with the daily PR.
 
 ## Design rules

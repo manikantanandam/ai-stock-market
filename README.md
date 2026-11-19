@@ -15,6 +15,8 @@ brew install uv
 uv sync
 ```
 
+Run the test suite (offline, a few seconds) with `uv run pytest`. It also runs on every PR as the required `pytest` check.
+
 The first command that uses news downloads FinBERT (~440MB) to the Hugging Face cache.
 
 ## Usage
