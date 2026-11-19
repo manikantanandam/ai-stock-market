@@ -1,0 +1,30 @@
+# Required status check for main (job name "pytest").
+# workflow_dispatch lets the daily-scan job trigger it on its own PR branch:
+# PRs opened with GITHUB_TOKEN don't trigger pull_request workflows.
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: Run tests
+        run: uv run pytest -q

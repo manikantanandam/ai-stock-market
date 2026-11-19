@@ -12,6 +12,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write  # to dispatch the Tests workflow on the PR branch
 
 concurrency:
   group: daily-scan
@@ -63,8 +64,10 @@ jobs:
           uv run aistock paper --show 20 | tee paper.txt
           { echo '## Paper trading'; echo '```'; cat paper.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
-      # main is protected (PR required), so the journal update goes through a
-      # PR that this job opens and squash-merges itself
+      # main is protected (PR + passing "pytest" check), so the journal update
+      # goes through a PR. PRs opened with GITHUB_TOKEN don't trigger other
+      # workflows, so Tests is dispatched on the branch explicitly, and
+      # auto-merge squash-merges the PR once the check passes.
       - name: Merge journal via PR
         env:
           GH_TOKEN: ${{ github.token }}
@@ -83,4 +86,5 @@ jobs:
           git push -u origin "$branch"
           gh pr create --base main --head "$branch" --title "Daily scan ${day}" \
             --body "Automated journal update from [run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
-          gh pr merge "$branch" --squash --delete-branch
+          gh workflow run tests.yml --ref "$branch"
+          gh pr merge "$branch" --auto --squash --delete-branch
