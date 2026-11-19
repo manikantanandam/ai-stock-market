@@ -1,0 +1,51 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares
+2026-11-19,ADANIENT,Adani Enterprises Limited,Energy,WATCH,0.07,0.2,-0.2,0.151,2703.1,2555.8,2924.05,6
+2026-11-19,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,BUY,0.543,0.6,0.55,0.388,1917.1,1824.89,2055.42,10
+2026-11-19,APOLLOHOSP,Apollo Hospitals Enterprise Limited,Healthcare,BUY,0.487,0.6,0.6,0.036,8738.0,8347.57,9323.64,2
+2026-11-19,ASIANPAINT,Asian Paints Limited,Basic Materials,WATCH,0.372,0.2,0.75,0.236,2595.0,2464.04,2791.44,7
+2026-11-19,AXISBANK,Axis Bank Limited,Financial Services,WATCH,0.201,0.0,0.55,0.179,1380.8,1325.92,1463.13,18
+2026-11-19,BAJAJ-AUTO,Bajaj Auto Limited,Consumer Cyclical,BUY,0.633,0.6,0.8,0.466,10817.0,10320.68,11561.47,2
+2026-11-19,BAJFINANCE,Bajaj Finance Limited,Financial Services,BUY,0.491,0.6,0.5,0.203,1092.85,1034.84,1179.86,17
+2026-11-19,BAJAJFINSV,Bajaj Finserv Ltd.,Financial Services,WATCH,0.259,0.2,0.4,0.193,1885.0,1799.27,2013.59,11
+2026-11-19,BEL,Bharat Electronics Limited,Industrials,WATCH,0.456,0.2,0.9,0.432,404.2,387.71,428.93,60
+2026-11-19,BHARTIARTL,Bharti Airtel Limited,Communication Services,BUY,0.43,0.4,0.7,0.099,2144.0,2056.59,2275.12,11
+2026-11-19,CIPLA,Cipla Limited,Healthcare,WATCH,0.238,0.6,-0.15,-0.086,1418.5,1366.25,1496.87,19
+2026-11-19,COALINDIA,Coal India Limited,Energy,WATCH,0.032,-0.6,1.0,0.16,391.5,375.12,416.07,61
+2026-11-19,DRREDDY,Dr. Reddy's Laboratories Limited,Healthcare,WATCH,-0.111,0.0,-0.4,0.044,1400.9,1348.92,1478.88,19
+2026-11-19,EICHERMOT,Eicher Motors Limited,Consumer Cyclical,WATCH,0.415,0.2,0.9,0.225,8058.5,7626.66,8706.26,2
+2026-11-19,ETERNAL,Eternal Limited,Consumer Cyclical,WATCH,0.389,0.6,0.1,0.296,366.85,347.04,396.56,50
+2026-11-19,GRASIM,Grasim Industries Limited,Basic Materials,WATCH,0.286,0.6,-0.15,0.155,3111.1,2970.97,3321.3,7
+2026-11-19,HCLTECH,HCL Technologies Limited,Technology,WATCH,0.375,0.2,0.8,0.176,1332.9,1259.25,1443.38,13
+2026-11-19,HDFCBANK,HDFC Bank Limited,Financial Services,WATCH,0.21,0.0,0.55,0.224,821.8,788.96,871.05,30
+2026-11-19,HDFCLIFE,HDFC Life Insurance Company Limited,Financial Services,WATCH,0.232,0.2,0.35,0.134,577.05,546.96,622.18,33
+2026-11-19,HINDALCO,Hindalco Industries Limited,Basic Materials,WATCH,-0.197,-0.6,0.45,-0.159,910.0,858.32,987.52,19
+2026-11-19,HINDUNILVR,Hindustan Unilever Limited,Consumer Defensive,WATCH,0.294,0.0,0.75,0.347,2074.2,1988.67,2202.5,11
+2026-11-19,ICICIBANK,ICICI Bank Limited,Financial Services,BUY,0.509,0.4,0.8,0.344,1608.9,1548.79,1699.06,16
+2026-11-19,INDIGO,InterGlobe Aviation Limited,Industrials,WATCH,0.18,0.6,-0.35,-0.076,5475.0,5188.67,5904.49,3
+2026-11-19,INFY,Infosys Limited,Technology,WATCH,0.06,-0.2,0.65,-0.174,1091.9,1024.56,1192.92,14
+2026-11-19,ITC,ITC Limited,Consumer Defensive,WATCH,0.218,0.0,0.5,0.339,301.0,287.6,321.1,74
+2026-11-19,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,0.109,0.2,0.0,0.044,226.8,216.39,242.42,96
+2026-11-19,JSWSTEEL,JSW Steel Limited,Basic Materials,BUY,0.577,0.6,0.8,0.184,1336.8,1277.64,1425.53,16
+2026-11-19,KOTAKBANK,Kotak Mahindra Bank Limited,Financial Services,BUY,0.434,0.4,0.55,0.344,503.0,482.77,533.34,49
+2026-11-19,LT,Larsen & Toubro Limited,Industrials,WATCH,0.261,0.0,0.6,0.403,4211.0,4050.96,4451.05,6
+2026-11-19,M&M,Mahindra & Mahindra Limited,Consumer Cyclical,WATCH,0.271,0.0,0.7,0.303,3509.0,3327.42,3781.37,5
+2026-11-19,MARUTI,Maruti Suzuki India Limited,Consumer Cyclical,WATCH,0.146,0.0,0.25,0.354,13589.0,12905.77,14613.84,1
+2026-11-19,MAXHEALTH,Max Healthcare Institute Limited,Healthcare,WATCH,0.167,0.0,0.25,0.462,1040.65,982.37,1128.07,17
+2026-11-19,NESTLEIND,Nestlé India Limited,Consumer Defensive,WATCH,0.348,0.2,0.8,0.04,1303.4,1237.62,1402.07,15
+2026-11-19,NTPC,NTPC Limited,Utilities,WATCH,0.408,0.2,0.55,0.715,325.0,311.2,345.7,72
+2026-11-19,ONGC,Oil and Natural Gas Corporation Limited,Energy,WATCH,0.316,0.2,0.65,0.103,224.52,216.65,236.32,127
+2026-11-19,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.328,0.2,0.45,0.464,264.5,252.19,282.96,81
+2026-11-19,RELIANCE,Reliance Industries Limited,Energy,WATCH,0.243,0.0,0.65,0.24,1375.6,1318.03,1461.96,17
+2026-11-19,SBILIFE,SBI Life Insurance Company Limited,Financial Services,WATCH,0.101,0.2,-0.05,0.08,1804.6,1718.15,1934.27,11
+2026-11-19,SHRIRAMFIN,Shriram Finance Limited,Financial Services,WATCH,0.281,0.2,0.55,0.082,973.3,913.44,1063.09,16
+2026-11-19,SBIN,State Bank of India,Financial Services,WATCH,0.173,0.0,0.35,0.341,1156.0,1107.96,1228.05,20
+2026-11-19,SUNPHARMA,Sun Pharmaceutical Industries Limited,Healthcare,BUY,0.429,0.6,0.35,0.122,1900.0,1816.22,2025.67,11
+2026-11-19,TCS,Tata Consultancy Services Limited,Technology,WATCH,0.157,-0.2,1.0,-0.214,2342.7,2216.19,2532.46,7
+2026-11-19,TATACONSUM,Tata Consumer Products Limited,Consumer Defensive,WATCH,0.068,0.0,0.2,0.04,1144.0,1094.72,1217.92,20
+2026-11-19,TMPV,Tata Motors Passenger Vehicles Limited,Consumer Cyclical,AVOID,-0.537,-0.6,-0.15,-0.958,263.5,245.06,291.15,54
+2026-11-19,TATASTEEL,Tata Steel Limited,Basic Materials,WATCH,0.42,0.2,0.45,0.924,180.89,171.55,194.91,107
+2026-11-19,TECHM,Tech Mahindra Limited,Technology,WATCH,0.353,0.2,0.8,0.063,1723.0,1634.03,1856.46,11
+2026-11-19,TITAN,Titan Company Limited,Consumer Cyclical,WATCH,0.311,0.6,0.4,-0.546,4700.0,4451.61,5072.58,4
+2026-11-19,TRENT,Trent Limited,Consumer Cyclical,BUY,0.543,0.6,0.7,0.167,3225.0,3061.7,3469.95,6
+2026-11-19,ULTRACEMCO,UltraTech Cement Limited,Basic Materials,WATCH,0.199,0.0,0.55,0.171,12560.0,12047.0,13329.5,1
+2026-11-19,WIPRO,Wipro Limited,Technology,WATCH,0.064,-0.2,0.65,-0.153,183.93,174.31,198.37,103
