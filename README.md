@@ -58,7 +58,7 @@ uv run aistock paper --strategy trend --since 2026-12-01
 
 Backtest commands take `--watchlist nifty50|nifty500`. For large lists, `scan` fetches news only for stocks that could still reach BUY (`--news candidates`, the default above 60 stocks). Recent listings with under 200 sessions of history are skipped.
 
-**Daily scan on GitHub Actions:** `.github/workflows/daily-scan.yml` runs `aistock scan --watchlist nifty500` at 16:30 IST on weekdays and commits `journal/signals.csv`. Run `git pull` before running `scan` locally to avoid journal conflicts. You can also trigger it from the Actions tab (`workflow_dispatch`).
+**Daily scan on GitHub Actions:** `.github/workflows/daily-scan.yml` runs `aistock scan --watchlist nifty500` at 16:30 IST on weekdays and merges `journal/signals.csv` into `main` through an automated PR. `main` is protected: every change, including the daily journal update, goes through a pull request. Run `git pull` before running `scan` locally, and don't commit local journal changes. You can also trigger it from the Actions tab (`workflow_dispatch`).
 
 Symbols are bare NSE tickers (`INFY`, `M&M`); `.NS` is added internally. Run `uv run aistock <command> --help` for all options.
 
