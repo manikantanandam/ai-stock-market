@@ -11,6 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 from aistock.backtest import engine
+from aistock.data import sectors
 from aistock.data.prices import get_prices, prefetch
 from aistock.technical import rules
 from aistock.technical.indicators import add_indicators
@@ -65,9 +66,38 @@ def run_universe(data: dict[str, pd.DataFrame], entries: dict[str, pd.Series], p
     return pd.DataFrame(stats), all_trades
 
 
-def build_entries(data: dict[str, pd.DataFrame], rule: str, market: pd.Series | None) -> dict[str, pd.Series]:
+def build_entries(data: dict[str, pd.DataFrame], rule: str, market: pd.Series | None,
+                  filters: dict[str, pd.Series] | None = None) -> dict[str, pd.Series]:
     fn = rules.build(rule)
-    return {sym: rules.with_regime(fn(ind), market) for sym, ind in data.items()}
+    entries = {sym: rules.with_regime(fn(ind), market) for sym, ind in data.items()}
+    return {sym: e & filters[sym] for sym, e in entries.items()} if filters else entries
+
+
+def filters(data: dict[str, pd.DataFrame], rs: bool, sector: bool, years: int) -> dict[str, pd.Series] | None:
+    """Per-symbol entry filters: beat NIFTY 50 (rs) and sector index above its SMA50 (sector).
+    Stocks outside NIFTY 500 have no known sector, so the sector filter blocks them."""
+    if not (rs or sector):
+        return None
+    index_close = get_prices(INDEX, years).Close if rs else None
+    out = {}
+    for sym, ind in data.items():
+        ok = pd.Series(True, index=ind.index)
+        if rs:
+            ok &= rules.outperforms(ind.Close, index_close)
+        if sector:
+            industry = sectors.INDUSTRY.get(sym)
+            trend = rules.sector_trend(sectors.index(industry, years)) if industry else pd.Series(dtype=bool)
+            ok &= trend.reindex(ind.index, fill_value=False)
+        out[sym] = ok
+    return out
+
+
+def strategy_entries(data: dict[str, pd.DataFrame], st, years: int,
+                     market: pd.Series | None = None) -> dict[str, pd.Series]:
+    """Entries for a preset: its rule plus whichever market, RS and sector filters it uses."""
+    if st.regime and market is None:
+        market = regime(years)
+    return build_entries(data, st.rule, market if st.regime else None, filters(data, st.rs, st.sector, years))
 
 
 def pooled(stats: pd.DataFrame, trades: pd.DataFrame, segment: str) -> dict:

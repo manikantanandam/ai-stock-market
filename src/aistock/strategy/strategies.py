@@ -22,6 +22,8 @@ class Strategy:
     max_hold: int = 20
     min_combined: float | None = None     # live gate on the weighted combined score
     min_fundamental: float | None = None  # live gate on the fundamental score
+    rs: bool = False              # only enter when the stock beat NIFTY 50 over ~3 and ~6 months
+    sector: bool = False          # only enter when its sector index is above its SMA50
 
     def params(self, **overrides) -> Params:
         """Backtest params, with CLI overrides (None means keep the preset)."""
@@ -38,7 +40,8 @@ class Strategy:
         if self.trail_atr:
             exits.append(f"trail {self.trail_atr:g} ATR")
         exits.append(f"max {self.max_hold} days")
-        entry = self.rule + (" + market filter" if self.regime else "")
+        filters = [name for name, on in [("market", self.regime), ("RS", self.rs), ("sector", self.sector)] if on]
+        entry = self.rule + "".join(f" + {f} filter" for f in filters)
         return f"{entry}; {', '.join(exits)}"
 
 
@@ -53,6 +56,9 @@ PRESETS = {s.name: s for s in [
              "pullback", regime=False, stop_atr=2.0, target_atr=3.0, max_hold=20, min_fundamental=0.0),
     Strategy("ema-cross", "EMA100 crosses above EMA200 (slow golden cross)",
              "ema_cross", regime=False, stop_atr=3.0, target_atr=None, max_hold=90, min_fundamental=0.0),
+    Strategy("leaders", "trend, limited to stocks beating NIFTY 50 whose sector is in an uptrend",
+             "score:0.4", regime=True, stop_atr=3.0, target_atr=None, max_hold=90, min_fundamental=0.0,
+             rs=True, sector=True),
 ]}
 DEFAULT = "swing"
 

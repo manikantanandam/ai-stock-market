@@ -16,6 +16,7 @@ def stub(monkeypatch):
     def setup(prices, sentiment=0.5, fundamentals=GOOD_FUNDAMENTALS):
         monkeypatch.setattr(signal, "get_prices", lambda s: prices[["Open", "High", "Low", "Close", "Volume"]])
         monkeypatch.setattr(signal, "get_fundamentals", lambda s: fundamentals)
+        monkeypatch.setattr(signal, "sector_up", lambda s: True)
 
         def news(symbol, name):
             calls["news"] += 1
@@ -80,3 +81,13 @@ def test_stops_follow_each_preset(stub):
         r = s.strategies[name]
         assert r.stop == pytest.approx(s.close - st.stop_atr * s.atr, abs=0.02)
         assert (r.target is None) == (st.target_atr is None)
+
+
+def test_rs_filter_blocks_leaders_when_not_beating_the_index(stub):
+    # the stub serves the same prices for the stock and ^NSEI, so RS is exactly 0: not outperforming
+    stub(uptrend())
+    s = signal.evaluate("TEST", strategies=[PRESETS["leaders"], PRESETS["trend"]], market=True)
+    assert s.strategies["trend"].action == "BUY"
+    assert s.strategies["leaders"].action == "WATCH"
+    assert s.strategies["leaders"].why == ["RS filter off (lagging NIFTY over 3 or 6 months)"]
+    assert s.rs_3m == pytest.approx(0) and s.sector_up is True
