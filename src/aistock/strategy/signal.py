@@ -10,7 +10,7 @@ untested priors until the signal journal builds history.
 from dataclasses import dataclass, field
 
 from aistock.data import sectors
-from aistock.data.fundamentals import get_fundamentals
+from aistock.data.fundamentals import RATIOS, get_fundamentals
 from aistock.data.news import get_news
 from aistock.data.prices import get_prices
 from aistock.fundamental.score import fundamental_score
@@ -20,6 +20,7 @@ from aistock.technical import rules
 from aistock.technical.indicators import add_indicators, technical_score
 
 NEWS_MODES = ("all", "candidates", "none")
+REASONS_SEP = " | "  # joins a part's reasons in one journal cell
 MIN_HISTORY = 201
 INDEX = "^NSEI"
 
@@ -68,17 +69,23 @@ class Signal:
     rs_3m: float | None = None    # return minus NIFTY 50's over ~3 months
     rs_6m: float | None = None    # same over ~6 months
     sector_up: bool | None = None  # sector index above its SMA50; None when not checked or unknown
+    fundamentals: dict = field(default_factory=dict)  # raw ratios behind the fundamental score
 
     @property
     def buys(self) -> list[str]:
         return [n for n, s in self.strategies.items() if s.action == "BUY"]
 
     def row(self) -> dict:
-        """Flat dict for the journal. Stops/targets are recomputable from close, atr and the preset."""
+        """Flat dict for the journal. Stops/targets are recomputable from close, atr and the preset.
+        Reasons and raw ratios are kept so notes can be rewritten and fundamentals
+        backtested later (Yahoo only serves today's snapshot)."""
         return {"symbol": self.symbol, "name": self.name, "sector": self.sector, "action": self.action,
                 "buys": ";".join(self.buys), "combined": self.combined, "technical": self.technical,
                 "fundamental": self.fundamental, "sentiment": self.sentiment, "close": self.close,
-                "atr": self.atr, "rs_3m": self.rs_3m, "rs_6m": self.rs_6m, "sector_up": self.sector_up}
+                "atr": self.atr, "rs_3m": self.rs_3m, "rs_6m": self.rs_6m, "sector_up": self.sector_up,
+                **{f"{part}_reasons": REASONS_SEP.join(self.reasons.get(part, []))
+                   for part in ("technical", "fundamental", "sentiment")},
+                **{f"f_{k}": self.fundamentals.get(k) for k in RATIOS}}
 
 
 def market_ok() -> bool:
@@ -112,6 +119,14 @@ def _passes_gates(st: Strategy, f: float, combined: float) -> list[str]:
     if st.min_fundamental is not None and f < st.min_fundamental:
         blocked.append(f"fundamental {f:+.2f} < {st.min_fundamental}")
     return blocked
+
+
+def levels(st: Strategy, close: float, atr: float, c: Config) -> tuple[float, float | None, int]:
+    """Stop, target and share count for a strategy entering at `close`."""
+    stop = close - st.stop_atr * atr
+    target = close + st.target_atr * atr if st.target_atr else None
+    shares = min(int(c.capital * c.risk_per_trade / (close - stop)), int(c.capital / close))
+    return round(stop, 2), None if target is None else round(target, 2), shares
 
 
 def evaluate(symbol: str, c: Config = Config(), news: str = "all",
@@ -156,12 +171,9 @@ def evaluate(symbol: str, c: Config = Config(), news: str = "all",
             why = _passes_gates(st, f_score, combined)
             if s_score is not None and s_score <= c.veto_sentiment:
                 why.append(f"news veto: sentiment {s_score:+.2f}")
-        stop = close - st.stop_atr * atr
-        target = close + st.target_atr * atr if st.target_atr else None
-        shares = min(int(c.capital * c.risk_per_trade / (close - stop)), int(c.capital / close))
+        stop, target, shares = levels(st, close, atr, c)
         action = "BUY" if fired[st.name] and not why else "WATCH"
-        results[st.name] = StrategySignal(st.name, action, fired[st.name], round(stop, 2),
-                                          None if target is None else round(target, 2), shares,
+        results[st.name] = StrategySignal(st.name, action, fired[st.name], stop, target, shares,
                                           why or ["all gates passed"])
 
     buys = [n for n, r in results.items() if r.action == "BUY"]
@@ -173,4 +185,5 @@ def evaluate(symbol: str, c: Config = Config(), news: str = "all",
         {"technical": t_why, "fundamental": f_why, "sentiment": s_why},
         as_of=f"{last.name:%Y-%m-%d}",
         rs_3m=round(rs[rules.RS_PERIODS[0]], 4), rs_6m=round(rs[rules.RS_PERIODS[1]], 4), sector_up=sector_ok,
+        fundamentals={k: f.get(k) for k in RATIOS},
     )

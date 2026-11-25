@@ -133,7 +133,8 @@ function table(rows, columns, opts = {}) {
       const cls = (numeric[c] ? 'num ' : '') + (isPct(c) ? sign(v) : '');
       const content = link[c] && v ? h('a', { href: link[c](v) }, String(v))
         : c === 'action' && v ? h('span', { class: 'badge ' + v }, v) : fmt(v, c);
-      return h('td', { class: cls }, content);
+      const long = typeof v === 'string' && v.length > 60;
+      return h('td', long ? { class: cls + ' clip', title: v } : { class: cls }, content);
     }))));
     count.textContent = `${out.length.toLocaleString()} of ${rows.length.toLocaleString()} rows`;
     more.style.display = out.length > shown ? '' : 'none';
@@ -183,7 +184,8 @@ function notesCard(rows, title) {
     h('p', { class: 'sub' }, 'Written by a local LLM (qwen2.5:3b) from the signal\'s numbers; the rules made the decision.'),
     rows.map(r => h('div', { class: 'note' },
       h('div', { class: 'note-head' }, h('a', { href: stockHref(r.symbol) }, r.symbol), ' ',
-        h('span', { class: 'muted' }, [r.name, r.strategy].filter(Boolean).join(' · '))),
+        h('span', { class: 'muted' }, [r.name, r.strategy].filter(Boolean).join(' · ')),
+        r.source === 'backfill' ? h('span', { class: 'badge', title: 'Written later from the journal row; fundamental and news reasons were not saved for this session' }, 'backfilled') : null),
       h('p', {}, r.note))));
 }
 

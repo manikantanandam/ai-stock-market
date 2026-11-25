@@ -9,6 +9,8 @@ The same rows are stored twice so each view stays small to read:
 `days/<date>.csv` holds one session's scan, `stocks/<SYMBOL>.csv` one
 stock's history. The day files are the source of truth for `load`.
 LLM notes on a session's BUYs go to `notes/<date>.csv`, one row per stock.
+Day rows also keep each score's reasons and the raw fundamental ratios
+(`f_*`), since Yahoo can't serve past fundamentals snapshots.
 """
 import csv
 from collections import defaultdict
@@ -37,12 +39,13 @@ def record(signals: list[Signal]) -> Path:
     return ROOT
 
 
-def record_notes(notes: list[tuple[Signal, str, str]]) -> None:
-    """Save (signal, strategy, note) triples by session; a re-run replaces a stock's note."""
+def record_notes(notes: list[tuple[Signal, str, str]], source: str = "live") -> None:
+    """Save (signal, strategy, note) triples by session; a re-run replaces a stock's note.
+    source: "live" (written by the scan) or "backfill" (rebuilt later from the journal)."""
     by_day = defaultdict(list)
     for s, strategy, text in notes:
         by_day[s.as_of].append({"date": s.as_of, "symbol": s.symbol, "name": s.name,
-                                "strategy": strategy, "note": text})
+                                "strategy": strategy, "note": text, "source": source})
     for day, rows in by_day.items():
         _upsert(NOTES / f"{day}.csv", rows, key="symbol")
 

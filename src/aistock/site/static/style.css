@@ -105,6 +105,8 @@ td a, .sub a { color: var(--accent); text-decoration: none; }
 .more { margin-top: 10px; }
 .note { padding: 10px 0; border-top: 1px solid var(--border); }
 .note:first-of-type { border-top: none; }
+td.clip { max-width: 360px; overflow: hidden; text-overflow: ellipsis; }
+.note-head .badge { margin-left: 6px; }
 .note-head a { color: var(--accent); font-weight: 600; text-decoration: none; }
 .note p { margin: 4px 0 0; max-width: 80ch; color: var(--ink-2); }
 button.link { background: none; border: 1px solid var(--border); color: var(--ink); border-radius: 6px; padding: 5px 12px; cursor: pointer; font: inherit; }
