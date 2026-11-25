@@ -66,7 +66,7 @@ jobs:
     needs: gate
     if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
 
@@ -127,20 +127,23 @@ jobs:
           { echo '```'; cat scan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       # Notes for journaled sessions that have none (from before notes were
-      # saved, or a day Ollama failed); ~13s per note, so 4 sessions of 50 BUYs
-      # fit in the job limit. Normally nothing is missing and this is a no-op.
+      # saved, or a day Ollama failed). A backfilled note takes ~30s on CI, so
+      # one session of 50 BUYs per run; the step limit keeps a slow run from
+      # starving the journal merge below. Normally this is a no-op.
       - name: Backfill notes
         continue-on-error: true
+        timeout-minutes: 30
         env:
           NO_COLOR: "1"
           COLUMNS: "120"
-        run: uv run aistock backfill-notes --sessions 4 --notes-max 50
+        run: uv run aistock backfill-notes --sessions 1 --notes-max 50
 
       # Manual runs can rewrite notes for chosen sessions, e.g. after the
       # backfill learns new reasons. Each date replaces that session's notes.
       - name: Rewrite notes for chosen sessions
         if: inputs.backfill_dates != ''
         continue-on-error: true
+        timeout-minutes: 45
         env:
           NO_COLOR: "1"
           COLUMNS: "120"
