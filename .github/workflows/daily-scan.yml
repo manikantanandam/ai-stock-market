@@ -1,12 +1,15 @@
 # Daily NIFTY 500 scan after the NSE close; merges the signal journal into main via a PR.
-# GitHub cron is UTC and can start late under load: 11:00 UTC = 16:30 IST.
+# GitHub cron is UTC and delays runs by hours under load, worst on the hour, so
+# the schedule avoids :00. 11:17 UTC = 16:47 IST; the 14:47 UTC (20:17 IST)
+# backup re-runs only if the journal on main still lacks the latest session.
 # Journal rows are keyed by the price bar's session date, so a late run still
-# lands on the right day.
+# lands on the right day, and a re-run replaces that day's rows.
 name: Daily scan
 
 on:
   schedule:
-    - cron: "0 11 * * 1-5"
+    - cron: "17 11 * * 1-5"
+    - cron: "47 14 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -19,7 +22,44 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Scheduled runs skip when main already has the latest session or an earlier
+  # run's journal PR is still open (a second PR on the same rows would conflict).
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+      expected: ${{ steps.check.outputs.expected }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: journal
+
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Latest completed session: today after 15:45 IST, else the previous
+          # day, rolled back over weekends. Holidays aren't known, so on one the
+          # backup run simply scans again.
+          d=$(TZ=Asia/Kolkata date +%Y-%m-%d)
+          [ "$(TZ=Asia/Kolkata date +%H%M)" -lt 1545 ] && d=$(date -d "$d -1 day" +%Y-%m-%d)
+          while [ "$(date -d "$d" +%u)" -gt 5 ]; do d=$(date -d "$d -1 day" +%Y-%m-%d); done
+          echo "expected=$d" >> "$GITHUB_OUTPUT"
+          latest=$(tail -n +2 journal/signals.csv | cut -d, -f1 | sort | tail -1)
+          open=$(gh pr list --state open --search "head:daily-scan/" --json number -q length)
+          run=true
+          if [ "${{ github.event_name }}" = schedule ]; then
+            if [ "$latest" \> "$d" ] || [ "$latest" = "$d" ]; then
+              echo "Journal already has session $latest; skipping"; run=false
+            elif [ "$open" -gt 0 ]; then
+              echo "A daily-scan PR is still open; skipping"; run=false
+            fi
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+
   scan:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -56,6 +96,17 @@ jobs:
           uv run aistock scan --watchlist nifty500 --top 50 | tee scan.txt
           { echo '```'; cat scan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
+      # Yahoo can lag after the close; flag a scan whose latest bar is older
+      # than the expected session (also fires on market holidays).
+      - name: Check data freshness
+        env:
+          EXPECTED: ${{ needs.gate.outputs.expected }}
+        run: |
+          session=$(tail -n +2 journal/signals.csv | cut -d, -f1 | sort | tail -1)
+          if [ "$session" \< "$EXPECTED" ]; then
+            echo "::warning::Scan is as of $session but the latest session should be $EXPECTED (stale Yahoo data or a market holiday)"
+          fi
+
       - name: Paper trading report
         env:
           NO_COLOR: "1"
@@ -79,7 +130,7 @@ jobs:
             echo "Journal unchanged"
             exit 0
           fi
-          day=$(TZ=Asia/Kolkata date +%Y-%m-%d)
+          day=$(tail -n +2 journal/signals.csv | cut -d, -f1 | sort | tail -1)  # session date
           branch="daily-scan/${day}-${{ github.run_id }}"
           git switch -c "$branch"
           git commit -m "Daily scan ${day}"
