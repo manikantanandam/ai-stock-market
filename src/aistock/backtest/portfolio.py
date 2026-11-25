@@ -6,8 +6,8 @@ exits on today's bar (same rules as engine.run: stop, target, trailing stop,
 max hold, gap-aware fills). Cash from an intraday exit is only reusable the
 next day, matching the single-stock engine. Each
 new position gets 1/max_positions of current equity. When more stocks signal
-than there are free slots, the highest technical score wins, with 126-day
-momentum as the tie-break.
+than there are free slots, the best rank wins (rank_inputs: technical score
+by default, or SMA200 slope), with 126-day momentum as the tie-break.
 
 Benchmark: NIFTY 50 price index (^NSEI), which excludes dividends (~1-1.5%/yr),
 so it slightly understates buy-and-hold.
@@ -36,9 +36,23 @@ class Position:
     trail_atr: float | None       # doesn't alter positions already open
 
 
+RANKS = ("score", "slope")
+
+
+def rank_inputs(ind: pd.DataFrame, rank_by: str = "score") -> tuple[pd.Series, pd.Series]:
+    """(primary, tie-break) per bar for ranking candidates: the technical score
+    ("score") or the 20-day change of SMA200 ("slope"), then 126-day momentum."""
+    mom = ind.Close.pct_change(126, fill_method=None)
+    if rank_by == "score":
+        return score_series(ind), mom
+    if rank_by == "slope":
+        return ind.sma200.pct_change(20, fill_method=None), mom
+    raise ValueError(f"unknown rank {rank_by!r}; choose from {', '.join(RANKS)}")
+
+
 def rank(score: float, mom: float) -> tuple:
-    """Sort key for candidates competing for slots: technical score, then 126-day momentum."""
-    return score, np.nan_to_num(mom, nan=-1)
+    """Sort key for candidates competing for slots: primary rank input, then momentum (NaN last)."""
+    return np.nan_to_num(score, nan=-np.inf), np.nan_to_num(mom, nan=-1)
 
 
 def buy(sym: str, entry_i: int, open_: float, high: float, atr: float, mark: float, cash: float,
@@ -81,15 +95,15 @@ def _panel(data: dict[str, pd.DataFrame], dates: pd.DatetimeIndex, col: str) -> 
 
 
 def run(data: dict[str, pd.DataFrame], entries: dict[str, pd.Series], dates: pd.DatetimeIndex,
-        p: Params, max_positions: int) -> tuple[pd.Series, pd.Series, pd.DataFrame]:
+        p: Params, max_positions: int, rank_by: str = "score") -> tuple[pd.Series, pd.Series, pd.DataFrame]:
     """Returns (daily equity, fraction of equity invested, trades).
     `dates` is the trading calendar (e.g. the index's)."""
     syms = list(data)
     o, h, l, c, atr = (_panel(data, dates, k) for k in ("Open", "High", "Low", "Close", "atr14"))
     ent = np.column_stack([entries[s].astype(bool).reindex(dates, fill_value=False).to_numpy() for s in syms])
-    score = np.column_stack([score_series(data[s]).reindex(dates).to_numpy(dtype=float) for s in syms])
-    mom = np.column_stack([data[s].Close.pct_change(126, fill_method=None).reindex(dates).to_numpy(dtype=float)
-                           for s in syms])
+    keys = [rank_inputs(data[s], rank_by) for s in syms]
+    score = np.column_stack([k[0].reindex(dates).to_numpy(dtype=float) for k in keys])
+    mom = np.column_stack([k[1].reindex(dates).to_numpy(dtype=float) for k in keys])
     last_close = pd.DataFrame(c).ffill().to_numpy()
 
     cash, positions, trades, equity, invested = p.capital, {}, [], [], []

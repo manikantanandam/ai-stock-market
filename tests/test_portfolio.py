@@ -59,3 +59,16 @@ def test_equal_weight_benchmark():
             "B": pd.DataFrame({"Close": [100, 90, 81]}, index=idx)}
     curve = portfolio.equal_weight(data, idx)
     assert curve.iloc[-1] == pytest.approx(1.0)  # +10% and -10% average to 0 each day
+
+
+def test_slope_rank_gives_the_slot_to_the_steepest_sma200(free_params):
+    """Three stocks signal on the same bar with one free slot: 'slope' picks the
+    steepest SMA200, 'score' doesn't care about slope."""
+    data = {s: random_walk(400, seed=i, drift=d) for i, (s, d) in enumerate([("FLAT", 0.0), ("UP", 0.003), ("MID", 0.0015)])}
+    dates = data["UP"].index
+    entries = {s: pd.Series(dates == dates[300], index=dates) for s in data}
+    slope = {s: portfolio.rank_inputs(d, "slope")[0].iloc[300] for s, d in data.items()}
+    _, _, trades = portfolio.run(data, entries, dates, free_params, max_positions=1, rank_by="slope")
+    assert trades.symbol.iloc[0] == max(slope, key=slope.get)
+    with pytest.raises(ValueError):
+        portfolio.rank_inputs(data["UP"], "nope")

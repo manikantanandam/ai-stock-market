@@ -24,6 +24,7 @@ class Strategy:
     min_fundamental: float | None = None  # live gate on the fundamental score
     rs: bool = False              # only enter when the stock beat NIFTY 50 over ~3 and ~6 months
     sector: bool = False          # only enter when its sector index is above its SMA50
+    rank: str = "score"           # who gets a slot when signals outnumber them: see portfolio.rank_inputs
 
     def params(self, **overrides) -> Params:
         """Backtest params, with CLI overrides (None means keep the preset)."""
@@ -42,7 +43,8 @@ class Strategy:
         exits.append(f"max {self.max_hold} days")
         filters = [name for name, on in [("market", self.regime), ("RS", self.rs), ("sector", self.sector)] if on]
         entry = self.rule + "".join(f" + {f} filter" for f in filters)
-        return f"{entry}; {', '.join(exits)}"
+        ranked = "" if self.rank == "score" else f"; ranked by {self.rank}"
+        return f"{entry}; {', '.join(exits)}{ranked}"
 
 
 PRESETS = {s.name: s for s in [
@@ -59,6 +61,9 @@ PRESETS = {s.name: s for s in [
     Strategy("leaders", "trend, limited to stocks beating NIFTY 50 whose sector is in an uptrend",
              "score:0.4", regime=True, stop_atr=3.0, target_atr=None, max_hold=90, min_fundamental=0.0,
              rs=True, sector=True),
+    Strategy("leaders-slope", "leaders, but slots go to the steepest SMA200 slope instead of the technical score",
+             "score:0.4", regime=True, stop_atr=3.0, target_atr=None, max_hold=90, min_fundamental=0.0,
+             rs=True, sector=True, rank="slope"),
 ]}
 DEFAULT = "swing"
 
