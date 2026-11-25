@@ -12,6 +12,7 @@ from aistock.backtest import engine, portfolio, sweep, universe, walkforward
 from aistock.data import fundamentals, prices, sectors, watchlists
 from aistock.data.prices import get_prices, market_phase
 from aistock.data.watchlists import WATCHLISTS
+from aistock.llm import notes as llm_notes
 from aistock.ml import features as ml_features
 from aistock.ml import model as ml_model
 from aistock.strategy import account, journal, signal, strategies
@@ -61,6 +62,7 @@ def analyze(
     capital: float = typer.Option(100_000, help="Account size in INR, for position sizing"),
     no_news: bool = typer.Option(False, "--no-news", help="Skip news/FinBERT"),
     strategy: str = typer.Option("all", "--strategy", "-s", help="'all' or comma-separated preset names"),
+    notes: bool = typer.Option(False, "--notes", help="Add a local-LLM (Ollama) note explaining each BUY"),
 ):
     """Technical + fundamental + news scores for one stock, and each strategy's verdict."""
     s = signal.evaluate(symbol, signal.Config(capital=capital), news="none" if no_news else "all",
@@ -79,6 +81,23 @@ def analyze(
         table.add_row(r.strategy, f"[{COLORS[r.action]}]{r.action}[/]", f"{r.stop:.2f}",
                       "-" if r.target is None else f"{r.target:.2f}", str(r.shares), "; ".join(r.why))
     print(table)
+    if notes:
+        _print_notes([(s, name) for name in s.buys])
+
+
+def _print_notes(items: list[tuple]) -> None:
+    """LLM notes for (signal, strategy) pairs; stops at the first sign Ollama is unavailable."""
+    if not items:
+        print("No BUY to explain.")
+        return
+    for s, name in track(items, description="Writing notes", transient=True):
+        try:
+            text = llm_notes.note(s, name)
+        except llm_notes.Unavailable as e:
+            print(f"[yellow]Notes skipped: {e}. Run `brew services start ollama` and "
+                  f"`ollama pull {llm_notes.MODEL}`.[/yellow]")
+            return
+        print(f"\n[bold]{s.symbol} · {name}[/bold]: {text}")
 
 
 @app.command("paper-account")
@@ -123,6 +142,7 @@ def scan(
     news: str = typer.Option("auto", help="all, candidates (only stocks a strategy could BUY), none; "
                                           "auto = all for <= 60 stocks, else candidates"),
     top: int = typer.Option(15, help="Rows to show"),
+    notes: bool = typer.Option(False, "--notes", help="Add a local-LLM (Ollama) note for each BUY shown"),
 ):
     """Run every strategy over a watchlist, list BUYs first, and log to journal/ (day and stock files)."""
     names = [x.strip().upper() for x in symbols.split(",") if x.strip()] or WATCHLISTS[watchlist]
@@ -166,6 +186,8 @@ def scan(
     print(f"BUY by strategy: {per_strategy}")
     print(f"Stocks: BUY {counts['BUY']}  WATCH {counts['WATCH']}  AVOID {counts['AVOID']}  · "
           f"news for {with_news}/{len(results)} · {logged}")
+    if notes:
+        _print_notes([(s, s.buys[0]) for s in results[:top] if s.buys])
     _print_skipped(failed)
 
 
