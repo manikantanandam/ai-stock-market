@@ -5,20 +5,27 @@ strategies that said BUY come from the row, stops and targets from the preset,
 as on the day. Reasons come from the row when it has them (rows from before
 they were journaled don't); otherwise technical reasons are recomputed from
 prices cut at that session and kept only if they reproduce the journaled
-technical score. Past fundamentals and headlines can't be fetched, so those
-reasons are stated as unavailable rather than taken from today's data.
+technical score. News reasons are rebuilt from Google News limited to the 14
+days before the session (the journaled sentiment score is kept; the re-fetched
+headlines may differ a little from what the scan saw). Past fundamentals can't
+be fetched, so those reasons are stated as unavailable rather than taken from
+today's data.
 """
 import math
+from datetime import date
 
 import pandas as pd
 
+from aistock.data.news import get_news_as_of, session_cutoff
 from aistock.data.prices import get_prices
+from aistock.sentiment.finbert import sentiment_score
 from aistock.strategy import journal
 from aistock.strategy.signal import REASONS_SEP, Config, Signal, StrategySignal, levels
 from aistock.strategy.strategies import PRESETS
 from aistock.technical.indicators import technical_score
 
 UNSAVED = "not saved for this session (score only)"
+NEWS_DAYS = 14
 
 
 def sessions_without_notes() -> list[str]:
@@ -46,8 +53,17 @@ def technical_reasons(prices: pd.DataFrame, day: str, expected: float | None) ->
     return why
 
 
-def signal_from_row(row: dict, prices: pd.DataFrame | None = None, c: Config = Config()) -> Signal | None:
-    """Rebuild a BUY's Signal from its journal row; None if no known preset said BUY."""
+def news_reasons(symbol: str, company: str | None, day: str) -> list[str]:
+    """Sentiment reasons from headlines re-fetched for the NEWS_DAYS before `day`."""
+    d = date.fromisoformat(day)
+    _, why = sentiment_score(get_news_as_of(symbol, company, d, NEWS_DAYS), now=session_cutoff(d))
+    return [f"headlines re-fetched later for the {NEWS_DAYS} days to {day}; the score is the one journaled that day"] + why
+
+
+def signal_from_row(row: dict, prices: pd.DataFrame | None = None, c: Config = Config(),
+                    sentiment_why: list[str] | None = None) -> Signal | None:
+    """Rebuild a BUY's Signal from its journal row; None if no known preset said BUY.
+    sentiment_why: rebuilt news reasons, used when the row has none saved."""
     buys = [b for b in str(row.get("buys") or "").split(";") if b in PRESETS]
     close, atr = _num(row.get("close")), _num(row.get("atr"))
     if not buys or close is None or atr is None:
@@ -61,8 +77,12 @@ def signal_from_row(row: dict, prices: pd.DataFrame | None = None, c: Config = C
     if "technical" not in reasons:
         reasons["technical"] = (technical_reasons(prices, row["date"], _num(row.get("technical")))
                                 if prices is not None else [UNSAVED])
-    for part in ("fundamental", "sentiment"):
-        reasons.setdefault(part, [UNSAVED])
+    if "sentiment" not in reasons:
+        if _num(row.get("sentiment")) is None:
+            reasons["sentiment"] = ["news not fetched for this session"]
+        else:
+            reasons["sentiment"] = sentiment_why or [UNSAVED]
+    reasons.setdefault("fundamental", [UNSAVED])
     return Signal(row["symbol"], row.get("name") or row["symbol"], row.get("sector") or "n/a", "BUY",
                   _num(row.get("combined")) or 0.0, _num(row.get("technical")) or 0.0,
                   _num(row.get("fundamental")) or 0.0, _num(row.get("sentiment")),
@@ -80,7 +100,10 @@ def session_signals(day: str, limit: int) -> list[Signal]:
             prices = get_prices(r["symbol"])
         except Exception:  # a delisted or renamed ticker still gets a note without technical reasons
             prices = None
-        s = signal_from_row(r, prices)
+        saved = str(r.get("sentiment_reasons") or "")
+        needs_news = (not saved or saved == "nan") and _num(r.get("sentiment")) is not None
+        s = signal_from_row(r, prices, sentiment_why=news_reasons(r["symbol"], r.get("name"), r["date"])
+                            if needs_news else None)
         if s:
             out.append(s)
     return out
