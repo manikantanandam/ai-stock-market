@@ -1,6 +1,7 @@
 from dataclasses import replace
 from datetime import date
 
+import numpy as np
 import pandas as pd
 import typer
 from rich import print
@@ -8,9 +9,10 @@ from rich.progress import track
 from rich.table import Table
 
 from aistock.backtest import engine, portfolio, sweep, universe, walkforward
-from aistock.data import fundamentals, prices, watchlists
+from aistock.data import fundamentals, prices, sectors, watchlists
 from aistock.data.prices import get_prices, market_phase
 from aistock.data.watchlists import WATCHLISTS
+from aistock.ml import features as ml_features
 from aistock.strategy import account, journal, signal, strategies
 from aistock.strategy import paper as paper_trading
 from aistock.strategy.strategies import PRESETS, Strategy
@@ -476,6 +478,49 @@ def yearly(watchlist: str = WATCHLIST, strategy: str = typer.Option("all", "--st
     universe.REPORTS.mkdir(exist_ok=True)
     path = universe.REPORTS / f"yearly_{watchlist}_{date.today()}.csv"
     res.to_csv(path)
+    print(f"Saved to {path}")
+    _print_skipped(skipped)
+
+
+ML_CACHE = prices.CACHE.parent / "ml"
+
+
+@app.command("ml-dataset")
+def ml_dataset(watchlist: str = typer.Option("nifty500", help=f"One of: {', '.join(WATCHLISTS)}"),
+               years: int = YEARS):
+    """Build the ML ranker's feature/label panel, cache it, and show each feature's rank IC by year."""
+    data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
+    index = add_indicators(get_prices(universe.INDEX, years))
+    industries = {sectors.INDUSTRY.get(s) for s in data} - {None}
+    sector_close = {i: sectors.index(i, years) for i in track(sorted(industries), description="Sectors")}
+    sector_of = {s: sector_close.get(sectors.INDUSTRY.get(s)) for s in data}
+    df = ml_features.dataset(data, index, sector_of, lambda xs: track(xs, description="Features"))
+    ML_CACHE.mkdir(parents=True, exist_ok=True)
+    path = ML_CACHE / f"dataset_{watchlist}_{years}y_{date.today()}.parquet"
+    df.to_parquet(path)
+
+    labelled = df.label.notna()
+    dates = df.index.get_level_values("date")
+    print(f"{len(df):,} rows, {df.index.get_level_values('symbol').nunique()} stocks, "
+          f"{dates.min():%Y-%m-%d} to {dates.max():%Y-%m-%d}; {labelled.mean():.1%} labelled "
+          f"(last {ml_features.HORIZON} sessions have no label)")
+    print(f"Label ({ml_features.HORIZON}-session excess return vs NIFTY): mean {df.label.mean():+.2%}, "
+          f"median {df.label.median():+.2%}, std {df.label.std():.2%}")
+    ic = ml_features.rank_ic(df).T
+    table = Table(title="Rank IC by year (mean daily Spearman of feature vs label; |IC| >= 0.03 is useful)")
+    table.add_column("Feature")
+    for y in ic.columns:
+        table.add_column(str(y), justify="right")
+    table.add_column("Mean", justify="right")
+    table.add_column("Same sign", justify="right")
+    for feat, r in ic.iterrows():
+        if r.isna().all():  # e.g. `market`: one value per date, so no ranking signal on its own
+            table.add_row(f"{feat} (same for all stocks)", *("-" for _ in range(len(r) + 2)), style="dim")
+            continue
+        same = (np.sign(r) == np.sign(r.mean())).sum()
+        table.add_row(feat, *(f"{v:+.3f}" for v in r), f"{r.mean():+.3f}", f"{same}/{len(r)}",
+                      style="bold" if abs(r.mean()) >= 0.03 else None)
+    print(table)
     print(f"Saved to {path}")
     _print_skipped(skipped)
 
