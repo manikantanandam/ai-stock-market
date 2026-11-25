@@ -19,7 +19,7 @@ Target hardware is an M1 with 8GB RAM, so only small local models work: FinBERT 
 - Daily scan also runs on GitHub Actions (`.github/workflows/daily-scan.yml`, 11:17 UTC weekdays, plus a 14:47 UTC backup that runs only if the latest session is missing) and merges the journal into `main` through its own PR, so `git pull` before local scans. Linux uses CPU-only torch via `[tool.uv.sources]` in `pyproject.toml`.
 - Paper trading: `uv run aistock paper` replays journal BUYs through `engine.run` (`strategy/paper.py`); the daily CI run adds its report to the job summary
 - Strategies: presets live in `strategy/strategies.py` (`uv run aistock strategies`); `uv run aistock compare` backtests all presets side by side
-- Backtests: `uv run aistock backtest <SYMBOL>`, `backtest-all`, `portfolio` take `--strategy <preset>`; `--rule/--regime/--rs/--sector/--stop-atr/...` override the preset. `sweep` grid-searches rules independently of presets. Outputs CSVs to `reports/`
+- Backtests: `uv run aistock backtest <SYMBOL>`, `backtest-all`, `portfolio` take `--strategy <preset>`; `--rule/--regime/--rs/--sector/--stop-atr/...` override the preset. `sweep` grid-searches rules, market/RS/sector filters and exits independently of presets (3840 combos; `--rs/--no-rs` etc. pin a filter to cut the grid). Outputs CSVs to `reports/`
 - Ollama (installed via Homebrew): `brew services start ollama`, then `ollama pull qwen2.5:3b`
 
 - Tests: `uv run pytest` (all offline, synthetic data; ~3s). Single test: `uv run pytest tests/test_engine.py::test_gap_down_fills_at_open_not_stop`. `tests/conftest.py` has `bars()` for exact OHLC scenarios and `random_walk()` for frames with indicators.

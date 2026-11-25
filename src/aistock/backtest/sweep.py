@@ -1,4 +1,4 @@
-"""Grid search over entry rules, market filter and exits on a watchlist.
+"""Grid search over entry rules, market / RS / sector filters and exits on a watchlist.
 
 Every combo is ranked on IN-SAMPLE pooled results only; the top few are then
 run once on the out-of-sample segment. With hundreds of combos the best
@@ -16,18 +16,25 @@ from aistock.backtest import engine, universe
 GRID = {
     "rule": ["score:0.4", "score:0.6", "pullback", "breakout", "ema_cross"],
     "regime": [False, True],
+    "rs": [False, True],
+    "sector": [False, True],
     "stop_atr": [1.5, 2.0, 3.0],
     "target_atr": [2.0, 3.0, 5.0, None],
     "trail_atr": [None, 3.0],
     "max_hold": [20, 40, 60, 90],
 }
-BASELINE = {"rule": "score:0.4", "regime": False, "stop_atr": 2.0,
+BASELINE = {"rule": "score:0.4", "regime": False, "rs": False, "sector": False, "stop_atr": 2.0,
             "target_atr": 3.0, "trail_atr": None, "max_hold": 20}
 RANK_BY = ("profit_factor", "avg_trade", "median_cagr", "median_sharpe")
 
 
-def combos() -> list[dict]:
-    return [dict(zip(GRID, values)) for values in product(*GRID.values())]
+def pinned(**fixed) -> dict[str, list]:
+    """GRID with some dimensions fixed to one value (None = keep sweeping it)."""
+    return GRID | {k: [v] for k, v in fixed.items() if v is not None}
+
+
+def combos(grid: dict[str, list] = GRID) -> list[dict]:
+    return [dict(zip(grid, values)) for values in product(*grid.values())]
 
 
 def _params(row: dict) -> dict:
@@ -36,25 +43,30 @@ def _params(row: dict) -> dict:
 
 
 def run(data: dict[str, pd.DataFrame], market: pd.Series, oos: float, rank_by: str,
-        min_trades: int, top: int, progress=iter) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Returns (all combos with in-sample stats, top + baseline with IS and OOS stats)."""
-    entries = {(rule, reg): universe.build_entries(data, rule, market if reg else None)
-               for rule, reg in product(GRID["rule"], GRID["regime"])}
+        min_trades: int, top: int, years: int, grid: dict[str, list] = GRID,
+        progress=iter) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Returns (all combos with in-sample stats, top + baseline with IS and OOS stats).
+    The baseline is left out when the grid excludes it (e.g. RS pinned on)."""
+    filters = {(rs, sec): universe.filters(data, rs, sec, years) for rs, sec in product(grid["rs"], grid["sector"])}
+    entries = {(rule, reg, rs, sec): universe.build_entries(data, rule, market if reg else None, filters[(rs, sec)])
+               for rule, reg, rs, sec in product(grid["rule"], grid["regime"], grid["rs"], grid["sector"])}
 
     def evaluate(c: dict, segment: str) -> dict:
         p = engine.Params(stop_atr=c["stop_atr"], target_atr=c["target_atr"],
                           trail_atr=c["trail_atr"], max_hold=c["max_hold"])
-        stats, trades = universe.run_universe(data, entries[(c["rule"], c["regime"])], p, oos, only=(segment,))
+        key = (c["rule"], c["regime"], c["rs"], c["sector"])
+        stats, trades = universe.run_universe(data, entries[key], p, oos, only=(segment,))
         return universe.pooled(stats, trades, segment)
 
-    rows = [{**c, **evaluate(c, "In-sample")} for c in progress(combos())]
+    rows = [{**c, **evaluate(c, "In-sample")} for c in progress(combos(grid))]
     results = pd.DataFrame(rows)
     eligible = results[results.trades >= min_trades].sort_values(rank_by, ascending=False)
 
     picks = [_params(r) | {"_row": r} for r in eligible.head(top).to_dict("records")]
     if not any(_params(p["_row"]) == BASELINE for p in picks):
-        base = next(r for r in results.to_dict("records") if _params(r) == BASELINE)
-        picks.append(_params(base) | {"_row": base})
+        base = next((r for r in results.to_dict("records") if _params(r) == BASELINE), None)
+        if base is not None:
+            picks.append(_params(base) | {"_row": base})
 
     final = []
     for pick in picks:

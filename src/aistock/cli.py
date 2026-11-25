@@ -380,24 +380,29 @@ def compare(watchlist: str = WATCHLIST, strategy: str = typer.Option("all", "--s
 def sweep_cmd(watchlist: str = WATCHLIST, years: int = YEARS, oos: float = OOS,
               rank_by: str = typer.Option("profit_factor", help=f"One of: {', '.join(sweep.RANK_BY)}"),
               min_trades: int = typer.Option(300, help="Ignore combos with fewer in-sample trades"),
-              top: int = typer.Option(10, help="Combos to re-test out-of-sample")):
-    """Grid-search rules, market filter and exits; rank in-sample, then check the top picks out-of-sample."""
+              top: int = typer.Option(10, help="Combos to re-test out-of-sample"),
+              regime: bool = typer.Option(None, "--regime/--no-regime", help="Pin the market filter instead of sweeping it"),
+              rs: bool = typer.Option(None, "--rs/--no-rs", help="Pin the RS filter instead of sweeping it"),
+              sector: bool = typer.Option(None, "--sector/--no-sector", help="Pin the sector filter instead of sweeping it")):
+    """Grid-search rules, market/RS/sector filters and exits; rank in-sample, then check the top picks out-of-sample."""
     if rank_by not in sweep.RANK_BY:
         raise typer.BadParameter(f"rank-by must be one of {sweep.RANK_BY}")
     data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
-    results, final = sweep.run(data, universe.regime(years), oos, rank_by, min_trades, top,
+    grid = sweep.pinned(regime=regime, rs=rs, sector=sector)
+    results, final = sweep.run(data, universe.regime(years), oos, rank_by, min_trades, top, years, grid,
                                progress=lambda xs: track(xs, description=f"Sweeping {len(xs)} combos"))
     path = sweep.save(results, watchlist)
 
     table = Table(title=f"Top {top} by in-sample {rank_by} (min {min_trades} trades), then out-of-sample")
-    for col in ["#", "Rule", "Mkt", "Stop", "Tgt", "Trail", "Hold",
+    for col in ["#", "Rule", "Mkt", "RS", "Sec", "Stop", "Tgt", "Trail", "Hold",
                 "IS n", "IS PF", "IS avg", "OOS n", "OOS PF", "OOS avg", "OOS win", "OOS CAGR", "B&H CAGR"]:
-        table.add_column(col, justify="left" if col in ("Rule", "Mkt") else "right")
+        table.add_column(col, justify="left" if col in ("Rule", "Mkt", "RS", "Sec") else "right")
+    on_off = lambda v: "on" if v else "off"
     opt = lambda v: "-" if v is None or pd.isna(v) else f"{v:g}"
     for n, r in enumerate(final.to_dict("records"), 1):
         g = lambda k, f: f(r[k]) if r.get(k) is not None and not pd.isna(r[k]) else "-"
         table.add_row(
-            "base" if r["baseline"] else str(n), r["rule"], "on" if r["regime"] else "off",
+            "base" if r["baseline"] else str(n), r["rule"], on_off(r["regime"]), on_off(r["rs"]), on_off(r["sector"]),
             opt(r["stop_atr"]), opt(r["target_atr"]), opt(r["trail_atr"]), str(r["max_hold"]),
             g("is_trades", str), g("is_profit_factor", num), g("is_avg_trade", pct),
             g("oos_trades", str), g("oos_profit_factor", num), g("oos_avg_trade", pct),
