@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,INDIANB,Indian Bank,Financial Services,WATCH,0.34,0.2,0.8,,937.0,,,,,22.35
+2026-11-19,INDIANB,Indian Bank,Financial Services,WATCH,0.24,0.0,0.8,,947.0,,,,,21.99
+2026-11-20,INDIANB,Indian Bank,Financial Services,WATCH,0.24,0.0,0.8,,950.0,,,,,22.61
+2026-11-23,INDIANB,Indian Bank,Financial Services,WATCH,0.34,0.2,0.8,,933.0,,,,,23.47

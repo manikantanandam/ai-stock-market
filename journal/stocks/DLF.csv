@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,DLF,DLF Limited,Real Estate,BUY,0.467,0.6,0.25,0.461,764.3,,,,swing;trend,18.39
+2026-11-19,DLF,DLF Limited,Real Estate,BUY,0.379,0.4,0.25,0.522,768.0,,,,trend,17.82
+2026-11-20,DLF,DLF Limited,Real Estate,BUY,0.3,0.4,0.25,0.125,785.0,,,,trend;breakout,18.76
+2026-11-23,DLF,DLF Limited,Real Estate,BUY,0.302,0.4,0.25,0.134,794.1,,,,trend,18.21

@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.44,0.6,0.4,0.102,4369.0,,,,swing;trend,114.82
+2026-11-19,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.464,0.6,0.4,0.22,4601.4,,,,swing;trend,123.21
+2026-11-20,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.459,0.6,0.4,0.197,4590.0,,,,swing;trend,118.74
+2026-11-23,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.449,0.6,0.4,0.143,4528.2,,,,swing;trend,117.75

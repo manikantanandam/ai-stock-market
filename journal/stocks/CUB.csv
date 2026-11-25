@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,CUB,City Union Bank Limited,Financial Services,WATCH,0.404,0.6,0.55,-0.303,232.2,,,,,8.4
+2026-11-19,CUB,City Union Bank Limited,Financial Services,BUY,0.418,0.6,0.55,-0.236,234.16,,,,swing;trend,8.18
+2026-11-20,CUB,City Union Bank Limited,Financial Services,BUY,0.454,0.6,0.55,-0.056,248.8,,,,swing;trend;breakout,9.09
+2026-11-23,CUB,City Union Bank Limited,Financial Services,BUY,0.471,0.6,0.55,0.031,245.54,,,,swing;trend,9.37

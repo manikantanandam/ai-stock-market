@@ -88,7 +88,7 @@ def scan(
                                           "auto = all for <= 60 stocks, else candidates"),
     top: int = typer.Option(15, help="Rows to show"),
 ):
-    """Run every strategy over a watchlist, list BUYs first, and log to journal/signals.csv."""
+    """Run every strategy over a watchlist, list BUYs first, and log to journal/ (day and stock files)."""
     names = [x.strip().upper() for x in symbols.split(",") if x.strip()] or WATCHLISTS[watchlist]
     chosen = _strategy_list(strategy)
     if news == "auto":

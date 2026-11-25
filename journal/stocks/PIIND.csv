@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1624.0,,,,,70.47
+2026-11-19,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1630.0,,,,,68.38
+2026-11-20,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1597.4,,,,,66.16
+2026-11-23,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1571.0,,,,,64.45

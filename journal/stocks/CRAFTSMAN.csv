@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.463,0.6,0.35,0.291,11345.0,,,,swing;trend,415.66
+2026-11-19,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.369,0.4,0.35,0.321,11930.0,,,,trend;breakout,453.04
+2026-11-20,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.444,0.6,0.35,0.195,11723.0,,,,swing;trend,450.61
+2026-11-23,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.44,0.6,0.35,0.176,11649.0,,,,swing;trend,457.99

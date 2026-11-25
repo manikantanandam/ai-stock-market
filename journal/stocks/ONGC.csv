@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,ONGC,Oil and Natural Gas Corporation Limited,Energy,WATCH,0.295,0.2,0.65,,225.0,,,,,4.05
+2026-11-19,ONGC,Oil and Natural Gas Corporation Limited,Energy,WATCH,0.295,0.2,0.65,,224.52,,,,,3.93
+2026-11-20,ONGC,Oil and Natural Gas Corporation Limited,Energy,WATCH,0.295,0.2,0.65,,223.46,,,,,3.86
+2026-11-23,ONGC,Oil and Natural Gas Corporation Limited,Energy,WATCH,0.095,-0.2,0.65,,222.85,,,,,3.77

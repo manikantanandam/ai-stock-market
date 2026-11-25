@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,ETERNAL,Eternal Limited,Consumer Cyclical,BUY,0.388,0.6,0.1,0.291,366.0,,,,trend,9.8
+2026-11-19,ETERNAL,Eternal Limited,Consumer Cyclical,BUY,0.349,0.6,0.1,0.096,366.85,,,,trend,9.9
+2026-11-20,ETERNAL,Eternal Limited,Consumer Cyclical,BUY,0.348,0.6,0.1,0.088,364.0,,,,trend,9.65
+2026-11-23,ETERNAL,Eternal Limited,Consumer Cyclical,WATCH,0.13,0.2,0.1,,362.1,,,,,9.57

@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,SAIL,Steel Authority of India Limited,Basic Materials,WATCH,0.235,0.2,0.45,,164.0,,,,,6.13
+2026-11-19,SAIL,Steel Authority of India Limited,Basic Materials,WATCH,0.035,-0.2,0.45,,164.43,,,,,6.0
+2026-11-20,SAIL,Steel Authority of India Limited,Basic Materials,WATCH,0.035,-0.2,0.45,,164.11,,,,,6.0
+2026-11-23,SAIL,Steel Authority of India Limited,Basic Materials,WATCH,0.035,-0.2,0.45,,162.0,,,,,5.96

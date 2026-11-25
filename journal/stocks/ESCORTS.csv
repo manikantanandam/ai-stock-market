@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,ESCORTS,Escorts Kubota Limited,Industrials,WATCH,-0.195,-0.6,0.35,,2400.7,,,,,66.61
+2026-11-19,ESCORTS,Escorts Kubota Limited,Industrials,WATCH,0.005,-0.2,0.35,,2450.1,,,,,67.0
+2026-11-20,ESCORTS,Escorts Kubota Limited,Industrials,WATCH,0.005,-0.2,0.35,,2471.4,,,,,65.98
+2026-11-23,ESCORTS,Escorts Kubota Limited,Industrials,WATCH,0.005,-0.2,0.35,,2450.0,,,,,65.18

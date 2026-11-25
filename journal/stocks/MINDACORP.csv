@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,MINDACORP,Minda Corporation Limited,Consumer Cyclical,BUY,0.546,0.6,0.6,0.331,714.2,,,,swing;trend,26.39
+2026-11-19,MINDACORP,Minda Corporation Limited,Consumer Cyclical,BUY,0.526,0.6,0.6,0.232,753.2,,,,swing;trend;breakout,28.14
+2026-11-20,MINDACORP,Minda Corporation Limited,Consumer Cyclical,BUY,0.494,0.6,0.6,0.072,749.3,,,,swing;trend,27.82
+2026-11-23,MINDACORP,Minda Corporation Limited,Consumer Cyclical,BUY,0.497,0.6,0.6,0.086,727.2,,,,swing;trend,28.8

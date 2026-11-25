@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,JINDALSTEL,Jindal Steel Limited,Basic Materials,WATCH,0.19,0.2,0.3,,1103.0,,,,,28.91
+2026-11-19,JINDALSTEL,Jindal Steel Limited,Basic Materials,WATCH,-0.01,-0.2,0.3,,1114.5,,,,,29.08
+2026-11-20,JINDALSTEL,Jindal Steel Limited,Basic Materials,WATCH,-0.01,-0.2,0.3,,1131.9,,,,,30.55
+2026-11-23,JINDALSTEL,Jindal Steel Limited,Basic Materials,WATCH,-0.01,-0.2,0.3,,1131.3,,,,,30.46

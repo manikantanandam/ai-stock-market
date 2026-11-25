@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1186.0,,,,,66.19
+2026-11-19,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1210.8,,,,,65.84
+2026-11-20,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1200.0,,,,,63.18
+2026-11-23,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1174.2,,,,,61.44

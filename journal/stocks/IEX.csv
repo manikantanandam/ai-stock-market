@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,IEX,Indian Energy Exchange Limited,Financial Services,WATCH,0.4,0.2,1.0,,115.0,,,,,3.15
+2026-11-19,IEX,Indian Energy Exchange Limited,Financial Services,WATCH,0.4,0.2,1.0,,115.17,,,,,3.26
+2026-11-20,IEX,Indian Energy Exchange Limited,Financial Services,WATCH,0.4,0.2,1.0,,113.15,,,,,3.25
+2026-11-23,IEX,Indian Energy Exchange Limited,Financial Services,WATCH,0.2,-0.2,1.0,,109.15,,,,,3.48

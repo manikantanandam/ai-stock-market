@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,VBL,Varun Beverages Limited,Consumer Defensive,WATCH,0.265,0.2,0.55,,424.55,,,,,11.62
+2026-11-19,VBL,Varun Beverages Limited,Consumer Defensive,WATCH,0.065,-0.2,0.55,,420.5,,,,,11.47
+2026-11-20,VBL,Varun Beverages Limited,Consumer Defensive,WATCH,0.265,0.2,0.55,,427.5,,,,,11.4
+2026-11-23,VBL,Varun Beverages Limited,Consumer Defensive,WATCH,0.265,0.2,0.55,,427.15,,,,,11.06

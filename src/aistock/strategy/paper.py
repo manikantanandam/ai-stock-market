@@ -17,7 +17,7 @@ import pandas as pd
 
 from aistock.backtest import engine
 from aistock.data.prices import IST, get_prices, market_phase, prefetch
-from aistock.strategy.journal import JOURNAL
+from aistock.strategy import journal
 from aistock.strategy.strategies import PRESETS
 from aistock.technical.indicators import add_indicators
 
@@ -27,7 +27,9 @@ INDEX = "^NSEI"
 def load_signals(since: str | None = None, only: list[str] | None = None) -> pd.DataFrame:
     """One row per (date, symbol, strategy) BUY. Rows from before strategy
     presets existed (no `buys` column) were swing signals."""
-    j = pd.read_csv(JOURNAL, dtype={"buys": str})
+    j = journal.load(dtype={"buys": str})
+    if j.empty:
+        return pd.DataFrame(columns=["date", "symbol", "strategy"])
     if "buys" not in j:
         j["buys"] = None
     legacy = j.buys.isna() & (j.action == "BUY")

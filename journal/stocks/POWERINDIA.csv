@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.31,0.2,0.7,,30840.0,,,,,1323.35
+2026-11-19,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.31,0.2,0.7,,30750.0,,,,,1267.75
+2026-11-20,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.31,0.2,0.7,,30150.0,,,,,1253.98
+2026-11-23,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.31,0.2,0.7,,30240.0,,,,,1220.84

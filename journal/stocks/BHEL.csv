@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,BHEL,Bharat Heavy Electricals Limited,Industrials,WATCH,0.265,0.2,0.55,,421.7,,,,,14.13
+2026-11-19,BHEL,Bharat Heavy Electricals Limited,Industrials,BUY,0.57,0.6,0.55,0.527,435.0,,,,swing;trend,14.28
+2026-11-20,BHEL,Bharat Heavy Electricals Limited,Industrials,BUY,0.499,0.6,0.55,0.17,433.65,,,,swing;trend,13.95
+2026-11-23,BHEL,Bharat Heavy Electricals Limited,Industrials,WATCH,0.265,0.2,0.55,,415.7,,,,,14.41

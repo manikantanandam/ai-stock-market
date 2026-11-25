@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,ATUL,Atul Ltd,Basic Materials,WATCH,0.105,0.0,0.35,,5018.5,,,,,147.62
+2026-11-19,ATUL,Atul Ltd,Basic Materials,WATCH,0.005,-0.2,0.35,,5064.0,,,,,144.75
+2026-11-20,ATUL,Atul Ltd,Basic Materials,WATCH,0.005,-0.2,0.35,,5057.0,,,,,146.2
+2026-11-23,ATUL,Atul Ltd,Basic Materials,WATCH,0.005,-0.2,0.35,,5034.5,,,,,140.22

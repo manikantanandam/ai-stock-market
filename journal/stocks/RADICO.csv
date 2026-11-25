@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,RADICO,Radico Khaitan Limited,Consumer Defensive,BUY,0.516,0.6,0.8,-0.119,4665.0,,,,swing;trend,131.52
+2026-11-19,RADICO,Radico Khaitan Limited,Consumer Defensive,BUY,0.535,0.6,0.8,-0.023,4660.0,,,,swing;trend,133.95
+2026-11-20,RADICO,Radico Khaitan Limited,Consumer Defensive,BUY,0.537,0.6,0.8,-0.013,4665.0,,,,swing;trend,129.5
+2026-11-23,RADICO,Radico Khaitan Limited,Consumer Defensive,BUY,0.526,0.6,0.8,-0.071,4636.5,,,,swing;trend,127.52

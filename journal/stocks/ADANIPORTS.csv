@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,BUY,0.543,0.6,0.55,0.388,1902.6,,,,swing;trend,47.26
+2026-11-19,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,BUY,0.538,0.6,0.55,0.366,1917.1,,,,swing;trend,46.11
+2026-11-20,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,WATCH,0.265,0.2,0.55,,1917.0,,,,,44.78
+2026-11-23,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,WATCH,0.265,0.2,0.55,,1919.0,,,,,44.89

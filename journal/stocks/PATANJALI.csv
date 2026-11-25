@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,PATANJALI,Patanjali Foods Limited,Consumer Defensive,WATCH,0.205,0.2,0.35,,401.0,,,,,14.1
+2026-11-19,PATANJALI,Patanjali Foods Limited,Consumer Defensive,WATCH,0.205,0.2,0.35,,402.0,,,,,13.46
+2026-11-20,PATANJALI,Patanjali Foods Limited,Consumer Defensive,WATCH,0.005,-0.2,0.35,,404.2,,,,,12.88
+2026-11-23,PATANJALI,Patanjali Foods Limited,Consumer Defensive,WATCH,0.005,-0.2,0.35,,407.0,,,,,12.47

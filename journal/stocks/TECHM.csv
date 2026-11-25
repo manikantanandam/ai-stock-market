@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,TECHM,Tech Mahindra Limited,Technology,WATCH,0.34,0.2,0.8,,1750.0,,,,,43.95
+2026-11-19,TECHM,Tech Mahindra Limited,Technology,WATCH,0.34,0.2,0.8,,1723.0,,,,,44.49
+2026-11-20,TECHM,Tech Mahindra Limited,Technology,WATCH,0.34,0.2,0.8,,1746.2,,,,,46.27
+2026-11-23,TECHM,Tech Mahindra Limited,Technology,WATCH,0.34,0.2,0.8,,1777.5,,,,,47.43

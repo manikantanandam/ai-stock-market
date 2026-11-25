@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,HDFCBANK,HDFC Bank Limited,Financial Services,WATCH,0.165,0.0,0.55,,808.15,,,,,16.31
+2026-11-19,HDFCBANK,HDFC Bank Limited,Financial Services,WATCH,0.165,0.0,0.55,,821.8,,,,,16.42
+2026-11-20,HDFCBANK,HDFC Bank Limited,Financial Services,WATCH,0.165,0.0,0.55,,846.0,,,,,17.73
+2026-11-23,HDFCBANK,HDFC Bank Limited,Financial Services,WATCH,0.265,0.2,0.55,,817.8,,,,,19.73

@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,PETRONET,Petronet LNG Limited,Energy,BUY,0.489,0.6,0.6,0.047,325.5,,,,swing;trend,7.6
+2026-11-19,PETRONET,Petronet LNG Limited,Energy,BUY,0.537,0.6,0.6,0.283,330.8,,,,swing;trend,7.45
+2026-11-20,PETRONET,Petronet LNG Limited,Energy,BUY,0.511,0.6,0.6,0.157,329.15,,,,swing;trend,7.27
+2026-11-23,PETRONET,Petronet LNG Limited,Energy,BUY,0.531,0.6,0.6,0.256,326.05,,,,swing;trend,7.06

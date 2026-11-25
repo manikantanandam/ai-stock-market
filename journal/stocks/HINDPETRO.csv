@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,HINDPETRO,Hindustan Petroleum Corporation Limited,Energy,WATCH,0.01,0.2,-0.3,,386.45,,,,,10.96
+2026-11-19,HINDPETRO,Hindustan Petroleum Corporation Limited,Energy,WATCH,0.01,0.2,-0.3,,390.0,,,,,10.6
+2026-11-20,HINDPETRO,Hindustan Petroleum Corporation Limited,Energy,WATCH,0.01,0.2,-0.3,,396.35,,,,,10.85
+2026-11-23,HINDPETRO,Hindustan Petroleum Corporation Limited,Energy,WATCH,0.01,0.2,-0.3,,385.0,,,,,11.22

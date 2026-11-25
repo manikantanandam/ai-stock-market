@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,DEEPAKFERT,Deepak Fertilisers And Petrochemicals Corporation Limited,Basic Materials,BUY,0.367,0.4,0.45,0.162,1480.5,,,,trend;breakout,61.03
+2026-11-19,DEEPAKFERT,Deepak Fertilisers And Petrochemicals Corporation Limited,Basic Materials,BUY,0.461,0.6,0.45,0.128,1449.9,,,,swing;trend,59.72
+2026-11-20,DEEPAKFERT,Deepak Fertilisers And Petrochemicals Corporation Limited,Basic Materials,BUY,0.476,0.6,0.45,0.203,1437.2,,,,swing;trend,57.61
+2026-11-23,DEEPAKFERT,Deepak Fertilisers And Petrochemicals Corporation Limited,Basic Materials,BUY,0.482,0.6,0.45,0.234,1416.5,,,,swing;trend,55.79

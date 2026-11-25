@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,IOC,Indian Oil Corporation Limited,Energy,WATCH,0.31,0.2,0.7,,143.82,,,,,3.2
+2026-11-19,IOC,Indian Oil Corporation Limited,Energy,WATCH,0.31,0.2,0.7,,147.8,,,,,3.26
+2026-11-20,IOC,Indian Oil Corporation Limited,Energy,WATCH,0.21,0.0,0.7,,150.5,,,,,3.38
+2026-11-23,IOC,Indian Oil Corporation Limited,Energy,WATCH,0.31,0.2,0.7,,145.0,,,,,3.63

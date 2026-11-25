@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.14,-0.2,0.8,,673.15,,,,,49.06
+2026-11-19,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.14,-0.2,0.8,,654.55,,,,,47.96
+2026-11-20,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.14,-0.2,0.8,,621.85,,,,,46.87
+2026-11-23,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.24,0.0,0.8,,590.8,,,,,45.74

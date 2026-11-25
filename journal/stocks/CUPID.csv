@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,CUPID,Cupid Limited,Consumer Defensive,BUY,0.619,0.6,0.8,0.395,363.2,,,,swing;trend,16.8
+2026-11-19,CUPID,Cupid Limited,Consumer Defensive,BUY,0.618,0.6,0.8,0.388,365.95,,,,swing;trend,16.56
+2026-11-20,CUPID,Cupid Limited,Consumer Defensive,BUY,0.597,0.6,0.8,0.284,365.65,,,,swing;trend,15.9
+2026-11-23,CUPID,Cupid Limited,Consumer Defensive,BUY,0.545,0.6,0.8,0.023,362.15,,,,swing;trend,15.5

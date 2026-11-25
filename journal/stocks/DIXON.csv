@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,DIXON,Dixon Technologies (India) Limited,Technology,WATCH,0.22,0.2,0.4,,12615.0,,,,,404.79
+2026-11-19,DIXON,Dixon Technologies (India) Limited,Technology,BUY,0.457,0.6,0.4,0.186,13054.0,,,,swing;trend,410.52
+2026-11-20,DIXON,Dixon Technologies (India) Limited,Technology,BUY,0.449,0.6,0.4,0.147,13120.0,,,,swing;trend,402.56
+2026-11-23,DIXON,Dixon Technologies (India) Limited,Technology,BUY,0.434,0.6,0.4,0.069,13390.0,,,,swing;trend,402.38

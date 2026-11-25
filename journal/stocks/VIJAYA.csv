@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,VIJAYA,Vijaya Diagnostic Centre Limited,Healthcare,BUY,0.564,0.6,0.8,0.118,1533.6,,,,swing;trend;breakout,56.78
+2026-11-19,VIJAYA,Vijaya Diagnostic Centre Limited,Healthcare,BUY,0.579,0.6,0.8,0.193,1510.6,,,,swing;trend,56.56
+2026-11-20,VIJAYA,Vijaya Diagnostic Centre Limited,Healthcare,BUY,0.594,0.6,0.8,0.272,1572.3,,,,swing;trend;breakout,58.71
+2026-11-23,VIJAYA,Vijaya Diagnostic Centre Limited,Healthcare,BUY,0.578,0.6,0.8,0.189,1572.6,,,,swing;trend,61.02

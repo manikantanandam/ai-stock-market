@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,ZENTEC,Zen Technologies Limited,Industrials,BUY,0.469,0.6,0.55,0.021,1724.0,,,,swing;trend,62.22
+2026-11-19,ZENTEC,Zen Technologies Limited,Industrials,BUY,0.469,0.6,0.55,0.021,1706.0,,,,swing;trend,60.33
+2026-11-20,ZENTEC,Zen Technologies Limited,Industrials,WATCH,0.265,0.2,0.55,,1680.9,,,,,59.21
+2026-11-23,ZENTEC,Zen Technologies Limited,Industrials,WATCH,0.265,0.2,0.55,,1694.6,,,,,58.07

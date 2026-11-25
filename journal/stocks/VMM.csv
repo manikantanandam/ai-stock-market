@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,VMM,Vishal Mega Mart Limited,Consumer Cyclical,WATCH,0.02,-0.2,0.4,,90.23,,,,,2.93
+2026-11-19,VMM,Vishal Mega Mart Limited,Consumer Cyclical,WATCH,0.02,-0.2,0.4,,91.99,,,,,2.91
+2026-11-20,VMM,Vishal Mega Mart Limited,Consumer Cyclical,WATCH,0.02,-0.2,0.4,,91.98,,,,,2.83
+2026-11-23,VMM,Vishal Mega Mart Limited,Consumer Cyclical,WATCH,0.02,-0.2,0.4,,94.5,,,,,2.89

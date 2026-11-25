@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,SCHNEIDER,Schneider Electric Infrastructure Limited,Industrials,WATCH,0.06,0.0,0.2,,998.2,,,,,45.89
+2026-11-19,SCHNEIDER,Schneider Electric Infrastructure Limited,Industrials,WATCH,-0.04,-0.2,0.2,,1008.5,,,,,44.35
+2026-11-20,SCHNEIDER,Schneider Electric Infrastructure Limited,Industrials,WATCH,-0.04,-0.2,0.2,,1042.4,,,,,45.17
+2026-11-23,SCHNEIDER,Schneider Electric Infrastructure Limited,Industrials,WATCH,-0.04,-0.2,0.2,,1008.8,,,,,45.7

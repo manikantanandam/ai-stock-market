@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,KARURVYSYA,The Karur Vysya Bank Limited,Financial Services,BUY,0.655,0.6,0.8,0.574,387.0,,,,swing;trend,13.36
+2026-11-19,KARURVYSYA,The Karur Vysya Bank Limited,Financial Services,BUY,0.63,0.6,0.8,0.452,384.0,,,,swing;trend,13.36
+2026-11-20,KARURVYSYA,The Karur Vysya Bank Limited,Financial Services,BUY,0.572,0.6,0.8,0.158,377.0,,,,swing;trend,13.31
+2026-11-23,KARURVYSYA,The Karur Vysya Bank Limited,Financial Services,BUY,0.577,0.6,0.8,0.185,384.1,,,,swing;trend,13.61

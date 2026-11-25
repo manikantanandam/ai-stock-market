@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.265,-0.2,-0.55,,32.58,,,,,1.81
+2026-11-19,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.265,-0.2,-0.55,,32.87,,,,,1.74
+2026-11-20,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.465,-0.6,-0.55,,32.59,,,,,1.65
+2026-11-23,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.465,-0.6,-0.55,,32.06,,,,,1.61

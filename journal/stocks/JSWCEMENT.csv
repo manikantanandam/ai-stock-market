@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,123.21,,,,,3.06
+2026-11-19,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,124.05,,,,,2.97
+2026-11-20,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,126.47,,,,,3.04
+2026-11-23,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,125.74,,,,,3.06

@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,LUPIN,Lupin Limited,Healthcare,WATCH,0.11,-0.2,0.7,,1971.9,,,,,41.54
+2026-11-19,LUPIN,Lupin Limited,Healthcare,WATCH,0.11,-0.2,0.7,,1998.8,,,,,41.61
+2026-11-20,LUPIN,Lupin Limited,Healthcare,WATCH,0.11,-0.2,0.7,,2014.0,,,,,40.7
+2026-11-23,LUPIN,Lupin Limited,Healthcare,WATCH,0.11,-0.2,0.7,,1975.6,,,,,40.93

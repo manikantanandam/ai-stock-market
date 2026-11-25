@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,M&M,Mahindra & Mahindra Limited,Consumer Cyclical,WATCH,0.31,0.2,0.7,,3359.1,,,,,82.94
+2026-11-19,M&M,Mahindra & Mahindra Limited,Consumer Cyclical,WATCH,0.21,0.0,0.7,,3509.0,,,,,90.79
+2026-11-20,M&M,Mahindra & Mahindra Limited,Consumer Cyclical,WATCH,0.21,0.0,0.7,,3545.0,,,,,90.79
+2026-11-23,M&M,Mahindra & Mahindra Limited,Consumer Cyclical,WATCH,0.31,0.2,0.7,,3487.4,,,,,91.43

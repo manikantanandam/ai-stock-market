@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,APOLLOHOSP,Apollo Hospitals Enterprise Limited,Healthcare,BUY,0.487,0.6,0.6,0.036,8821.0,,,,swing;trend,200.15
+2026-11-19,APOLLOHOSP,Apollo Hospitals Enterprise Limited,Healthcare,BUY,0.57,0.6,0.6,0.452,8738.0,,,,swing;trend,195.21
+2026-11-20,APOLLOHOSP,Apollo Hospitals Enterprise Limited,Healthcare,BUY,0.443,0.4,0.6,0.313,9200.0,,,,swing;trend;breakout,220.16
+2026-11-23,APOLLOHOSP,Apollo Hospitals Enterprise Limited,Healthcare,BUY,0.459,0.4,0.6,0.396,9257.0,,,,swing;trend,219.44

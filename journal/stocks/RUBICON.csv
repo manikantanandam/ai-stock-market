@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,RUBICON,Rubicon Research Limited,Healthcare,BUY,0.549,0.6,0.8,0.043,1658.3,,,,swing;trend,67.35
+2026-11-19,RUBICON,Rubicon Research Limited,Healthcare,BUY,0.56,0.6,0.8,0.101,1722.3,,,,swing;trend,69.28
+2026-11-20,RUBICON,Rubicon Research Limited,Healthcare,BUY,0.572,0.6,0.8,0.159,1718.7,,,,swing;trend,68.88
+2026-11-23,RUBICON,Rubicon Research Limited,Healthcare,BUY,0.558,0.6,0.8,0.091,1675.7,,,,swing;trend,72.18

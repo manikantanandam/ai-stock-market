@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,AETHER,Aether Industries Limited,Basic Materials,BUY,0.557,0.6,0.55,0.46,1647.2,,,,swing;trend,68.89
+2026-11-19,AETHER,Aether Industries Limited,Basic Materials,BUY,0.535,0.6,0.55,0.349,1696.5,,,,swing;trend,70.11
+2026-11-20,AETHER,Aether Industries Limited,Basic Materials,WATCH,0.265,0.2,0.55,,1620.3,,,,,71.1
+2026-11-23,AETHER,Aether Industries Limited,Basic Materials,WATCH,0.265,0.2,0.55,,1596.9,,,,,70.66

@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,ANURAS,Anupam Rasayan India Ltd,Basic Materials,BUY,0.097,0.0,0.2,0.186,1321.1,,,,ema-cross,34.82
+2026-11-19,ANURAS,Anupam Rasayan India Ltd,Basic Materials,WATCH,0.06,0.0,0.2,,1327.0,,,,,33.85
+2026-11-20,ANURAS,Anupam Rasayan India Ltd,Basic Materials,WATCH,0.06,0.0,0.2,,1329.4,,,,,33.25
+2026-11-23,ANURAS,Anupam Rasayan India Ltd,Basic Materials,WATCH,0.06,0.0,0.2,,1313.6,,,,,34.05

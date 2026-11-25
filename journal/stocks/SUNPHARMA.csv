@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,SUNPHARMA,Sun Pharmaceutical Industries Limited,Healthcare,BUY,0.428,0.6,0.35,0.114,1871.5,,,,swing;trend,41.78
+2026-11-19,SUNPHARMA,Sun Pharmaceutical Industries Limited,Healthcare,BUY,0.421,0.6,0.35,0.078,1900.0,,,,swing;trend,41.89
+2026-11-20,SUNPHARMA,Sun Pharmaceutical Industries Limited,Healthcare,WATCH,0.205,0.2,0.35,,1884.9,,,,,40.83
+2026-11-23,SUNPHARMA,Sun Pharmaceutical Industries Limited,Healthcare,WATCH,0.205,0.2,0.35,,1860.0,,,,,41.4

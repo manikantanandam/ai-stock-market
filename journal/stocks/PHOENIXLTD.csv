@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,PHOENIXLTD,The Phoenix Mills Limited,Real Estate,BUY,0.386,0.6,0.0,0.428,2204.6,,,,trend,68.03
+2026-11-19,PHOENIXLTD,The Phoenix Mills Limited,Real Estate,BUY,0.411,0.6,0.0,0.553,2237.5,,,,swing;trend,67.74
+2026-11-20,PHOENIXLTD,The Phoenix Mills Limited,Real Estate,BUY,0.301,0.4,0.0,0.504,2285.3,,,,trend,69.07
+2026-11-23,PHOENIXLTD,The Phoenix Mills Limited,Real Estate,BUY,0.37,0.6,0.0,0.352,2276.2,,,,trend,68.83

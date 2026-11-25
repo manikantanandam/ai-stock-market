@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.487,0.4,0.8,0.235,96.0,,,,swing;trend,2.65
+2026-11-19,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.534,0.4,0.8,0.471,97.98,,,,swing;trend,2.67
+2026-11-20,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.468,0.4,0.8,0.139,99.45,,,,swing;trend,2.76
+2026-11-23,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.435,0.4,0.8,-0.025,97.56,,,,swing;trend,2.83

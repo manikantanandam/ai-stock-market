@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,CYIENT,Cyient Limited,Industrials,WATCH,-0.1,-0.2,0.0,,1086.4,,,,,43.04
+2026-11-19,CYIENT,Cyient Limited,Industrials,WATCH,0.1,0.2,0.0,,1111.0,,,,,43.4
+2026-11-20,CYIENT,Cyient Limited,Industrials,WATCH,0.1,0.2,0.0,,1155.5,,,,,45.12
+2026-11-23,CYIENT,Cyient Limited,Industrials,BUY,0.31,0.6,0.0,0.051,1160.5,,,,trend,44.12

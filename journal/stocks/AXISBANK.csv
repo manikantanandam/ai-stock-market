@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,AXISBANK,Axis Bank Limited,Financial Services,WATCH,0.265,0.2,0.55,,1360.0,,,,,27.72
+2026-11-19,AXISBANK,Axis Bank Limited,Financial Services,WATCH,0.165,0.0,0.55,,1380.8,,,,,27.44
+2026-11-20,AXISBANK,Axis Bank Limited,Financial Services,WATCH,0.165,0.0,0.55,,1446.0,,,,,31.28
+2026-11-23,AXISBANK,Axis Bank Limited,Financial Services,WATCH,0.265,0.2,0.55,,1388.6,,,,,34.07

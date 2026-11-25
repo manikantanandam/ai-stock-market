@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,LICHSGFIN,LIC Housing Finance Limited,Financial Services,BUY,0.336,0.4,0.35,0.157,610.0,,,,trend,18.59
+2026-11-19,LICHSGFIN,LIC Housing Finance Limited,Financial Services,BUY,0.309,0.4,0.35,0.019,610.0,,,,trend,17.96
+2026-11-20,LICHSGFIN,LIC Housing Finance Limited,Financial Services,BUY,0.325,0.4,0.35,0.101,614.9,,,,trend,18.35
+2026-11-23,LICHSGFIN,LIC Housing Finance Limited,Financial Services,BUY,0.397,0.6,0.35,-0.038,606.0,,,,trend,18.3

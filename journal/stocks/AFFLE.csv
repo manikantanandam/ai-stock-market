@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,AFFLE,Affle 3i Limited,Communication Services,BUY,0.479,0.6,0.65,-0.082,1585.1,,,,swing;trend,55.27
+2026-11-19,AFFLE,Affle 3i Limited,Communication Services,BUY,0.472,0.6,0.65,-0.114,1590.8,,,,swing;trend,53.19
+2026-11-20,AFFLE,Affle 3i Limited,Communication Services,BUY,0.487,0.6,0.65,-0.039,1599.4,,,,swing;trend,51.62
+2026-11-23,AFFLE,Affle 3i Limited,Communication Services,BUY,0.494,0.6,0.65,-0.007,1616.6,,,,swing;trend,50.52

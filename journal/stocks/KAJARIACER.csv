@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,KAJARIACER,Kajaria Ceramics Limited,Industrials,WATCH,0.34,0.2,0.8,,1180.2,,,,,32.98
+2026-11-19,KAJARIACER,Kajaria Ceramics Limited,Industrials,BUY,0.517,0.6,0.8,-0.117,1203.0,,,,swing;trend,33.79
+2026-11-20,KAJARIACER,Kajaria Ceramics Limited,Industrials,BUY,0.553,0.6,0.8,0.066,1200.5,,,,swing;trend,33.66
+2026-11-23,KAJARIACER,Kajaria Ceramics Limited,Industrials,BUY,0.566,0.6,0.8,0.131,1200.9,,,,swing;trend,32.85

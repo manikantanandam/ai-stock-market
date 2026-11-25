@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,SHYAMMETL,Shyam Metalics and Energy Limited,Basic Materials,BUY,0.375,0.4,0.55,0.049,1317.1,,,,trend,45.29
+2026-11-19,SHYAMMETL,Shyam Metalics and Energy Limited,Basic Materials,BUY,0.469,0.6,0.55,0.019,1294.0,,,,swing;trend,45.35
+2026-11-20,SHYAMMETL,Shyam Metalics and Energy Limited,Basic Materials,WATCH,0.265,0.2,0.55,,1314.3,,,,,45.93
+2026-11-23,SHYAMMETL,Shyam Metalics and Energy Limited,Basic Materials,WATCH,0.265,0.2,0.55,,1276.2,,,,,47.06

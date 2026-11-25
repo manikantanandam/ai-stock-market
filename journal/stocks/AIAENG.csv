@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,AIAENG,AIA Engineering Limited,Industrials,WATCH,0.02,-0.2,0.4,,3327.2,,,,,109.73
+2026-11-19,AIAENG,AIA Engineering Limited,Industrials,WATCH,0.02,-0.2,0.4,,3328.0,,,,,105.7
+2026-11-20,AIAENG,AIA Engineering Limited,Industrials,WATCH,0.02,-0.2,0.4,,3433.5,,,,,110.02
+2026-11-23,AIAENG,AIA Engineering Limited,Industrials,WATCH,0.02,-0.2,0.4,,3388.2,,,,,113.1

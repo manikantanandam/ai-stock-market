@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,VEDL,Vedanta Limited,Basic Materials,WATCH,0.02,-0.2,0.4,,245.4,,,,,7.54
+2026-11-19,VEDL,Vedanta Limited,Basic Materials,WATCH,-0.18,-0.6,0.4,,243.7,,,,,7.34
+2026-11-20,VEDL,Vedanta Limited,Basic Materials,WATCH,-0.18,-0.6,0.4,,238.04,,,,,7.66
+2026-11-23,VEDL,Vedanta Limited,Basic Materials,WATCH,-0.18,-0.6,0.4,,235.53,,,,,7.52

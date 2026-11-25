@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.509,0.6,0.5,0.294,1050.0,,,,swing;trend,44.82
+2026-11-19,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.474,0.6,0.5,0.118,1071.75,,,,swing;trend,44.91
+2026-11-20,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.46,0.6,0.5,0.052,1052.45,,,,swing;trend,44.61
+2026-11-23,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.448,0.6,0.5,-0.01,1042.95,,,,swing;trend,43.93

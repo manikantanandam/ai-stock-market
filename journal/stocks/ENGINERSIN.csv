@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,ENGINERSIN,Engineers India Limited,Industrials,BUY,0.501,0.6,0.6,0.105,304.7,,,,swing;trend,13.41
+2026-11-19,ENGINERSIN,Engineers India Limited,Industrials,BUY,0.501,0.6,0.6,0.105,307.5,,,,swing;trend,12.98
+2026-11-20,ENGINERSIN,Engineers India Limited,Industrials,BUY,0.493,0.6,0.6,0.063,296.55,,,,swing;trend,12.95
+2026-11-23,ENGINERSIN,Engineers India Limited,Industrials,BUY,0.48,0.6,0.6,-0.001,298.4,,,,swing;trend,12.64

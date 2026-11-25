@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,MEESHO,Meesho Limited,Consumer Cyclical,BUY,0.337,0.6,0.05,0.109,253.55,,,,trend,8.88
+2026-11-19,MEESHO,Meesho Limited,Consumer Cyclical,BUY,0.349,0.6,0.05,0.169,258.85,,,,trend,8.71
+2026-11-20,MEESHO,Meesho Limited,Consumer Cyclical,BUY,0.254,0.4,0.05,0.195,259.92,,,,trend,8.69
+2026-11-23,MEESHO,Meesho Limited,Consumer Cyclical,BUY,0.359,0.6,0.05,0.22,253.11,,,,trend,9.0

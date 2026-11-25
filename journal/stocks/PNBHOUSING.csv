@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,PNBHOUSING,PNB Housing Finance Limited,Financial Services,WATCH,0.1,0.2,0.0,,1125.3,,,,,32.39
+2026-11-19,PNBHOUSING,PNB Housing Finance Limited,Financial Services,BUY,0.342,0.6,0.0,0.208,1154.2,,,,trend,33.33
+2026-11-20,PNBHOUSING,PNB Housing Finance Limited,Financial Services,BUY,0.315,0.6,0.0,0.077,1191.3,,,,trend,35.57
+2026-11-23,PNBHOUSING,PNB Housing Finance Limited,Financial Services,BUY,0.272,0.6,0.0,-0.142,1180.2,,,,trend,36.47

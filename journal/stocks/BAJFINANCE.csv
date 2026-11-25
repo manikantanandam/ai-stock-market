@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,BAJFINANCE,Bajaj Finance Limited,Financial Services,BUY,0.49,0.6,0.5,0.198,1093.85,,,,swing;trend,30.05
+2026-11-19,BAJFINANCE,Bajaj Finance Limited,Financial Services,BUY,0.481,0.6,0.5,0.153,1092.85,,,,swing;trend,29.0
+2026-11-20,BAJFINANCE,Bajaj Finance Limited,Financial Services,BUY,0.477,0.6,0.5,0.136,1122.0,,,,swing;trend,30.28
+2026-11-23,BAJFINANCE,Bajaj Finance Limited,Financial Services,BUY,0.487,0.6,0.5,0.186,1095.5,,,,swing;trend,30.79
