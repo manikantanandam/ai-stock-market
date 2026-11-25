@@ -101,10 +101,13 @@ def paper_account(
                       pct(r["nifty_return"]), pct(r["max_drawdown"]), str(r["open"]), str(r["closed"]),
                       "-" if r["win_rate"] is None else pct(r["win_rate"]))
     print(table)
+    for a in accounts:
+        for note in a.notes:
+            print(f"[yellow]{a.strategy}: {note}[/yellow]")
     if show:
         for a in accounts:
             for pos in a.positions.values():
-                print(f"{a.strategy}: {pos.sym} {pos.shares} @ {pos.entry_px:.2f}, stop {pos.stop:.2f}, "
+                print(f"{a.strategy}: {pos.sym} {pos.shares:g} @ {pos.entry_px:.2f}, stop {pos.stop:.2f}, "
                       f"target {'-' if pos.target == float('inf') else f'{pos.target:.2f}'}")
 
 

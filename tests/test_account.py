@@ -111,3 +111,37 @@ def test_update_reads_the_journal_and_saves_each_strategy(tmp_path, monkeypatch)
     assert len(again["trend"].equity) == len(accounts["trend"].equity)
     s = account.summary(again["trend"], frames["^NSEI"].Close)
     assert s["open"] == 1 and s["closed"] == 0 and s["nifty_return"] == 0
+
+
+def flat_frame(price: float, atr: float, n: int = 12) -> pd.DataFrame:
+    return bars([(price, price * 1.01, price * 0.99, price)] * n, atr=atr) \
+        .assign(sma50=price * 0.9, sma200=price * 0.8, rsi14=50.0, macd_hist=1.0)
+
+
+@pytest.mark.parametrize("factor, kind", [(0.5, "split/bonus"), (0.99, "dividend")])
+def test_readjust_rescales_open_positions(tmp_path, monkeypatch, factor, kind):
+    """Yahoo re-adjusts past bars after a split (or dividend). Without rescaling,
+    the old stop (80) would sit far above the new adjusted price (50) and fire."""
+    monkeypatch.setattr(account, "ROOT", tmp_path)
+    before, after = flat_frame(100.0, 10.0), flat_frame(100.0 * factor, 10.0 * factor)
+    dates = before.index
+    p = Params(stop_atr=2.0, target_atr=None, max_hold=90)
+    acct = account.Account("t", 100_000.0, 1, 100_000.0)
+    account.advance(acct, dates[:4], {"A": before}, {dates[0]: ["A"]}, p)
+    account.save(acct, dates)
+    pos = acct.positions["A"]
+    shares, stop, value = pos.shares, pos.stop, acct.equity[-1]["equity"]
+
+    acct = account.load("t", dates)
+    account.readjust(acct, {"A": after})
+    account.advance(acct, dates, {"A": after}, {dates[0]: ["A"]}, p)
+    pos = acct.positions["A"]
+    assert not acct.trades                                  # no false stop-out
+    assert pos.shares == pytest.approx(shares / factor)
+    assert pos.stop == pytest.approx(stop * factor)
+    assert acct.equity[-1]["equity"] == pytest.approx(value)  # value unchanged by the adjustment
+    assert len(acct.notes) == 1 and kind in acct.notes[0]
+    account.save(acct, dates)
+    again = account.load("t", dates)
+    account.readjust(again, {"A": after})
+    assert not again.notes                                  # already applied: not rescaled twice

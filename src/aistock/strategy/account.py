@@ -11,6 +11,13 @@ saved, so it shows what one account with N slots would really have held, and
 positions keep the exits they were opened with even if a preset changes later.
 Each run catches up on every completed session since the last saved one.
 
+Yahoo prices are split- and dividend-adjusted, and the adjustment rewrites
+past bars after each event. Each open position therefore saves the close it
+was last marked at (ref_date, ref_close); on the next run, readjust() compares
+it with the current data and rescales the position's prices (and shares by the
+inverse), so stops keep their place relative to the price and the value is
+unchanged. A split or bonus shows up as a large ratio, a dividend as a small one.
+
 Files per strategy in journal/paper/<strategy>/: account.json (capital,
 slots), positions.csv (open), trades.csv (closed), equity.csv (per session).
 """
@@ -42,6 +49,8 @@ class Account:
     positions: dict[str, portfolio.Position] = field(default_factory=dict)  # entry_i indexes the calendar
     trades: list[dict] = field(default_factory=list)
     equity: list[dict] = field(default_factory=list)  # date, cash, invested, equity
+    refs: dict[str, tuple[str, float]] = field(default_factory=dict)  # symbol -> (date, close) at last mark
+    notes: list[str] = field(default_factory=list)  # adjustments made this run
 
     @property
     def last(self) -> pd.Timestamp | None:
@@ -112,6 +121,32 @@ def advance(acct: Account, dates: pd.DatetimeIndex, frames: dict[str, pd.DataFra
         acct.equity.append({"date": f"{d:%Y-%m-%d}", "cash": acct.cash, "invested": held,
                             "equity": acct.cash + held})
 
+    if acct.last is not None:  # remember each open position's mark, to detect re-adjusted prices later
+        acct.refs = {s: (f"{acct.last:%Y-%m-%d}", last_close(s, acct.last)) for s in acct.positions}
+
+
+SPLIT_RATIO = 0.8   # a re-adjustment beyond 20% is a split or bonus, smaller is a dividend
+TOLERANCE = 1e-4    # ignore float noise between Yahoo downloads
+
+
+def readjust(acct: Account, frames: dict[str, pd.DataFrame]) -> None:
+    """Rescale open positions whose past prices Yahoo has re-adjusted since the last save."""
+    for s, pos in acct.positions.items():
+        if s not in acct.refs or s not in frames:
+            continue
+        date, saved = acct.refs[s]
+        before = frames[s].Close.loc[:pd.Timestamp(date)]
+        if before.empty or not saved:
+            continue
+        f = float(before.iloc[-1]) / saved
+        if abs(f - 1) < TOLERANCE:
+            continue
+        pos.entry_px, pos.stop, pos.target = pos.entry_px * f, pos.stop * f, pos.target * f
+        pos.atr, pos.highest, pos.shares = pos.atr * f, pos.highest * f, pos.shares / f
+        acct.refs[s] = (date, float(before.iloc[-1]))
+        kind = "split/bonus" if min(f, 1 / f) < SPLIT_RATIO else "dividend"
+        acct.notes.append(f"{s}: prices re-adjusted x{f:.4f} ({kind}); position rescaled")
+
 
 def _dir(strategy: str) -> Path:
     return ROOT / strategy
@@ -126,14 +161,16 @@ def load(strategy: str, dates: pd.DatetimeIndex) -> Account | None:
     read = lambda name: pd.read_csv(path / name).to_dict("records") if (path / name).exists() else []
     equity, trades = read("equity.csv"), read("trades.csv")
     positions = {}
+    refs = {}
     for r in read("positions.csv"):
+        refs[r["sym"]] = (r.pop("ref_date"), r.pop("ref_close"))
         r["entry_i"] = int(dates.get_loc(pd.Timestamp(r.pop("entry_date"))))
         r["trail_atr"] = None if pd.isna(r["trail_atr"]) else r["trail_atr"]
         r["max_hold"] = int(r["max_hold"])
-        r["shares"] = int(r["shares"])
+        r["shares"] = float(r["shares"])  # fractional after a dividend re-adjustment
         positions[r["sym"]] = portfolio.Position(**r)
     cash = equity[-1]["cash"] if equity else cfg["capital"]
-    return Account(strategy, cfg["capital"], cfg["max_positions"], cash, positions, trades, equity)
+    return Account(strategy, cfg["capital"], cfg["max_positions"], cash, positions, trades, equity, refs)
 
 
 def save(acct: Account, dates: pd.DatetimeIndex) -> Path:
@@ -144,8 +181,10 @@ def save(acct: Account, dates: pd.DatetimeIndex) -> Path:
     rows = []
     for pos in acct.positions.values():
         r = asdict(pos)
-        rows.append({"entry_date": f"{dates[r.pop('entry_i')]:%Y-%m-%d}", **r})
-    cols = ["entry_date"] + [f.name for f in fields(portfolio.Position) if f.name != "entry_i"]
+        ref_date, ref_close = acct.refs[pos.sym]
+        rows.append({"entry_date": f"{dates[r.pop('entry_i')]:%Y-%m-%d}", **r,
+                     "ref_date": ref_date, "ref_close": ref_close})
+    cols = ["entry_date"] + [f.name for f in fields(portfolio.Position) if f.name != "entry_i"] + ["ref_date", "ref_close"]
     pd.DataFrame(rows, columns=cols).to_csv(path / "positions.csv", index=False)
     pd.DataFrame(acct.trades, columns=TRADE_COLS).to_csv(path / "trades.csv", index=False)
     pd.DataFrame(acct.equity, columns=EQUITY_COLS).to_csv(path / "equity.csv", index=False)
@@ -173,6 +212,7 @@ def update(only: list[str] | None = None, capital: float = 100_000.0, max_positi
     for name, acct in accounts.items():
         group = sig[sig.strategy == name]
         signals = {pd.Timestamp(d): list(g.symbol) for d, g in group.groupby("date")}
+        readjust(acct, frames)
         advance(acct, dates, frames, signals, PRESETS[name].params(), start=pd.Timestamp(group.date.min()))
         save(acct, dates)
     return list(accounts.values())
