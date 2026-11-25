@@ -32,6 +32,48 @@ class Position:
     target: float
     atr: float
     highest: float
+    max_hold: int                 # exits are fixed at entry, so a later preset change
+    trail_atr: float | None       # doesn't alter positions already open
+
+
+def rank(score: float, mom: float) -> tuple:
+    """Sort key for candidates competing for slots: technical score, then 126-day momentum."""
+    return score, np.nan_to_num(mom, nan=-1)
+
+
+def buy(sym: str, entry_i: int, open_: float, high: float, atr: float, mark: float, cash: float,
+        p: Params, max_positions: int) -> Position | None:
+    """Fill at the open with 1/max_positions of equity (capped by cash); None if not even one share."""
+    px = open_ * (1 + p.costs.slippage)
+    budget = min(mark / max_positions, cash)
+    n = int(budget / (px * (1 + 0.0012)))  # leave room for buy costs
+    if n <= 0:
+        return None
+    stop = px - p.stop_atr * atr
+    target = px + p.target_atr * atr if p.target_atr else np.inf
+    return Position(sym, n, entry_i, px, n * px + p.costs.buy_cost(n * px), stop, target, atr, high,
+                    p.max_hold, p.trail_atr)
+
+
+def check_exit(pos: Position, o: float, h: float, l: float, c: float, held: int) -> tuple[float, str] | None:
+    """(price, reason) if the position exits on this bar (gap-aware), else None.
+    `held` counts bars including the entry bar. Ratchets the trailing stop."""
+    if l <= pos.stop:
+        return min(o, pos.stop), "stop"
+    if h >= pos.target:
+        return max(o, pos.target), "target"
+    if held >= pos.max_hold:
+        return c, "time"
+    if pos.trail_atr:
+        pos.highest = max(pos.highest, h)
+        pos.stop = max(pos.stop, pos.highest - pos.trail_atr * pos.atr)
+    return None
+
+
+def sell(pos: Position, px: float, p: Params) -> tuple[float, float]:
+    """(fill price after slippage, cash proceeds after selling costs)."""
+    fill = px * (1 - p.costs.slippage)
+    return fill, pos.shares * fill - p.costs.sell_cost(pos.shares * fill)
 
 
 def _panel(data: dict[str, pd.DataFrame], dates: pd.DatetimeIndex, col: str) -> np.ndarray:
@@ -55,8 +97,7 @@ def run(data: dict[str, pd.DataFrame], entries: dict[str, pd.Series], dates: pd.
     def close(j: int, i: int, px: float, reason: str):
         nonlocal cash
         pos = positions.pop(j)
-        fill = px * (1 - p.costs.slippage)
-        proceeds = pos.shares * fill - p.costs.sell_cost(pos.shares * fill)
+        fill, proceeds = sell(pos, px, p)
         cash += proceeds
         trades.append({"symbol": pos.sym, "entry_date": dates[pos.entry_i], "exit_date": dates[i],
                        "entry": pos.entry_px, "exit": fill, "bars": i - pos.entry_i + 1, "reason": reason,
@@ -69,36 +110,24 @@ def run(data: dict[str, pd.DataFrame], entries: dict[str, pd.Series], dates: pd.
         if i > 0 and free > 0:
             cand = [j for j in np.flatnonzero(ent[i - 1])
                     if j not in positions and not np.isnan(o[i, j]) and not np.isnan(atr[i - 1, j])]
-            cand.sort(key=lambda j: (score[i - 1, j], np.nan_to_num(mom[i - 1, j], nan=-1)), reverse=True)
+            cand.sort(key=lambda j: rank(score[i - 1, j], mom[i - 1, j]), reverse=True)
             mark = cash + sum(pos.shares * last_close[i - 1, j] for j, pos in positions.items())
             for j in cand[:free]:
-                px = o[i, j] * (1 + p.costs.slippage)
-                budget = min(mark / max_positions, cash)
-                n = int(budget / (px * (1 + 0.0012)))  # leave room for buy costs
-                if n <= 0:
+                pos = buy(syms[j], i, o[i, j], h[i, j], atr[i - 1, j], mark, cash, p, max_positions)
+                if pos is None:
                     continue
-                cost = n * px + p.costs.buy_cost(n * px)
-                cash -= cost
-                stop = px - p.stop_atr * atr[i - 1, j]
-                target = px + p.target_atr * atr[i - 1, j] if p.target_atr else np.inf
-                positions[j] = Position(syms[j], n, i, px, cost, stop, target, atr[i - 1, j], h[i, j])
-                if l[i, j] <= stop:  # stopped out on the entry bar
-                    close(j, i, stop, "stop")
+                cash -= pos.cost_basis
+                positions[j] = pos
+                if l[i, j] <= pos.stop:  # stopped out on the entry bar
+                    close(j, i, pos.stop, "stop")
 
         # 2. exits on today's bar for positions opened before today
         for j in [j for j, pos in positions.items() if pos.entry_i < i]:
             if np.isnan(o[i, j]):
                 continue  # no bar today (suspension)
-            pos = positions[j]
-            if l[i, j] <= pos.stop:
-                close(j, i, min(o[i, j], pos.stop), "stop")
-            elif h[i, j] >= pos.target:
-                close(j, i, max(o[i, j], pos.target), "target")
-            elif i - pos.entry_i + 1 >= p.max_hold:
-                close(j, i, c[i, j], "time")
-            elif p.trail_atr:
-                pos.highest = max(pos.highest, h[i, j])
-                pos.stop = max(pos.stop, pos.highest - p.trail_atr * pos.atr)
+            hit = check_exit(positions[j], o[i, j], h[i, j], l[i, j], c[i, j], i - positions[j].entry_i + 1)
+            if hit:
+                close(j, i, *hit)
 
         held = sum(pos.shares * last_close[i, j] for j, pos in positions.items())
         equity.append(cash + held)

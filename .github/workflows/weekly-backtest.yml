@@ -1,0 +1,39 @@
+# Weekly refresh of the strategy comparison, so backtest results don't go stale.
+# Runs Monday 03:23 UTC (08:53 IST, before the open; avoids :00 cron delays).
+# Results go to the job summary and an artifact; nothing is committed.
+name: Weekly backtest
+
+on:
+  schedule:
+    - cron: "23 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: Compare strategies
+        env:
+          NO_COLOR: "1"
+          COLUMNS: "140"
+        run: |
+          uv run aistock compare --watchlist nifty500 | tee compare.txt
+          { echo '## Strategy comparison (nifty500)'; echo '```'; cat compare.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compare-reports
+          path: reports/

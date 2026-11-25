@@ -11,7 +11,7 @@ from aistock.backtest import engine, portfolio, sweep, universe
 from aistock.data import fundamentals, prices, watchlists
 from aistock.data.prices import get_prices, market_phase
 from aistock.data.watchlists import WATCHLISTS
-from aistock.strategy import journal, signal, strategies
+from aistock.strategy import account, journal, signal, strategies
 from aistock.strategy import paper as paper_trading
 from aistock.strategy.strategies import PRESETS, Strategy
 from aistock.technical import rules
@@ -76,6 +76,39 @@ def analyze(
         table.add_row(r.strategy, f"[{COLORS[r.action]}]{r.action}[/]", f"{r.stop:.2f}",
                       "-" if r.target is None else f"{r.target:.2f}", str(r.shares), "; ".join(r.why))
     print(table)
+
+
+@app.command("paper-account")
+def paper_account(
+    strategy: str = typer.Option("all", "--strategy", "-s", help="'all' or comma-separated preset names"),
+    capital: float = typer.Option(100_000, help="Starting capital for new accounts"),
+    positions: int = typer.Option(10, help="Slots for new accounts; each buy gets 1/N of equity"),
+    show: bool = typer.Option(False, help="List open positions"),
+):
+    """Advance each strategy's paper account (shared capital, N slots) to the latest session and save it."""
+    only = None if strategy == "all" else [st.name for st in _strategy_list(strategy)]
+    accounts = account.update(only, capital, positions)
+    if not accounts:
+        print("No BUY signals in the journal yet. Run `aistock scan` daily to build history.")
+        return
+    nifty = paper_trading.session_prices(paper_trading.INDEX).Close
+    table = Table(title=f"Paper accounts, saved in {account.ROOT}")
+    for col in ["Strategy", "Since", "Sessions", "Equity", "Return", "NIFTY", "Max DD", "Open", "Closed", "Win"]:
+        table.add_column(col, justify="left" if col in ("Strategy", "Since") else "right")
+    for a in accounts:
+        r = account.summary(a, nifty)
+        table.add_row(r["strategy"], r["since"], str(r["sessions"]), f"{r['equity']:,.0f}", pct(r["return"]),
+                      pct(r["nifty_return"]), pct(r["max_drawdown"]), str(r["open"]), str(r["closed"]),
+                      "-" if r["win_rate"] is None else pct(r["win_rate"]))
+    print(table)
+    for a in accounts:
+        for note in a.notes:
+            print(f"[yellow]{a.strategy}: {note}[/yellow]")
+    if show:
+        for a in accounts:
+            for pos in a.positions.values():
+                print(f"{a.strategy}: {pos.sym} {pos.shares:g} @ {pos.entry_px:.2f}, stop {pos.stop:.2f}, "
+                      f"target {'-' if pos.target == float('inf') else f'{pos.target:.2f}'}")
 
 
 @app.command()
