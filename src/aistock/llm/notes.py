@@ -3,8 +3,8 @@
 The LLM only explains a verdict the rules already reached: it is given the
 signal's numbers and reasons, chooses nothing, and changes nothing. A 3B model
 can invent figures, so a note that quotes any number not in the facts it was
-given is withheld. Notes are optional and local: CI has no Ollama, so scans
-run without them.
+given is withheld. Notes are optional: `scan --notes` saves them to
+journal/notes/, and the daily CI scan runs Ollama on CPU to write them.
 """
 import json
 import re

@@ -61,7 +61,7 @@ jobs:
     needs: gate
     if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
@@ -88,12 +88,37 @@ jobs:
       - name: Install
         run: uv sync --locked
 
+      # LLM notes on the top BUYs (journal/notes/). Ollama runs on CPU here,
+      # ~30s per note; the binary and model (~2.5GB) are cached between runs.
+      # If Ollama fails to start, the scan logs a warning and skips notes.
+      - name: Cache Ollama
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/ollama
+            ~/.ollama/models
+          key: ollama-v0.40.15-qwen2.5-3b
+
+      - name: Start Ollama
+        continue-on-error: true
+        run: |
+          if [ ! -x ~/ollama/bin/ollama ]; then
+            mkdir -p ~/ollama
+            curl -fsSL https://github.com/ollama/ollama/releases/download/v0.40.15/ollama-linux-amd64.tar.zst | tar --zstd -x -C ~/ollama
+            # GPU libraries are useless on CPU runners; drop them to keep the cache small
+            find ~/ollama/lib -maxdepth 2 -type d -name 'cuda*' -exec rm -rf {} +
+          fi
+          echo "$HOME/ollama/bin" >> "$GITHUB_PATH"
+          nohup ~/ollama/bin/ollama serve > ollama.log 2>&1 &
+          for i in $(seq 30); do curl -sf localhost:11434 >/dev/null && break; sleep 1; done
+          ~/ollama/bin/ollama pull qwen2.5:3b
+
       - name: Scan
         env:
           NO_COLOR: "1"
           COLUMNS: "120"
         run: |
-          uv run aistock scan --watchlist nifty500 --top 50 | tee scan.txt
+          uv run aistock scan --watchlist nifty500 --top 50 --notes --notes-max 15 | tee scan.txt
           { echo '```'; cat scan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       # Yahoo can lag after the close; flag a scan whose latest bar is older

@@ -8,6 +8,7 @@ the next morning after the Mac was asleep, still lands on the right day.
 The same rows are stored twice so each view stays small to read:
 `days/<date>.csv` holds one session's scan, `stocks/<SYMBOL>.csv` one
 stock's history. The day files are the source of truth for `load`.
+LLM notes on a session's BUYs go to `notes/<date>.csv`, one row per stock.
 """
 import csv
 from collections import defaultdict
@@ -20,6 +21,7 @@ from aistock.strategy.signal import Signal
 ROOT = Path(__file__).resolve().parents[3] / "journal"
 DAYS = ROOT / "days"
 STOCKS = ROOT / "stocks"
+NOTES = ROOT / "notes"
 
 
 def record(signals: list[Signal]) -> Path:
@@ -33,6 +35,16 @@ def record(signals: list[Signal]) -> Path:
     for symbol, stock_rows in by_stock.items():
         _upsert(STOCKS / f"{symbol}.csv", stock_rows, key="date")
     return ROOT
+
+
+def record_notes(notes: list[tuple[Signal, str, str]]) -> None:
+    """Save (signal, strategy, note) triples by session; a re-run replaces a stock's note."""
+    by_day = defaultdict(list)
+    for s, strategy, text in notes:
+        by_day[s.as_of].append({"date": s.as_of, "symbol": s.symbol, "name": s.name,
+                                "strategy": strategy, "note": text})
+    for day, rows in by_day.items():
+        _upsert(NOTES / f"{day}.csv", rows, key="symbol")
 
 
 def load(**read_csv_kw) -> pd.DataFrame:
