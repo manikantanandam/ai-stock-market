@@ -243,6 +243,28 @@ def paper(
         print(f"{len(pending)} signals waiting for the next session's open")
 
 
+@app.command()
+def site(
+    out: str = typer.Option("site", help="Output folder"),
+    serve: bool = typer.Option(False, "--serve", help="Serve the site on localhost after building"),
+    port: int = typer.Option(8000, help="Port for --serve"),
+):
+    """Build the dashboard (journal + reports CSVs with charts) as a static site."""
+    from pathlib import Path
+
+    from aistock import site as dashboard
+
+    manifest = dashboard.build(Path(out))
+    print(f"Built {out}/ with {len(manifest['files'])} CSV files")
+    if serve:
+        import functools
+        import http.server
+
+        handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=out)
+        print(f"Serving http://localhost:{port} (Ctrl+C to stop)")
+        http.server.ThreadingHTTPServer(("127.0.0.1", port), handler).serve_forever()
+
+
 @app.command("update-watchlists")
 def update_watchlists():
     """Refresh index constituent CSVs from niftyindices.com (NSE rebalances twice a year)."""
