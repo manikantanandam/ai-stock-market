@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,PREMIERENE,Premier Energies Limited,Technology,WATCH,-0.06,-0.6,0.8,,832.5,,,,,30.6
-2026-11-19,PREMIERENE,Premier Energies Limited,Technology,WATCH,-0.06,-0.6,0.8,,829.6,,,,,29.77
-2026-11-20,PREMIERENE,Premier Energies Limited,Technology,WATCH,-0.06,-0.6,0.8,,834.5,,,,,29.15
-2026-11-23,PREMIERENE,Premier Energies Limited,Technology,WATCH,-0.06,-0.6,0.8,,809.85,,,,,29.53
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,PREMIERENE,Premier Energies Limited,Technology,WATCH,-0.06,-0.6,0.8,,832.5,,,,,30.6,,,,,,,,,,,,,,,,,
+2026-11-19,PREMIERENE,Premier Energies Limited,Technology,WATCH,-0.06,-0.6,0.8,,829.6,,,,,29.77,,,,,,,,,,,,,,,,,
+2026-11-20,PREMIERENE,Premier Energies Limited,Technology,WATCH,-0.06,-0.6,0.8,,834.5,,,,,29.15,,,,,,,,,,,,,,,,,
+2026-11-23,PREMIERENE,Premier Energies Limited,Technology,WATCH,-0.06,-0.6,0.8,,809.85,,,,,29.53,,,,,,,,,,,,,,,,,
+2026-11-25,PREMIERENE,Premier Energies Limited,Technology,WATCH,-0.06,-0.6,0.8,,815.25,,,,,28.62,-0.29,-0.2591,False,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE 40.1% (good) | Debt/Equity 0.69x | Revenue growth 43.3% (good) | Earnings growth 29.8% (good) | Net margin 19.1% (good) | P/E 21.0 (good),not fetched (no strategy can reach BUY),374611279872,20.970676,7.178147,0.40062,68.527,0.433,0.298,0.19108,1.495,0.15,

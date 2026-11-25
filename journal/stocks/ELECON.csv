@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ELECON,Elecon Engineering Company Limited,Industrials,WATCH,0.22,0.2,0.4,,445.7,,,,,18.68
-2026-11-19,ELECON,Elecon Engineering Company Limited,Industrials,WATCH,0.22,0.2,0.4,,450.5,,,,,18.25
-2026-11-20,ELECON,Elecon Engineering Company Limited,Industrials,WATCH,0.22,0.2,0.4,,454.8,,,,,18.03
-2026-11-23,ELECON,Elecon Engineering Company Limited,Industrials,WATCH,0.02,-0.2,0.4,,438.5,,,,,18.13
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ELECON,Elecon Engineering Company Limited,Industrials,WATCH,0.22,0.2,0.4,,445.7,,,,,18.68,,,,,,,,,,,,,,,,,
+2026-11-19,ELECON,Elecon Engineering Company Limited,Industrials,WATCH,0.22,0.2,0.4,,450.5,,,,,18.25,,,,,,,,,,,,,,,,,
+2026-11-20,ELECON,Elecon Engineering Company Limited,Industrials,WATCH,0.22,0.2,0.4,,454.8,,,,,18.03,,,,,,,,,,,,,,,,,
+2026-11-23,ELECON,Elecon Engineering Company Limited,Industrials,WATCH,0.02,-0.2,0.4,,438.5,,,,,18.13,,,,,,,,,,,,,,,,,
+2026-11-25,ELECON,Elecon Engineering Company Limited,Industrials,WATCH,0.22,0.2,0.4,,439.6,,,,,17.64,-0.09,-0.2609,False,MACD histogram positive,ROE 10.3% | Debt/Equity 0.14x (good) | Revenue growth 10.5% (good) | Earnings growth 9.7% | Net margin 10.0% | P/E 41.3,not fetched (no strategy can reach BUY),101092171776,41.292393,4.03215,0.10295,14.401,0.105,0.097,0.0996,2.957,0.45,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.265,-0.2,-0.55,,32.58,,,,,1.81
-2026-11-19,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.265,-0.2,-0.55,,32.87,,,,,1.74
-2026-11-20,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.465,-0.6,-0.55,,32.59,,,,,1.65
-2026-11-23,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.465,-0.6,-0.55,,32.06,,,,,1.61
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.265,-0.2,-0.55,,32.58,,,,,1.81,,,,,,,,,,,,,,,,,
+2026-11-19,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.265,-0.2,-0.55,,32.87,,,,,1.74,,,,,,,,,,,,,,,,,
+2026-11-20,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.465,-0.6,-0.55,,32.59,,,,,1.65,,,,,,,,,,,,,,,,,
+2026-11-23,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.465,-0.6,-0.55,,32.06,,,,,1.61,,,,,,,,,,,,,,,,,
+2026-11-25,OLAELEC,Ola Electric Mobility Limited,Consumer Cyclical,AVOID,-0.465,-0.6,-0.55,,31.73,,,,,1.56,-0.2236,-0.2074,True,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE -43.4% (weak) | Debt/Equity 0.59x | Revenue growth -39.0% (weak) | Earnings growth: n/a | Net margin -104.6% (weak) | P/E: n/a,not fetched (no strategy can reach BUY),157412900864,,4.450311,-0.43372002,59.481,-0.39,,-1.04593,1.137,0.0,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,LTTS,L&T Technology Services Limited,Technology,WATCH,0.31,0.2,0.7,,4095.7,,,,,128.24
-2026-11-19,LTTS,L&T Technology Services Limited,Technology,BUY,0.335,0.2,0.7,0.126,4036.0,,,,ema-cross,125.84
-2026-11-20,LTTS,L&T Technology Services Limited,Technology,WATCH,0.31,0.2,0.7,,4082.5,,,,,127.18
-2026-11-23,LTTS,L&T Technology Services Limited,Technology,WATCH,0.31,0.2,0.7,,4222.6,,,,,129.23
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,LTTS,L&T Technology Services Limited,Technology,WATCH,0.31,0.2,0.7,,4095.7,,,,,128.24,,,,,,,,,,,,,,,,,
+2026-11-19,LTTS,L&T Technology Services Limited,Technology,BUY,0.335,0.2,0.7,0.126,4036.0,,,,ema-cross,125.84,,,,,,,,,,,,,,,,,
+2026-11-20,LTTS,L&T Technology Services Limited,Technology,WATCH,0.31,0.2,0.7,,4082.5,,,,,127.18,,,,,,,,,,,,,,,,,
+2026-11-23,LTTS,L&T Technology Services Limited,Technology,WATCH,0.31,0.2,0.7,,4222.6,,,,,129.23,,,,,,,,,,,,,,,,,
+2026-11-25,LTTS,L&T Technology Services Limited,Technology,WATCH,0.31,0.2,0.7,,4178.0,,,,,130.65,0.1002,0.1394,True,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE 20.2% (good) | Debt/Equity 0.08x (good) | Revenue growth 2.0% | Earnings growth 66.6% (good) | Net margin 13.2% (good) | P/E 31.7,not fetched (no strategy can reach BUY),428198494208,31.657385,6.0472393,0.20207001,7.863,0.02,0.666,0.13242,2.733,1.47,

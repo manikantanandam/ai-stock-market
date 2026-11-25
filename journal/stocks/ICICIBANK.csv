@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ICICIBANK,ICICI Bank Limited,Financial Services,BUY,0.508,0.4,0.8,0.341,1601.3,,,,swing;trend,30.58
-2026-11-19,ICICIBANK,ICICI Bank Limited,Financial Services,BUY,0.516,0.4,0.8,0.379,1608.9,,,,swing;trend,30.05
-2026-11-20,ICICIBANK,ICICI Bank Limited,Financial Services,BUY,0.448,0.4,0.8,0.04,1640.0,,,,swing;trend,31.06
-2026-11-23,ICICIBANK,ICICI Bank Limited,Financial Services,BUY,0.543,0.6,0.8,0.017,1585.5,,,,swing;trend,33.08
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ICICIBANK,ICICI Bank Limited,Financial Services,BUY,0.508,0.4,0.8,0.341,1601.3,,,,swing;trend,30.58,,,,,,,,,,,,,,,,,
+2026-11-19,ICICIBANK,ICICI Bank Limited,Financial Services,BUY,0.516,0.4,0.8,0.379,1608.9,,,,swing;trend,30.05,,,,,,,,,,,,,,,,,
+2026-11-20,ICICIBANK,ICICI Bank Limited,Financial Services,BUY,0.448,0.4,0.8,0.04,1640.0,,,,swing;trend,31.06,,,,,,,,,,,,,,,,,
+2026-11-23,ICICIBANK,ICICI Bank Limited,Financial Services,BUY,0.543,0.6,0.8,0.017,1585.5,,,,swing;trend,33.08,,,,,,,,,,,,,,,,,
+2026-11-25,ICICIBANK,ICICI Bank Limited,Financial Services,BUY,0.486,0.4,0.8,0.228,1640.0,,,,swing;trend;leaders;leaders-slope,35.32,0.0903,0.2196,True,uptrend: price > SMA50 > SMA200 | RSI overbought (71) | MACD histogram positive,ROE 16.5% (good) | Debt/Equity: n/a | Revenue growth 15.8% (good) | Earnings growth 22.1% (good) | Net margin 27.8% (good) | P/E 19.8 (good),"51 headlines: 13 positive, 3 negative, 35 neutral | +0.91 2026-11-25 ICICI Bank shares hit ₹1,650, 6th gain in 7 days (NewsBytes) | +0.90 2026-11-25 Bank Nifty Jumps Over 1,100 Points Today as HDFC Bank and ICICI Bank Shares Rally Over 3%; Private Banks Lead Gains (Kotak Neo) | +0.90 2026-11-25 ICICI Bank, HDFC Bank, Reliance, and Airtel lead Nifty to 45% rally (India Infoline) | +0.84 2026-11-25 NIFTY Bank soars over 2% as ICICI Bank shares hit 52-week high; HDFC Bank, Axis Bank lead gains (Dailyhunt)",11558537134080,19.758074,2.9565096,0.1649,,0.158,0.221,0.27844998,,0.75,

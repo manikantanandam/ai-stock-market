@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,KEC,KEC International Limited,Industrials,AVOID,-0.28,-0.2,-0.6,,313.7,,,,,13.57
-2026-11-19,KEC,KEC International Limited,Industrials,AVOID,-0.48,-0.6,-0.6,,306.65,,,,,13.45
-2026-11-20,KEC,KEC International Limited,Industrials,AVOID,-0.48,-0.6,-0.6,,300.15,,,,,13.04
-2026-11-23,KEC,KEC International Limited,Industrials,AVOID,-0.48,-0.6,-0.6,,295.25,,,,,12.73
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,KEC,KEC International Limited,Industrials,AVOID,-0.28,-0.2,-0.6,,313.7,,,,,13.57,,,,,,,,,,,,,,,,,
+2026-11-19,KEC,KEC International Limited,Industrials,AVOID,-0.48,-0.6,-0.6,,306.65,,,,,13.45,,,,,,,,,,,,,,,,,
+2026-11-20,KEC,KEC International Limited,Industrials,AVOID,-0.48,-0.6,-0.6,,300.15,,,,,13.04,,,,,,,,,,,,,,,,,
+2026-11-23,KEC,KEC International Limited,Industrials,AVOID,-0.48,-0.6,-0.6,,295.25,,,,,12.73,,,,,,,,,,,,,,,,,
+2026-11-25,KEC,KEC International Limited,Industrials,AVOID,-0.48,-0.6,-0.6,,297.65,,,,,12.37,-0.3819,-0.4677,False,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE 7.2% (weak) | Debt/Equity 1.04x | Revenue growth -10.2% (weak) | Earnings growth -81.5% (weak) | Net margin 1.8% (weak) | P/E 19.3 (good),not fetched (no strategy can reach BUY),81630224384,19.310453,1.3367538,0.07203,103.505,-0.102,-0.815,0.01847,1.234,1.75,

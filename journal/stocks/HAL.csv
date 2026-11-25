@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.17,-0.2,0.9,,4675.0,,,,,129.66
-2026-11-19,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.17,-0.2,0.9,,4760.0,,,,,126.47
-2026-11-20,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.17,-0.2,0.9,,4809.0,,,,,122.91
-2026-11-23,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.17,-0.2,0.9,,4780.0,,,,,119.8
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.17,-0.2,0.9,,4675.0,,,,,129.66,,,,,,,,,,,,,,,,,
+2026-11-19,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.17,-0.2,0.9,,4760.0,,,,,126.47,,,,,,,,,,,,,,,,,
+2026-11-20,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.17,-0.2,0.9,,4809.0,,,,,122.91,,,,,,,,,,,,,,,,,
+2026-11-23,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.17,-0.2,0.9,,4780.0,,,,,119.8,,,,,,,,,,,,,,,,,
+2026-11-25,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.37,0.2,0.9,,4936.0,,,,,122.95,-0.0774,0.0437,False,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE 23.6% (good) | Debt/Equity 0.00x (good) | Revenue growth 14.9% (good) | Earnings growth 15.9% (good) | Net margin 27.6% (good) | P/E 33.2,not fetched (no strategy can reach BUY),3183368994816,33.203125,7.235901,0.23639,0.023,0.149,0.159,0.27576,2.724,0.96,

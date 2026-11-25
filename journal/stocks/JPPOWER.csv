@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,JPPOWER,Jaiprakash Power Ventures Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,13.31,,,,,0.49
-2026-11-19,JPPOWER,Jaiprakash Power Ventures Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,13.47,,,,,0.48
-2026-11-20,JPPOWER,Jaiprakash Power Ventures Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,13.37,,,,,0.47
-2026-11-23,JPPOWER,Jaiprakash Power Ventures Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,13.24,,,,,0.46
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,JPPOWER,Jaiprakash Power Ventures Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,13.31,,,,,0.49,,,,,,,,,,,,,,,,,
+2026-11-19,JPPOWER,Jaiprakash Power Ventures Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,13.47,,,,,0.48,,,,,,,,,,,,,,,,,
+2026-11-20,JPPOWER,Jaiprakash Power Ventures Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,13.37,,,,,0.47,,,,,,,,,,,,,,,,,
+2026-11-23,JPPOWER,Jaiprakash Power Ventures Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,13.24,,,,,0.46,,,,,,,,,,,,,,,,,
+2026-11-25,JPPOWER,Jaiprakash Power Ventures Limited,Utilities,AVOID,-0.33,-0.6,-0.1,,13.05,,,,,0.45,-0.3015,-0.3929,False,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE 3.8% (weak) | Debt/Equity 0.23x (good) | Revenue growth 5.1% | Earnings growth -80.0% (weak) | Net margin 8.5% | P/E 24.5 (good),not fetched (no strategy can reach BUY),92316090368,24.49091,1.1906656,0.03793,23.023,0.051,-0.8,0.08525,2.741,0.0,

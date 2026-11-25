@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,CEATLTD,CEAT Limited,Consumer Cyclical,WATCH,0.085,0.2,-0.05,,3498.9,,,,,93.81
-2026-11-19,CEATLTD,CEAT Limited,Consumer Cyclical,WATCH,0.085,0.2,-0.05,,3541.6,,,,,92.88
-2026-11-20,CEATLTD,CEAT Limited,Consumer Cyclical,WATCH,0.085,0.2,-0.05,,3543.0,,,,,92.27
-2026-11-23,CEATLTD,CEAT Limited,Consumer Cyclical,WATCH,0.085,0.2,-0.05,,3492.4,,,,,92.56
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,CEATLTD,CEAT Limited,Consumer Cyclical,WATCH,0.085,0.2,-0.05,,3498.9,,,,,93.81,,,,,,,,,,,,,,,,,
+2026-11-19,CEATLTD,CEAT Limited,Consumer Cyclical,WATCH,0.085,0.2,-0.05,,3541.6,,,,,92.88,,,,,,,,,,,,,,,,,
+2026-11-20,CEATLTD,CEAT Limited,Consumer Cyclical,WATCH,0.085,0.2,-0.05,,3543.0,,,,,92.27,,,,,,,,,,,,,,,,,
+2026-11-23,CEATLTD,CEAT Limited,Consumer Cyclical,WATCH,0.085,0.2,-0.05,,3492.4,,,,,92.56,,,,,,,,,,,,,,,,,
+2026-11-25,CEATLTD,CEAT Limited,Consumer Cyclical,WATCH,0.085,0.2,-0.05,,3579.4,,,,,101.28,-0.0601,0.0218,True,MACD histogram positive | volume spike vs 20d average,ROE 10.8% | Debt/Equity 0.82x | Revenue growth 26.2% (good) | Earnings growth -39.6% (weak) | Net margin 3.0% (weak) | P/E 27.7,not fetched (no strategy can reach BUY),142768504832,27.692549,2.8771322,0.10792,81.807,0.262,-0.396,0.029560002,0.672,1.0,

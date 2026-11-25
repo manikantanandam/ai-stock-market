@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,SUZLON,Suzlon Energy Limited,Industrials,WATCH,0.11,-0.2,0.7,,36.13,,,,,1.27
-2026-11-19,SUZLON,Suzlon Energy Limited,Industrials,WATCH,0.11,-0.2,0.7,,36.95,,,,,1.28
-2026-11-20,SUZLON,Suzlon Energy Limited,Industrials,WATCH,0.11,-0.2,0.7,,36.96,,,,,1.26
-2026-11-23,SUZLON,Suzlon Energy Limited,Industrials,WATCH,0.11,-0.2,0.7,,35.86,,,,,1.28
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,SUZLON,Suzlon Energy Limited,Industrials,WATCH,0.11,-0.2,0.7,,36.13,,,,,1.27,,,,,,,,,,,,,,,,,
+2026-11-19,SUZLON,Suzlon Energy Limited,Industrials,WATCH,0.11,-0.2,0.7,,36.95,,,,,1.28,,,,,,,,,,,,,,,,,
+2026-11-20,SUZLON,Suzlon Energy Limited,Industrials,WATCH,0.11,-0.2,0.7,,36.96,,,,,1.26,,,,,,,,,,,,,,,,,
+2026-11-23,SUZLON,Suzlon Energy Limited,Industrials,WATCH,0.11,-0.2,0.7,,35.86,,,,,1.28,,,,,,,,,,,,,,,,,
+2026-11-25,SUZLON,Suzlon Energy Limited,Industrials,WATCH,-0.09,-0.6,0.7,,36.13,,,,,1.24,-0.2911,-0.4163,False,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE 24.9% (good) | Debt/Equity 0.07x (good) | Revenue growth 26.0% (good) | Earnings growth -68.8% (weak) | Net margin 12.3% (good) | P/E 22.5 (good),not fetched (no strategy can reach BUY),507937751040,22.530489,4.88692,0.2491,6.548,0.26,-0.688,0.12287,1.744,0.0,

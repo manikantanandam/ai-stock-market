@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,DIXON,Dixon Technologies (India) Limited,Technology,WATCH,0.22,0.2,0.4,,12615.0,,,,,404.79
-2026-11-19,DIXON,Dixon Technologies (India) Limited,Technology,BUY,0.457,0.6,0.4,0.186,13054.0,,,,swing;trend,410.52
-2026-11-20,DIXON,Dixon Technologies (India) Limited,Technology,BUY,0.449,0.6,0.4,0.147,13120.0,,,,swing;trend,402.56
-2026-11-23,DIXON,Dixon Technologies (India) Limited,Technology,BUY,0.434,0.6,0.4,0.069,13390.0,,,,swing;trend,402.38
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,DIXON,Dixon Technologies (India) Limited,Technology,WATCH,0.22,0.2,0.4,,12615.0,,,,,404.79,,,,,,,,,,,,,,,,,
+2026-11-19,DIXON,Dixon Technologies (India) Limited,Technology,BUY,0.457,0.6,0.4,0.186,13054.0,,,,swing;trend,410.52,,,,,,,,,,,,,,,,,
+2026-11-20,DIXON,Dixon Technologies (India) Limited,Technology,BUY,0.449,0.6,0.4,0.147,13120.0,,,,swing;trend,402.56,,,,,,,,,,,,,,,,,
+2026-11-23,DIXON,Dixon Technologies (India) Limited,Technology,BUY,0.434,0.6,0.4,0.069,13390.0,,,,swing;trend,402.38,,,,,,,,,,,,,,,,,
+2026-11-25,DIXON,Dixon Technologies (India) Limited,Technology,BUY,0.425,0.6,0.4,0.025,12978.0,,,,swing;trend,435.35,-0.19,0.0195,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 30.6% (good) | Debt/Equity 0.18x (good) | Revenue growth 46.7% (good) | Earnings growth -45.1% (weak) | Net margin 2.7% (weak) | P/E 45.6,"20 headlines: 6 positive, 4 negative, 10 neutral | +0.90 2026-11-23 Kaynes vs Dixon: One EMS stock up to 25% upside on IT hardware push (The Financial Express) | -0.78 2026-11-23 Dixon Technologies (India) Ltd: Technical Momentum Shifts Signal Cautious Optimism (MarketsMojo) | +0.66 2026-11-23 Dixon, Syrma, Kaynes: Emkay sees up to 39% upside in 1 EMS stock but 1 gets a ‘Reduce’ (The Financial Express) | -0.60 2026-11-23 Dixon Technologies Share Price Fall Streak: Price Action (Univest)",798520836096,45.5637,11.315497,0.30622,18.377,0.467,-0.451,0.026500002,1.055,0.08,

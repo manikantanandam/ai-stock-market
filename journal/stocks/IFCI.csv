@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,IFCI,IFCI Limited,Financial Services,WATCH,0.055,0.2,-0.15,,59.73,,,,,2.74
-2026-11-19,IFCI,IFCI Limited,Financial Services,WATCH,0.055,0.2,-0.15,,61.38,,,,,2.71
-2026-11-20,IFCI,IFCI Limited,Financial Services,WATCH,-0.145,-0.2,-0.15,,59.82,,,,,2.65
-2026-11-23,IFCI,IFCI Limited,Financial Services,WATCH,-0.145,-0.2,-0.15,,58.77,,,,,2.63
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,IFCI,IFCI Limited,Financial Services,WATCH,0.055,0.2,-0.15,,59.73,,,,,2.74,,,,,,,,,,,,,,,,,
+2026-11-19,IFCI,IFCI Limited,Financial Services,WATCH,0.055,0.2,-0.15,,61.38,,,,,2.71,,,,,,,,,,,,,,,,,
+2026-11-20,IFCI,IFCI Limited,Financial Services,WATCH,-0.145,-0.2,-0.15,,59.82,,,,,2.65,,,,,,,,,,,,,,,,,
+2026-11-23,IFCI,IFCI Limited,Financial Services,WATCH,-0.145,-0.2,-0.15,,58.77,,,,,2.63,,,,,,,,,,,,,,,,,
+2026-11-25,IFCI,IFCI Limited,Financial Services,WATCH,-0.145,-0.2,-0.15,,57.67,,,,,2.6,-0.3519,-0.1391,True,downtrend: price < SMA50 < SMA200 | MACD histogram positive,ROE: n/a | Debt/Equity 0.23x (good) | Revenue growth -6.3% (weak) | Earnings growth -20.0% (weak) | Net margin 12.7% (good) | P/E 91.6 (weak),not fetched (no strategy can reach BUY),165377015808,91.61194,1.8144197,,22.723,-0.063,-0.2,0.12699,,0.0,

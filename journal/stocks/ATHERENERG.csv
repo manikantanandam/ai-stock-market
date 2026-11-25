@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ATHERENERG,Ather Energy Limited,Consumer Cyclical,BUY,0.406,0.6,0.05,0.457,1901.1,,,,swing;trend,71.02
-2026-11-19,ATHERENERG,Ather Energy Limited,Consumer Cyclical,BUY,0.29,0.4,0.05,0.377,1924.9,,,,trend,71.02
-2026-11-20,ATHERENERG,Ather Energy Limited,Consumer Cyclical,BUY,0.266,0.4,0.05,0.253,1935.4,,,,trend,70.16
-2026-11-23,ATHERENERG,Ather Energy Limited,Consumer Cyclical,BUY,0.236,0.4,0.05,0.105,1979.2,,,,trend,68.61
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ATHERENERG,Ather Energy Limited,Consumer Cyclical,BUY,0.406,0.6,0.05,0.457,1901.1,,,,swing;trend,71.02,,,,,,,,,,,,,,,,,
+2026-11-19,ATHERENERG,Ather Energy Limited,Consumer Cyclical,BUY,0.29,0.4,0.05,0.377,1924.9,,,,trend,71.02,,,,,,,,,,,,,,,,,
+2026-11-20,ATHERENERG,Ather Energy Limited,Consumer Cyclical,BUY,0.266,0.4,0.05,0.253,1935.4,,,,trend,70.16,,,,,,,,,,,,,,,,,
+2026-11-23,ATHERENERG,Ather Energy Limited,Consumer Cyclical,BUY,0.236,0.4,0.05,0.105,1979.2,,,,trend,68.61,,,,,,,,,,,,,,,,,
+2026-11-25,ATHERENERG,Ather Energy Limited,Consumer Cyclical,WATCH,0.115,0.2,0.05,,1871.9,,,,,73.2,0.2157,1.0295,True,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE -6.7% (weak) | Debt/Equity 0.22x (good) | Revenue growth 62.9% (good) | Earnings growth: n/a | Net margin -4.9% (weak) | P/E: n/a,not fetched (no strategy can reach BUY),764405415936,,18.863802,-0.066989996,22.455,0.629,,-0.048800003,2.647,0.0,

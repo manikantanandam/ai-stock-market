@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.445,0.6,0.45,0.051,4820.4,,,,swing;trend,169.85
-2026-11-19,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.474,0.6,0.45,0.193,4978.6,,,,swing;trend;breakout,173.35
-2026-11-20,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.5,0.6,0.45,0.324,4932.7,,,,swing;trend,171.1
-2026-11-23,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.46,0.6,0.45,0.123,4895.0,,,,swing;trend,169.82
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.445,0.6,0.45,0.051,4820.4,,,,swing;trend,169.85,,,,,,,,,,,,,,,,,
+2026-11-19,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.474,0.6,0.45,0.193,4978.6,,,,swing;trend;breakout,173.35,,,,,,,,,,,,,,,,,
+2026-11-20,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.5,0.6,0.45,0.324,4932.7,,,,swing;trend,171.1,,,,,,,,,,,,,,,,,
+2026-11-23,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.46,0.6,0.45,0.123,4895.0,,,,swing;trend,169.82,,,,,,,,,,,,,,,,,
+2026-11-25,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.464,0.6,0.45,0.147,4731.8,,,,swing;trend,177.98,-0.0402,0.1465,False,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 8.3% | Debt/Equity 0.26x (good) | Revenue growth 45.5% (good) | Earnings growth 35.6% (good) | Net margin 11.9% | P/E 81.0 (weak),"13 headlines: 3 positive, 0 negative, 10 neutral | +0.93 2026-11-23 Gujarat Fluorochemicals EBITDA up 32% in Q2FY27; EV capex delayed (scanx.trade) | +0.83 2026-11-20 Gujarat Fluorochemicals Share Price: Fresh 52-Week High (Univest)",546899230720,80.96601,6.5201793,0.08299,26.223,0.455,0.356,0.1188,1.622,0.06,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,CREDITACC,CreditAccess Grameen Limited,Financial Services,WATCH,0.08,-0.2,0.6,,1046.2,,,,,43.47
-2026-11-19,CREDITACC,CreditAccess Grameen Limited,Financial Services,WATCH,0.18,0.0,0.6,,970.6,,,,,46.54
-2026-11-20,CREDITACC,CreditAccess Grameen Limited,Financial Services,WATCH,0.08,-0.2,0.6,,981.7,,,,,45.89
-2026-11-23,CREDITACC,CreditAccess Grameen Limited,Financial Services,WATCH,-0.12,-0.6,0.6,,983.8,,,,,44.12
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,CREDITACC,CreditAccess Grameen Limited,Financial Services,WATCH,0.08,-0.2,0.6,,1046.2,,,,,43.47,,,,,,,,,,,,,,,,,
+2026-11-19,CREDITACC,CreditAccess Grameen Limited,Financial Services,WATCH,0.18,0.0,0.6,,970.6,,,,,46.54,,,,,,,,,,,,,,,,,
+2026-11-20,CREDITACC,CreditAccess Grameen Limited,Financial Services,WATCH,0.08,-0.2,0.6,,981.7,,,,,45.89,,,,,,,,,,,,,,,,,
+2026-11-23,CREDITACC,CreditAccess Grameen Limited,Financial Services,WATCH,-0.12,-0.6,0.6,,983.8,,,,,44.12,,,,,,,,,,,,,,,,,
+2026-11-25,CREDITACC,CreditAccess Grameen Limited,Financial Services,WATCH,0.08,-0.2,0.6,,1019.8,,,,,46.29,-0.383,-0.2884,True,downtrend: price < SMA50 < SMA200 | MACD histogram positive | volume spike vs 20d average,ROE 19.7% (good) | Debt/Equity 2.83x (weak) | Revenue growth 108.9% (good) | Earnings growth 297.4% (good) | Net margin 44.2% (good) | P/E 9.8 (good),not fetched (no strategy can reach BUY),155566686208,9.84581,1.7455295,0.1973,282.89,1.089,2.974,0.44195,142.868,0.0,

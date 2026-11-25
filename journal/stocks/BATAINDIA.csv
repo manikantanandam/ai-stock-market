@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,BATAINDIA,Bata India Limited,Consumer Cyclical,AVOID,-0.255,-0.6,0.15,,624.0,,,,,17.13
-2026-11-19,BATAINDIA,Bata India Limited,Consumer Cyclical,AVOID,-0.255,-0.6,0.15,,627.2,,,,,16.82
-2026-11-20,BATAINDIA,Bata India Limited,Consumer Cyclical,WATCH,-0.055,-0.2,0.15,,634.5,,,,,16.97
-2026-11-23,BATAINDIA,Bata India Limited,Consumer Cyclical,AVOID,-0.255,-0.6,0.15,,626.7,,,,,16.97
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,BATAINDIA,Bata India Limited,Consumer Cyclical,AVOID,-0.255,-0.6,0.15,,624.0,,,,,17.13,,,,,,,,,,,,,,,,,
+2026-11-19,BATAINDIA,Bata India Limited,Consumer Cyclical,AVOID,-0.255,-0.6,0.15,,627.2,,,,,16.82,,,,,,,,,,,,,,,,,
+2026-11-20,BATAINDIA,Bata India Limited,Consumer Cyclical,WATCH,-0.055,-0.2,0.15,,634.5,,,,,16.97,,,,,,,,,,,,,,,,,
+2026-11-23,BATAINDIA,Bata India Limited,Consumer Cyclical,AVOID,-0.255,-0.6,0.15,,626.7,,,,,16.97,,,,,,,,,,,,,,,,,
+2026-11-25,BATAINDIA,Bata India Limited,Consumer Cyclical,AVOID,-0.255,-0.6,0.15,,631.5,,,,,16.73,-0.1638,-0.1271,True,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE 10.9% | Debt/Equity 1.12x | Revenue growth 7.5% | Earnings growth 30.6% (good) | Net margin 4.2% | P/E 53.6,not fetched (no strategy can reach BUY),80612474880,53.60684,6.4943676,0.10877,111.626,0.075,0.306,0.04163,1.531,5.45,

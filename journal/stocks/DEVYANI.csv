@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,DEVYANI,Devyani International Limited,Consumer Cyclical,WATCH,-0.005,0.2,-0.35,,122.73,,,,,4.73
-2026-11-19,DEVYANI,Devyani International Limited,Consumer Cyclical,WATCH,-0.005,0.2,-0.35,,123.75,,,,,4.59
-2026-11-20,DEVYANI,Devyani International Limited,Consumer Cyclical,WATCH,-0.005,0.2,-0.35,,121.73,,,,,4.46
-2026-11-23,DEVYANI,Devyani International Limited,Consumer Cyclical,AVOID,-0.205,-0.2,-0.35,,119.72,,,,,4.4
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,DEVYANI,Devyani International Limited,Consumer Cyclical,WATCH,-0.005,0.2,-0.35,,122.73,,,,,4.73,,,,,,,,,,,,,,,,,
+2026-11-19,DEVYANI,Devyani International Limited,Consumer Cyclical,WATCH,-0.005,0.2,-0.35,,123.75,,,,,4.59,,,,,,,,,,,,,,,,,
+2026-11-20,DEVYANI,Devyani International Limited,Consumer Cyclical,WATCH,-0.005,0.2,-0.35,,121.73,,,,,4.46,,,,,,,,,,,,,,,,,
+2026-11-23,DEVYANI,Devyani International Limited,Consumer Cyclical,AVOID,-0.205,-0.2,-0.35,,119.72,,,,,4.4,,,,,,,,,,,,,,,,,
+2026-11-25,DEVYANI,Devyani International Limited,Consumer Cyclical,AVOID,-0.205,-0.2,-0.35,,125.57,,,,,4.68,-0.195,0.0091,True,MACD histogram negative | volume spike vs 20d average,ROE -0.1% (weak) | Debt/Equity 1.82x (weak) | Revenue growth 10.4% (good) | Earnings growth: n/a | Net margin -0.1% (weak) | P/E: n/a,not fetched (no strategy can reach BUY),152576294912,,9.453059,-0.0014599999,181.871,0.104,,-0.00101,0.379,0.0,

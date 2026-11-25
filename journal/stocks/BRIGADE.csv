@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,BRIGADE,Brigade Enterprises Limited,Real Estate,WATCH,0.115,0.2,0.05,,565.95,,,,,20.8
-2026-11-19,BRIGADE,Brigade Enterprises Limited,Real Estate,WATCH,0.115,0.2,0.05,,566.2,,,,,20.43
-2026-11-20,BRIGADE,Brigade Enterprises Limited,Real Estate,BUY,0.369,0.6,0.05,0.272,578.35,,,,trend,20.65
-2026-11-23,BRIGADE,Brigade Enterprises Limited,Real Estate,BUY,0.351,0.6,0.05,0.18,581.65,,,,trend,20.39
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,BRIGADE,Brigade Enterprises Limited,Real Estate,WATCH,0.115,0.2,0.05,,565.95,,,,,20.8,,,,,,,,,,,,,,,,,
+2026-11-19,BRIGADE,Brigade Enterprises Limited,Real Estate,WATCH,0.115,0.2,0.05,,566.2,,,,,20.43,,,,,,,,,,,,,,,,,
+2026-11-20,BRIGADE,Brigade Enterprises Limited,Real Estate,BUY,0.369,0.6,0.05,0.272,578.35,,,,trend,20.65,,,,,,,,,,,,,,,,,
+2026-11-23,BRIGADE,Brigade Enterprises Limited,Real Estate,BUY,0.351,0.6,0.05,0.18,581.65,,,,trend,20.39,,,,,,,,,,,,,,,,,
+2026-11-25,BRIGADE,Brigade Enterprises Limited,Real Estate,BUY,0.369,0.6,0.05,0.272,589.7,,,,trend;breakout,21.86,-0.1422,0.0853,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive | volume spike vs 20d average,ROE 11.1% | Debt/Equity 0.83x | Revenue growth -13.5% (weak) | Earnings growth 19.1% (good) | Net margin 13.6% (good) | P/E 25.5,"54 headlines: 22 positive, 7 negative, 25 neutral | +0.93 2026-11-25 Brigade Enterprises shares gain up to 7% as real estate developer sells homes worth Rs 1,600 crore in... (Moneycontrol.com) | +0.92 2026-11-25 Buzzing Stocks: RMC Switchgears shares gain 20% on Rs 521cr order; Brigade Enterprises shares surge 5% (Moneycontrol.com) | +0.85 2026-11-25 Brigade Enterprises shares climb 7%: Two triggers behind the rally (Business Today) | +0.92 2026-11-23 Brigade Enterprises acquires land parcel in Hyderabad with ₹1,000 crore revenue potential; shares gain 6.5% in a month (Dailyhunt)",184673140736,25.458633,2.5792286,0.11078,82.897,-0.135,0.191,0.13584,1.196,0.35,

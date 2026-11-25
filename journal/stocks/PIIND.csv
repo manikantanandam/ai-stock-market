@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1624.0,,,,,70.47
-2026-11-19,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1630.0,,,,,68.38
-2026-11-20,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1597.4,,,,,66.16
-2026-11-23,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1571.0,,,,,64.45
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1624.0,,,,,70.47,,,,,,,,,,,,,,,,,
+2026-11-19,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1630.0,,,,,68.38,,,,,,,,,,,,,,,,,
+2026-11-20,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1597.4,,,,,66.16,,,,,,,,,,,,,,,,,
+2026-11-23,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1571.0,,,,,64.45,,,,,,,,,,,,,,,,,
+2026-11-25,PIIND,PI Industries Limited,Basic Materials,AVOID,-0.29,-0.4,-0.3,,1576.0,,,,,61.67,-0.4334,-0.5198,False,downtrend: price < SMA50 < SMA200 | RSI oversold (23) | MACD histogram negative,ROE 7.9% (weak) | Debt/Equity 0.03x (good) | Revenue growth -9.1% (weak) | Earnings growth -70.2% (weak) | Net margin 13.8% (good) | P/E 28.2,not fetched (no strategy can reach BUY),247281008640,28.16658,2.1596184,0.07879,2.615,-0.091,-0.702,0.13836001,3.846,0.92,

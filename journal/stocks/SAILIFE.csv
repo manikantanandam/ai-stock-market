@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,SAILIFE,Sai Life Sciences Limited,Healthcare,BUY,0.617,0.6,0.8,0.385,1788.1,,,,swing;trend,82.29
-2026-11-19,SAILIFE,Sai Life Sciences Limited,Healthcare,BUY,0.615,0.6,0.8,0.376,1788.4,,,,swing;trend,79.43
-2026-11-20,SAILIFE,Sai Life Sciences Limited,Healthcare,BUY,0.576,0.6,0.8,0.179,1800.7,,,,swing;trend,77.54
-2026-11-23,SAILIFE,Sai Life Sciences Limited,Healthcare,BUY,0.583,0.6,0.8,0.217,1809.1,,,,swing;trend,74.24
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,SAILIFE,Sai Life Sciences Limited,Healthcare,BUY,0.617,0.6,0.8,0.385,1788.1,,,,swing;trend,82.29,,,,,,,,,,,,,,,,,
+2026-11-19,SAILIFE,Sai Life Sciences Limited,Healthcare,BUY,0.615,0.6,0.8,0.376,1788.4,,,,swing;trend,79.43,,,,,,,,,,,,,,,,,
+2026-11-20,SAILIFE,Sai Life Sciences Limited,Healthcare,BUY,0.576,0.6,0.8,0.179,1800.7,,,,swing;trend,77.54,,,,,,,,,,,,,,,,,
+2026-11-23,SAILIFE,Sai Life Sciences Limited,Healthcare,BUY,0.583,0.6,0.8,0.217,1809.1,,,,swing;trend,74.24,,,,,,,,,,,,,,,,,
+2026-11-25,SAILIFE,Sai Life Sciences Limited,Healthcare,BUY,0.564,0.6,0.8,0.12,1799.3,,,,swing;trend;leaders;leaders-slope,73.58,0.17,0.5269,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 15.2% (good) | Debt/Equity 0.23x (good) | Revenue growth 22.5% (good) | Earnings growth 16.5% (good) | Net margin 15.9% (good) | P/E 101.7 (weak),"13 headlines: 7 positive, 2 negative, 4 neutral | +0.93 2026-11-20 Sai Life Sciences Share Price Is Up 55% in 2026 (Univest) | -0.95 2026-11-17 Sai Life Sciences falls 2.79% in Tuesday's session (Global Banking & Finance Review) | -0.90 2026-11-16 Pharma stocks under pressure; Laurus, Sai Life, Divi's slide up to 10% (Business Standard) | +0.92 2026-11-14 Broad-Based Technical Strength Lifts Sai Life Sciences Ltd to 52-Week High of Rs 1955 (MarketsMojo)",379986214912,101.72924,14.127833,0.15177,23.049,0.225,0.165,0.15864,1.216,0.0,

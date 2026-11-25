@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ZFCVINDIA,ZF Commercial Vehicle Control Systems India Limited,Consumer Cyclical,WATCH,-0.085,-0.2,0.05,,2241.7,,,,,81.8
-2026-11-19,ZFCVINDIA,ZF Commercial Vehicle Control Systems India Limited,Consumer Cyclical,WATCH,-0.085,-0.2,0.05,,2212.8,,,,,80.27
-2026-11-20,ZFCVINDIA,ZF Commercial Vehicle Control Systems India Limited,Consumer Cyclical,WATCH,-0.085,-0.2,0.05,,2191.8,,,,,77.96
-2026-11-23,ZFCVINDIA,ZF Commercial Vehicle Control Systems India Limited,Consumer Cyclical,AVOID,-0.285,-0.6,0.05,,2159.6,,,,,78.01
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ZFCVINDIA,ZF Commercial Vehicle Control Systems India Limited,Consumer Cyclical,WATCH,-0.085,-0.2,0.05,,2241.7,,,,,81.8,,,,,,,,,,,,,,,,,
+2026-11-19,ZFCVINDIA,ZF Commercial Vehicle Control Systems India Limited,Consumer Cyclical,WATCH,-0.085,-0.2,0.05,,2212.8,,,,,80.27,,,,,,,,,,,,,,,,,
+2026-11-20,ZFCVINDIA,ZF Commercial Vehicle Control Systems India Limited,Consumer Cyclical,WATCH,-0.085,-0.2,0.05,,2191.8,,,,,77.96,,,,,,,,,,,,,,,,,
+2026-11-23,ZFCVINDIA,ZF Commercial Vehicle Control Systems India Limited,Consumer Cyclical,AVOID,-0.285,-0.6,0.05,,2159.6,,,,,78.01,,,,,,,,,,,,,,,,,
+2026-11-25,ZFCVINDIA,ZF Commercial Vehicle Control Systems India Limited,Consumer Cyclical,AVOID,-0.285,-0.6,0.05,,2119.8,,,,,78.74,-0.2683,-0.228,True,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE: n/a | Debt/Equity 0.01x (good) | Revenue growth 9.3% | Earnings growth -14.6% (weak) | Net margin 11.9% | P/E 48.5,not fetched (no strategy can reach BUY),251828830208,48.547607,6.8235645,,1.485,0.093,-0.146,0.118599996,,0.17,

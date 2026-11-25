@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,CUMMINSIND,Cummins India Limited,Industrials,WATCH,-0.18,-0.6,0.4,,4005.0,,,,,166.75
-2026-11-19,CUMMINSIND,Cummins India Limited,Industrials,WATCH,-0.18,-0.6,0.4,,4141.5,,,,,165.96
-2026-11-20,CUMMINSIND,Cummins India Limited,Industrials,WATCH,-0.18,-0.6,0.4,,4100.0,,,,,161.36
-2026-11-23,CUMMINSIND,Cummins India Limited,Industrials,WATCH,-0.18,-0.6,0.4,,4052.8,,,,,155.51
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,CUMMINSIND,Cummins India Limited,Industrials,WATCH,-0.18,-0.6,0.4,,4005.0,,,,,166.75,,,,,,,,,,,,,,,,,
+2026-11-19,CUMMINSIND,Cummins India Limited,Industrials,WATCH,-0.18,-0.6,0.4,,4141.5,,,,,165.96,,,,,,,,,,,,,,,,,
+2026-11-20,CUMMINSIND,Cummins India Limited,Industrials,WATCH,-0.18,-0.6,0.4,,4100.0,,,,,161.36,,,,,,,,,,,,,,,,,
+2026-11-23,CUMMINSIND,Cummins India Limited,Industrials,WATCH,-0.18,-0.6,0.4,,4052.8,,,,,155.51,,,,,,,,,,,,,,,,,
+2026-11-25,CUMMINSIND,Cummins India Limited,Industrials,WATCH,-0.18,-0.6,0.4,,4067.0,,,,,149.21,-0.2683,-0.3225,False,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE 27.8% (good) | Debt/Equity 0.00x (good) | Revenue growth 4.1% | Earnings growth -18.5% (weak) | Net margin 17.6% (good) | P/E 51.0,not fetched (no strategy can reach BUY),1148023865344,50.978584,13.829802,0.27812,0.449,0.041,-0.185,0.17603001,3.056,1.65,

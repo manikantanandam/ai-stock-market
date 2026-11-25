@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,BEML,BEML Limited,Industrials,WATCH,0.353,0.6,-0.1,0.415,2020.2,,,,,79.84
-2026-11-19,BEML,BEML Limited,Industrials,WATCH,0.352,0.6,-0.1,0.412,2034.8,,,,,76.97
-2026-11-20,BEML,BEML Limited,Industrials,WATCH,0.322,0.6,-0.1,0.259,2052.4,,,,,77.41
-2026-11-23,BEML,BEML Limited,Industrials,WATCH,0.07,0.2,-0.1,,2008.1,,,,,76.12
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,BEML,BEML Limited,Industrials,WATCH,0.353,0.6,-0.1,0.415,2020.2,,,,,79.84,,,,,,,,,,,,,,,,,
+2026-11-19,BEML,BEML Limited,Industrials,WATCH,0.352,0.6,-0.1,0.412,2034.8,,,,,76.97,,,,,,,,,,,,,,,,,
+2026-11-20,BEML,BEML Limited,Industrials,WATCH,0.322,0.6,-0.1,0.259,2052.4,,,,,77.41,,,,,,,,,,,,,,,,,
+2026-11-23,BEML,BEML Limited,Industrials,WATCH,0.07,0.2,-0.1,,2008.1,,,,,76.12,,,,,,,,,,,,,,,,,
+2026-11-25,BEML,BEML Limited,Industrials,WATCH,0.07,0.2,-0.1,,2041.2,,,,,76.03,-0.0037,0.0347,False,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE 5.8% (weak) | Debt/Equity 0.22x (good) | Revenue growth 42.0% (good) | Earnings growth -30.6% (weak) | Net margin 3.3% (weak) | P/E 29.2,not fetched (no strategy can reach BUY),169476456448,29.21045,5.9009476,0.057740003,21.949,0.42,-0.306,0.03349,1.926,0.85,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,0.16,0.2,0.2,,788.05,,,,,29.77
-2026-11-19,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,-0.04,-0.2,0.2,,772.55,,,,,28.86
-2026-11-20,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,-0.04,-0.2,0.2,,760.8,,,,,28.01
-2026-11-23,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,-0.04,-0.2,0.2,,770.0,,,,,28.33
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,0.16,0.2,0.2,,788.05,,,,,29.77,,,,,,,,,,,,,,,,,
+2026-11-19,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,-0.04,-0.2,0.2,,772.55,,,,,28.86,,,,,,,,,,,,,,,,,
+2026-11-20,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,-0.04,-0.2,0.2,,760.8,,,,,28.01,,,,,,,,,,,,,,,,,
+2026-11-23,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,-0.04,-0.2,0.2,,770.0,,,,,28.33,,,,,,,,,,,,,,,,,
+2026-11-25,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,-0.04,-0.2,0.2,,757.15,,,,,27.92,0.0146,-0.1098,False,MACD histogram negative,ROE 26.2% (good) | Debt/Equity 0.02x (good) | Revenue growth -28.7% (weak) | Earnings growth -50.2% (weak) | Net margin 19.6% (good) | P/E 36.5,not fetched (no strategy can reach BUY),214146957312,36.509926,8.60042,0.26193002,2.343,-0.287,-0.502,0.19612,2.929,0.38,

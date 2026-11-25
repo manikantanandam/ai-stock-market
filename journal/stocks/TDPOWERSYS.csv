@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,TDPOWERSYS,TD Power Systems Limited,Industrials,WATCH,0.17,-0.2,0.9,,632.3,,,,,42.5
-2026-11-19,TDPOWERSYS,TD Power Systems Limited,Industrials,WATCH,0.17,-0.2,0.9,,637.85,,,,,40.42
-2026-11-20,TDPOWERSYS,TD Power Systems Limited,Industrials,WATCH,0.17,-0.2,0.9,,619.0,,,,,39.31
-2026-11-23,TDPOWERSYS,TD Power Systems Limited,Industrials,WATCH,0.17,-0.2,0.9,,605.3,,,,,38.76
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,TDPOWERSYS,TD Power Systems Limited,Industrials,WATCH,0.17,-0.2,0.9,,632.3,,,,,42.5,,,,,,,,,,,,,,,,,
+2026-11-19,TDPOWERSYS,TD Power Systems Limited,Industrials,WATCH,0.17,-0.2,0.9,,637.85,,,,,40.42,,,,,,,,,,,,,,,,,
+2026-11-20,TDPOWERSYS,TD Power Systems Limited,Industrials,WATCH,0.17,-0.2,0.9,,619.0,,,,,39.31,,,,,,,,,,,,,,,,,
+2026-11-23,TDPOWERSYS,TD Power Systems Limited,Industrials,WATCH,0.17,-0.2,0.9,,605.3,,,,,38.76,,,,,,,,,,,,,,,,,
+2026-11-25,TDPOWERSYS,TD Power Systems Limited,Industrials,WATCH,0.17,-0.2,0.9,,587.05,,,,,38.61,-0.2988,-0.1801,False,MACD histogram negative,ROE 29.4% (good) | Debt/Equity 0.00x (good) | Revenue growth 85.9% (good) | Earnings growth 105.7% (good) | Net margin 13.5% (good) | P/E 58.9,not fetched (no strategy can reach BUY),205036109824,58.896584,14.937239,0.29426,0.001,0.859,1.057,0.13471,1.869,0.21,

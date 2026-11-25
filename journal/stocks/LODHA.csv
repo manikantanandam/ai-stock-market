@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,LODHA,Lodha Developers Limited,Real Estate,BUY,0.615,0.6,0.9,0.223,1197.1,,,,swing;trend,44.89
-2026-11-19,LODHA,Lodha Developers Limited,Real Estate,BUY,0.617,0.6,0.9,0.233,1202.7,,,,swing;trend,43.36
-2026-11-20,LODHA,Lodha Developers Limited,Real Estate,BUY,0.581,0.6,0.9,0.055,1218.7,,,,swing;trend,43.78
-2026-11-23,LODHA,Lodha Developers Limited,Real Estate,BUY,0.59,0.6,0.9,0.099,1219.0,,,,swing;trend,42.72
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,LODHA,Lodha Developers Limited,Real Estate,BUY,0.615,0.6,0.9,0.223,1197.1,,,,swing;trend,44.89,,,,,,,,,,,,,,,,,
+2026-11-19,LODHA,Lodha Developers Limited,Real Estate,BUY,0.617,0.6,0.9,0.233,1202.7,,,,swing;trend,43.36,,,,,,,,,,,,,,,,,
+2026-11-20,LODHA,Lodha Developers Limited,Real Estate,BUY,0.581,0.6,0.9,0.055,1218.7,,,,swing;trend,43.78,,,,,,,,,,,,,,,,,
+2026-11-23,LODHA,Lodha Developers Limited,Real Estate,BUY,0.59,0.6,0.9,0.099,1219.0,,,,swing;trend,42.72,,,,,,,,,,,,,,,,,
+2026-11-25,LODHA,Lodha Developers Limited,Real Estate,BUY,0.573,0.6,0.9,0.016,1202.0,,,,swing;trend,43.73,-0.0968,0.2717,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 18.6% (good) | Debt/Equity 0.41x (good) | Revenue growth 17.6% (good) | Earnings growth 28.6% (good) | Net margin 23.1% (good) | P/E 27.7,"16 headlines: 8 positive, 2 negative, 6 neutral | +0.89 2026-11-21 Tech Mahindra increases authorised share capital to Rs. 1,000 crore (Business Upturn) | +0.33 2026-11-24 Lodha Developers Shifts Focus: Less Land Buy, More Cash Flow (Rediff MoneyWiz) | -0.32 2026-11-24 Lodha Developers sitting on inventory worth ₹2 lakh crore, to invest less on land acquisition (BusinessLine) | -0.47 2026-11-22 Lodha Developers director Mukund Chitale ceases office after second term (scanx.trade)",1201799036928,27.68009,4.751501,0.18639,41.126,0.176,0.286,0.23076001,1.741,0.36,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,MSUMI,Motherson Sumi Wiring India Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,39.52,,,,,1.01
-2026-11-19,MSUMI,Motherson Sumi Wiring India Limited,Consumer Cyclical,WATCH,0.24,0.0,0.8,,41.25,,,,,1.1
-2026-11-20,MSUMI,Motherson Sumi Wiring India Limited,Consumer Cyclical,WATCH,0.24,0.0,0.8,,42.71,,,,,1.16
-2026-11-23,MSUMI,Motherson Sumi Wiring India Limited,Consumer Cyclical,WATCH,0.24,0.0,0.8,,41.65,,,,,1.2
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,MSUMI,Motherson Sumi Wiring India Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,39.52,,,,,1.01,,,,,,,,,,,,,,,,,
+2026-11-19,MSUMI,Motherson Sumi Wiring India Limited,Consumer Cyclical,WATCH,0.24,0.0,0.8,,41.25,,,,,1.1,,,,,,,,,,,,,,,,,
+2026-11-20,MSUMI,Motherson Sumi Wiring India Limited,Consumer Cyclical,WATCH,0.24,0.0,0.8,,42.71,,,,,1.16,,,,,,,,,,,,,,,,,
+2026-11-23,MSUMI,Motherson Sumi Wiring India Limited,Consumer Cyclical,WATCH,0.24,0.0,0.8,,41.65,,,,,1.2,,,,,,,,,,,,,,,,,
+2026-11-25,MSUMI,Motherson Sumi Wiring India Limited,Consumer Cyclical,WATCH,0.24,0.0,0.8,,42.12,,,,,1.18,0.0334,-0.0111,True,RSI overbought (73) | MACD histogram positive,ROE 34.4% (good) | Debt/Equity 0.14x (good) | Revenue growth 46.7% (good) | Earnings growth 36.0% (good) | Net margin 5.0% | P/E 39.7,not fetched (no strategy can reach BUY),273556062208,39.663464,12.661142,0.34418,13.838,0.467,0.36,0.050329998,1.591,1.47,

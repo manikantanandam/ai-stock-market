@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,CGCL,Capri Global Capital Limited,Financial Services,WATCH,0.28,0.2,0.6,,239.88,,,,,7.39
-2026-11-19,CGCL,Capri Global Capital Limited,Financial Services,WATCH,0.28,0.2,0.6,,239.69,,,,,7.04
-2026-11-20,CGCL,Capri Global Capital Limited,Financial Services,WATCH,0.28,0.2,0.6,,234.77,,,,,7.12
-2026-11-23,CGCL,Capri Global Capital Limited,Financial Services,WATCH,0.08,-0.2,0.6,,232.61,,,,,7.01
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,CGCL,Capri Global Capital Limited,Financial Services,WATCH,0.28,0.2,0.6,,239.88,,,,,7.39,,,,,,,,,,,,,,,,,
+2026-11-19,CGCL,Capri Global Capital Limited,Financial Services,WATCH,0.28,0.2,0.6,,239.69,,,,,7.04,,,,,,,,,,,,,,,,,
+2026-11-20,CGCL,Capri Global Capital Limited,Financial Services,WATCH,0.28,0.2,0.6,,234.77,,,,,7.12,,,,,,,,,,,,,,,,,
+2026-11-23,CGCL,Capri Global Capital Limited,Financial Services,WATCH,0.08,-0.2,0.6,,232.61,,,,,7.01,,,,,,,,,,,,,,,,,
+2026-11-25,CGCL,Capri Global Capital Limited,Financial Services,WATCH,0.08,-0.2,0.6,,237.17,,,,,7.08,-0.0052,0.1564,True,MACD histogram negative,ROE 17.9% (good) | Debt/Equity 3.83x (weak) | Revenue growth 62.3% (good) | Earnings growth 77.5% (good) | Net margin 36.4% (good) | P/E 17.7 (good),not fetched (no strategy can reach BUY),230618693632,17.663229,2.8966608,0.17907,383.398,0.623,0.775,0.36359,74.269,0.08,

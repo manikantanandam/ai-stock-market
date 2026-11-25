@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,JSWSTEEL,JSW Steel Limited,Basic Materials,BUY,0.557,0.6,0.8,0.086,1315.9,,,,swing;trend,29.25
-2026-11-19,JSWSTEEL,JSW Steel Limited,Basic Materials,BUY,0.506,0.6,0.8,-0.169,1336.8,,,,swing;trend,29.58
-2026-11-20,JSWSTEEL,JSW Steel Limited,Basic Materials,WATCH,0.34,0.2,0.8,,1337.0,,,,,31.24
-2026-11-23,JSWSTEEL,JSW Steel Limited,Basic Materials,WATCH,0.34,0.2,0.8,,1311.9,,,,,31.5
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,JSWSTEEL,JSW Steel Limited,Basic Materials,BUY,0.557,0.6,0.8,0.086,1315.9,,,,swing;trend,29.25,,,,,,,,,,,,,,,,,
+2026-11-19,JSWSTEEL,JSW Steel Limited,Basic Materials,BUY,0.506,0.6,0.8,-0.169,1336.8,,,,swing;trend,29.58,,,,,,,,,,,,,,,,,
+2026-11-20,JSWSTEEL,JSW Steel Limited,Basic Materials,WATCH,0.34,0.2,0.8,,1337.0,,,,,31.24,,,,,,,,,,,,,,,,,
+2026-11-23,JSWSTEEL,JSW Steel Limited,Basic Materials,WATCH,0.34,0.2,0.8,,1311.9,,,,,31.5,,,,,,,,,,,,,,,,,
+2026-11-25,JSWSTEEL,JSW Steel Limited,Basic Materials,WATCH,0.34,0.2,0.8,,1302.5,,,,,31.78,-0.0578,-0.0695,False,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE 31.9% (good) | Debt/Equity 0.62x | Revenue growth 20.7% (good) | Earnings growth 225.2% (good) | Net margin 14.3% (good) | P/E 11.5 (good),not fetched (no strategy can reach BUY),3264307003392,11.494411,2.8794458,0.31928,61.529,0.207,2.252,0.14288999,1.146,0.54,

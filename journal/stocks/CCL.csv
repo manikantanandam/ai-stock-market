@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,CCL,CCL Products (India) Limited,Consumer Defensive,WATCH,0.08,-0.2,0.6,,951.7,,,,,32.41
-2026-11-19,CCL,CCL Products (India) Limited,Consumer Defensive,WATCH,0.08,-0.2,0.6,,944.6,,,,,31.16
-2026-11-20,CCL,CCL Products (India) Limited,Consumer Defensive,WATCH,0.08,-0.2,0.6,,953.05,,,,,30.68
-2026-11-23,CCL,CCL Products (India) Limited,Consumer Defensive,WATCH,0.08,-0.2,0.6,,937.55,,,,,30.29
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,CCL,CCL Products (India) Limited,Consumer Defensive,WATCH,0.08,-0.2,0.6,,951.7,,,,,32.41,,,,,,,,,,,,,,,,,
+2026-11-19,CCL,CCL Products (India) Limited,Consumer Defensive,WATCH,0.08,-0.2,0.6,,944.6,,,,,31.16,,,,,,,,,,,,,,,,,
+2026-11-20,CCL,CCL Products (India) Limited,Consumer Defensive,WATCH,0.08,-0.2,0.6,,953.05,,,,,30.68,,,,,,,,,,,,,,,,,
+2026-11-23,CCL,CCL Products (India) Limited,Consumer Defensive,WATCH,0.08,-0.2,0.6,,937.55,,,,,30.29,,,,,,,,,,,,,,,,,
+2026-11-25,CCL,CCL Products (India) Limited,Consumer Defensive,WATCH,0.08,-0.2,0.6,,938.15,,,,,29.25,-0.1954,-0.2051,True,downtrend: price < SMA50 < SMA200 | MACD histogram positive,ROE 19.4% (good) | Debt/Equity 0.46x (good) | Revenue growth 7.8% | Earnings growth 29.0% (good) | Net margin 9.8% | P/E 26.6,not fetched (no strategy can reach BUY),125956947968,26.578503,4.7358575,0.19443001,46.024,0.078,0.29,0.09834,1.816,0.6,

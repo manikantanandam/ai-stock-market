@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,MEDANTA,Global Health Limited,Healthcare,BUY,0.548,0.6,0.8,0.039,1436.6,,,,swing;trend,44.41
-2026-11-19,MEDANTA,Global Health Limited,Healthcare,BUY,0.558,0.6,0.8,0.089,1478.3,,,,swing;trend,45.01
-2026-11-20,MEDANTA,Global Health Limited,Healthcare,BUY,0.574,0.6,0.8,0.17,1480.2,,,,swing;trend,44.44
-2026-11-23,MEDANTA,Global Health Limited,Healthcare,BUY,0.483,0.4,0.8,0.214,1500.2,,,,swing;trend,45.26
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,MEDANTA,Global Health Limited,Healthcare,BUY,0.548,0.6,0.8,0.039,1436.6,,,,swing;trend,44.41,,,,,,,,,,,,,,,,,
+2026-11-19,MEDANTA,Global Health Limited,Healthcare,BUY,0.558,0.6,0.8,0.089,1478.3,,,,swing;trend,45.01,,,,,,,,,,,,,,,,,
+2026-11-20,MEDANTA,Global Health Limited,Healthcare,BUY,0.574,0.6,0.8,0.17,1480.2,,,,swing;trend,44.44,,,,,,,,,,,,,,,,,
+2026-11-23,MEDANTA,Global Health Limited,Healthcare,BUY,0.483,0.4,0.8,0.214,1500.2,,,,swing;trend,45.26,,,,,,,,,,,,,,,,,
+2026-11-25,MEDANTA,Global Health Limited,Healthcare,BUY,0.471,0.4,0.8,0.153,1528.5,,,,swing;trend;leaders;leaders-slope,44.58,0.0196,0.1465,True,uptrend: price > SMA50 > SMA200 | RSI overbought (73) | MACD histogram positive,ROE 15.2% (good) | Debt/Equity 0.31x (good) | Revenue growth 33.6% (good) | Earnings growth 39.2% (good) | Net margin 12.2% (good) | P/E 64.3 (weak),"53 headlines: 13 positive, 4 negative, 36 neutral | +0.94 2026-11-25 Global Health (ASX:GLH): Can Recurring Software Revenue Support a Positive Cash Flow Goal for FY27? (Kalkine) | +0.86 2026-11-25 Gilead Sciences stock: Generic lenacapavir supply reaches Zambia (ad-hoc-news.de) | +0.93 2026-11-23 Global Health Ltd Reports Strong Quarterly Growth, Upgrades to Buy (MarketsMojo) | -0.97 2026-11-23 The Cigna Group stock slips to EUR 247.50, down 2.86% premarket (ad-hoc-news.de)",397481672704,64.32986,9.19055,0.15226,31.147,0.336,0.392,0.122379996,2.719,0.03,

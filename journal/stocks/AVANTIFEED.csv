@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,AVANTIFEED,Avanti Feeds Limited,Consumer Defensive,WATCH,-0.055,-0.2,0.15,,717.4,,,,,28.43
-2026-11-19,AVANTIFEED,Avanti Feeds Limited,Consumer Defensive,WATCH,-0.055,-0.2,0.15,,713.8,,,,,27.3
-2026-11-20,AVANTIFEED,Avanti Feeds Limited,Consumer Defensive,WATCH,-0.055,-0.2,0.15,,717.1,,,,,26.58
-2026-11-23,AVANTIFEED,Avanti Feeds Limited,Consumer Defensive,WATCH,-0.055,-0.2,0.15,,700.35,,,,,26.53
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,AVANTIFEED,Avanti Feeds Limited,Consumer Defensive,WATCH,-0.055,-0.2,0.15,,717.4,,,,,28.43,,,,,,,,,,,,,,,,,
+2026-11-19,AVANTIFEED,Avanti Feeds Limited,Consumer Defensive,WATCH,-0.055,-0.2,0.15,,713.8,,,,,27.3,,,,,,,,,,,,,,,,,
+2026-11-20,AVANTIFEED,Avanti Feeds Limited,Consumer Defensive,WATCH,-0.055,-0.2,0.15,,717.1,,,,,26.58,,,,,,,,,,,,,,,,,
+2026-11-23,AVANTIFEED,Avanti Feeds Limited,Consumer Defensive,WATCH,-0.055,-0.2,0.15,,700.35,,,,,26.53,,,,,,,,,,,,,,,,,
+2026-11-25,AVANTIFEED,Avanti Feeds Limited,Consumer Defensive,WATCH,-0.055,-0.2,0.15,,697.5,,,,,26.13,-0.2416,-0.5487,True,downtrend: price < SMA50 < SMA200 | MACD histogram positive,ROE 13.7% | Debt/Equity 0.00x (good) | Revenue growth 8.9% | Earnings growth -55.0% (weak) | Net margin 6.9% | P/E 21.1 (good),not fetched (no strategy can reach BUY),97252130816,21.124592,2.9280376,0.1374,0.33,0.089,-0.55,0.06869,4.089,1.39,

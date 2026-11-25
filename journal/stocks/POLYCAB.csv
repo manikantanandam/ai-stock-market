@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,POLYCAB,Polycab India Limited,Industrials,WATCH,-0.06,-0.6,0.8,,7307.5,,,,,253.0
-2026-11-19,POLYCAB,Polycab India Limited,Industrials,WATCH,-0.06,-0.6,0.8,,7550.0,,,,,258.72
-2026-11-20,POLYCAB,Polycab India Limited,Industrials,WATCH,-0.06,-0.6,0.8,,7570.0,,,,,257.52
-2026-11-23,POLYCAB,Polycab India Limited,Industrials,WATCH,-0.06,-0.6,0.8,,7430.0,,,,,251.2
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,POLYCAB,Polycab India Limited,Industrials,WATCH,-0.06,-0.6,0.8,,7307.5,,,,,253.0,,,,,,,,,,,,,,,,,
+2026-11-19,POLYCAB,Polycab India Limited,Industrials,WATCH,-0.06,-0.6,0.8,,7550.0,,,,,258.72,,,,,,,,,,,,,,,,,
+2026-11-20,POLYCAB,Polycab India Limited,Industrials,WATCH,-0.06,-0.6,0.8,,7570.0,,,,,257.52,,,,,,,,,,,,,,,,,
+2026-11-23,POLYCAB,Polycab India Limited,Industrials,WATCH,-0.06,-0.6,0.8,,7430.0,,,,,251.2,,,,,,,,,,,,,,,,,
+2026-11-25,POLYCAB,Polycab India Limited,Industrials,WATCH,-0.06,-0.6,0.8,,7379.0,,,,,245.65,-0.2416,-0.2882,False,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE 26.8% (good) | Debt/Equity 0.02x (good) | Revenue growth 52.8% (good) | Earnings growth 42.5% (good) | Net margin 9.1% | P/E 36.0,not fetched (no strategy can reach BUY),1137758437376,35.976364,8.688837,0.26767,2.054,0.528,0.425,0.09119,1.725,0.64,

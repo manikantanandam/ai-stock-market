@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,APOLLOTYRE,Apollo Tyres Limited,Consumer Cyclical,WATCH,0.295,0.2,0.65,,415.1,,,,,11.88
-2026-11-19,APOLLOTYRE,Apollo Tyres Limited,Consumer Cyclical,WATCH,0.295,0.2,0.65,,419.4,,,,,11.51
-2026-11-20,APOLLOTYRE,Apollo Tyres Limited,Consumer Cyclical,WATCH,0.295,0.2,0.65,,417.85,,,,,11.35
-2026-11-23,APOLLOTYRE,Apollo Tyres Limited,Consumer Cyclical,WATCH,0.295,0.2,0.65,,420.7,,,,,11.3
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,APOLLOTYRE,Apollo Tyres Limited,Consumer Cyclical,WATCH,0.295,0.2,0.65,,415.1,,,,,11.88,,,,,,,,,,,,,,,,,
+2026-11-19,APOLLOTYRE,Apollo Tyres Limited,Consumer Cyclical,WATCH,0.295,0.2,0.65,,419.4,,,,,11.51,,,,,,,,,,,,,,,,,
+2026-11-20,APOLLOTYRE,Apollo Tyres Limited,Consumer Cyclical,WATCH,0.295,0.2,0.65,,417.85,,,,,11.35,,,,,,,,,,,,,,,,,
+2026-11-23,APOLLOTYRE,Apollo Tyres Limited,Consumer Cyclical,WATCH,0.295,0.2,0.65,,420.7,,,,,11.3,,,,,,,,,,,,,,,,,
+2026-11-25,APOLLOTYRE,Apollo Tyres Limited,Consumer Cyclical,WATCH,0.295,0.2,0.65,,437.35,,,,,12.01,-0.07,0.0945,True,MACD histogram positive | volume spike vs 20d average,ROE 10.5% | Debt/Equity 0.31x (good) | Revenue growth 16.6% (good) | Earnings growth 13.5% (good) | Net margin 5.7% | P/E 15.2 (good),not fetched (no strategy can reach BUY),265304604672,15.228758,1.5116128,0.105340004,31.408,0.166,0.135,0.057239998,1.223,1.45,

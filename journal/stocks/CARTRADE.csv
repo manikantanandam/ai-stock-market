@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,CARTRADE,CarTrade Tech Limited,Consumer Cyclical,WATCH,0.205,0.2,0.35,,2628.6,,,,,142.27
-2026-11-19,CARTRADE,CarTrade Tech Limited,Consumer Cyclical,WATCH,0.205,0.2,0.35,,2641.7,,,,,138.82
-2026-11-20,CARTRADE,CarTrade Tech Limited,Consumer Cyclical,WATCH,0.205,0.2,0.35,,2655.7,,,,,134.49
-2026-11-23,CARTRADE,CarTrade Tech Limited,Consumer Cyclical,WATCH,0.205,0.2,0.35,,2613.5,,,,,131.02
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,CARTRADE,CarTrade Tech Limited,Consumer Cyclical,WATCH,0.205,0.2,0.35,,2628.6,,,,,142.27,,,,,,,,,,,,,,,,,
+2026-11-19,CARTRADE,CarTrade Tech Limited,Consumer Cyclical,WATCH,0.205,0.2,0.35,,2641.7,,,,,138.82,,,,,,,,,,,,,,,,,
+2026-11-20,CARTRADE,CarTrade Tech Limited,Consumer Cyclical,WATCH,0.205,0.2,0.35,,2655.7,,,,,134.49,,,,,,,,,,,,,,,,,
+2026-11-23,CARTRADE,CarTrade Tech Limited,Consumer Cyclical,WATCH,0.205,0.2,0.35,,2613.5,,,,,131.02,,,,,,,,,,,,,,,,,
+2026-11-25,CARTRADE,CarTrade Tech Limited,Consumer Cyclical,WATCH,0.205,0.2,0.35,,2513.5,,,,,133.2,-0.2467,0.3105,True,MACD histogram positive,ROE 9.7% | Debt/Equity 0.05x (good) | Revenue growth 10.2% (good) | Earnings growth -0.9% (weak) | Net margin 28.0% (good) | P/E 57.5,not fetched (no strategy can reach BUY),128428580864,57.515785,4.855004,0.09747,4.615,0.102,-0.009,0.27953,5.321,0.0,

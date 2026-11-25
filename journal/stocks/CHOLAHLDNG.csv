@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,CHOLAHLDNG,Cholamandalam Financial Holdings Limited,Financial Services,WATCH,0.19,0.2,0.3,,1432.4,,,,,51.04
-2026-11-19,CHOLAHLDNG,Cholamandalam Financial Holdings Limited,Financial Services,WATCH,-0.01,-0.2,0.3,,1412.2,,,,,49.73
-2026-11-20,CHOLAHLDNG,Cholamandalam Financial Holdings Limited,Financial Services,WATCH,-0.01,-0.2,0.3,,1400.8,,,,,48.54
-2026-11-23,CHOLAHLDNG,Cholamandalam Financial Holdings Limited,Financial Services,AVOID,-0.21,-0.6,0.3,,1357.1,,,,,50.06
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,CHOLAHLDNG,Cholamandalam Financial Holdings Limited,Financial Services,WATCH,0.19,0.2,0.3,,1432.4,,,,,51.04,,,,,,,,,,,,,,,,,
+2026-11-19,CHOLAHLDNG,Cholamandalam Financial Holdings Limited,Financial Services,WATCH,-0.01,-0.2,0.3,,1412.2,,,,,49.73,,,,,,,,,,,,,,,,,
+2026-11-20,CHOLAHLDNG,Cholamandalam Financial Holdings Limited,Financial Services,WATCH,-0.01,-0.2,0.3,,1400.8,,,,,48.54,,,,,,,,,,,,,,,,,
+2026-11-23,CHOLAHLDNG,Cholamandalam Financial Holdings Limited,Financial Services,AVOID,-0.21,-0.6,0.3,,1357.1,,,,,50.06,,,,,,,,,,,,,,,,,
+2026-11-25,CHOLAHLDNG,Cholamandalam Financial Holdings Limited,Financial Services,AVOID,-0.21,-0.6,0.3,,1337.9,,,,,50.87,-0.208,-0.2508,True,downtrend: price < SMA50 < SMA200 | MACD histogram negative | volume spike vs 20d average,ROE 18.8% (good) | Debt/Equity 6.10x (weak) | Revenue growth 6.6% | Earnings growth 16.9% (good) | Net margin 11.8% | P/E 9.6 (good),not fetched (no strategy can reach BUY),265179316224,9.563215,1.5485396,0.18761,610.132,0.066,0.169,0.11766,74.619,0.09,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,FORCEMOT,Force Motors Limited,Consumer Cyclical,WATCH,0.12,0.0,0.4,,20088.0,,,,,680.47
-2026-11-19,FORCEMOT,Force Motors Limited,Consumer Cyclical,WATCH,0.12,0.0,0.4,,20443.0,,,,,670.94
-2026-11-20,FORCEMOT,Force Motors Limited,Consumer Cyclical,WATCH,0.12,0.0,0.4,,20285.0,,,,,649.87
-2026-11-23,FORCEMOT,Force Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,20098.0,,,,,647.95
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,FORCEMOT,Force Motors Limited,Consumer Cyclical,WATCH,0.12,0.0,0.4,,20088.0,,,,,680.47,,,,,,,,,,,,,,,,,
+2026-11-19,FORCEMOT,Force Motors Limited,Consumer Cyclical,WATCH,0.12,0.0,0.4,,20443.0,,,,,670.94,,,,,,,,,,,,,,,,,
+2026-11-20,FORCEMOT,Force Motors Limited,Consumer Cyclical,WATCH,0.12,0.0,0.4,,20285.0,,,,,649.87,,,,,,,,,,,,,,,,,
+2026-11-23,FORCEMOT,Force Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,20098.0,,,,,647.95,,,,,,,,,,,,,,,,,
+2026-11-25,FORCEMOT,Force Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,20392.0,,,,,652.6,0.0862,-0.0598,True,MACD histogram positive,ROE 29.3% (good) | Debt/Equity: n/a | Revenue growth 40.5% (good) | Earnings growth -16.2% (weak) | Net margin 11.9% | P/E 22.5 (good),not fetched (no strategy can reach BUY),269362331648,22.539886,5.8081326,0.29333,,0.405,-0.162,0.118990004,1.809,0.25,

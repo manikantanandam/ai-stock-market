@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.31,0.2,0.7,,30840.0,,,,,1323.35
-2026-11-19,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.31,0.2,0.7,,30750.0,,,,,1267.75
-2026-11-20,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.31,0.2,0.7,,30150.0,,,,,1253.98
-2026-11-23,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.31,0.2,0.7,,30240.0,,,,,1220.84
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.31,0.2,0.7,,30840.0,,,,,1323.35,,,,,,,,,,,,,,,,,
+2026-11-19,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.31,0.2,0.7,,30750.0,,,,,1267.75,,,,,,,,,,,,,,,,,
+2026-11-20,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.31,0.2,0.7,,30150.0,,,,,1253.98,,,,,,,,,,,,,,,,,
+2026-11-23,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.31,0.2,0.7,,30240.0,,,,,1220.84,,,,,,,,,,,,,,,,,
+2026-11-25,POWERINDIA,Hitachi Energy India Limited,Industrials,WATCH,0.11,-0.2,0.7,,29770.0,,,,,1199.71,-0.1939,-0.251,False,downtrend: price < SMA50 < SMA200 | MACD histogram positive,ROE 23.3% (good) | Debt/Equity 0.01x (good) | Revenue growth 63.5% (good) | Earnings growth 20.5% (good) | Net margin 11.7% | P/E 113.8 (weak),not fetched (no strategy can reach BUY),1370600243200,113.78353,23.81157,0.23301001,1.454,0.635,0.205,0.116639994,1.477,0.03,

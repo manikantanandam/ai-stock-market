@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,MRPL,Mangalore Refinery and Petrochemicals Limited,Energy,WATCH,0.28,0.2,0.6,,175.97,,,,,7.59
-2026-11-19,MRPL,Mangalore Refinery and Petrochemicals Limited,Energy,WATCH,0.28,0.2,0.6,,176.18,,,,,7.29
-2026-11-20,MRPL,Mangalore Refinery and Petrochemicals Limited,Energy,WATCH,0.28,0.2,0.6,,175.52,,,,,6.98
-2026-11-23,MRPL,Mangalore Refinery and Petrochemicals Limited,Energy,WATCH,0.28,0.2,0.6,,175.36,,,,,6.69
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,MRPL,Mangalore Refinery and Petrochemicals Limited,Energy,WATCH,0.28,0.2,0.6,,175.97,,,,,7.59,,,,,,,,,,,,,,,,,
+2026-11-19,MRPL,Mangalore Refinery and Petrochemicals Limited,Energy,WATCH,0.28,0.2,0.6,,176.18,,,,,7.29,,,,,,,,,,,,,,,,,
+2026-11-20,MRPL,Mangalore Refinery and Petrochemicals Limited,Energy,WATCH,0.28,0.2,0.6,,175.52,,,,,6.98,,,,,,,,,,,,,,,,,
+2026-11-23,MRPL,Mangalore Refinery and Petrochemicals Limited,Energy,WATCH,0.28,0.2,0.6,,175.36,,,,,6.69,,,,,,,,,,,,,,,,,
+2026-11-25,MRPL,Mangalore Refinery and Petrochemicals Limited,Energy,WATCH,0.08,-0.2,0.6,,164.68,,,,,7.08,-0.1169,0.0363,True,MACD histogram negative,ROE 29.1% (good) | Debt/Equity 0.60x | Revenue growth 43.6% (good) | Earnings growth 203.1% (good) | Net margin 3.7% (weak) | P/E 7.0 (good),not fetched (no strategy can reach BUY),308772831232,6.994045,1.8114518,0.29083002,59.887,0.436,2.031,0.0369,1.293,3.41,

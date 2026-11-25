@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ACC,ACC Limited,Basic Materials,WATCH,-0.05,0.2,-0.5,,1229.8,,,,,31.17
-2026-11-19,ACC,ACC Limited,Basic Materials,WATCH,-0.05,0.2,-0.5,,1268.6,,,,,32.07
-2026-11-20,ACC,ACC Limited,Basic Materials,WATCH,-0.05,0.2,-0.5,,1277.0,,,,,31.85
-2026-11-23,ACC,ACC Limited,Basic Materials,WATCH,-0.05,0.2,-0.5,,1255.8,,,,,32.36
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ACC,ACC Limited,Basic Materials,WATCH,-0.05,0.2,-0.5,,1229.8,,,,,31.17,,,,,,,,,,,,,,,,,
+2026-11-19,ACC,ACC Limited,Basic Materials,WATCH,-0.05,0.2,-0.5,,1268.6,,,,,32.07,,,,,,,,,,,,,,,,,
+2026-11-20,ACC,ACC Limited,Basic Materials,WATCH,-0.05,0.2,-0.5,,1277.0,,,,,31.85,,,,,,,,,,,,,,,,,
+2026-11-23,ACC,ACC Limited,Basic Materials,WATCH,-0.05,0.2,-0.5,,1255.8,,,,,32.36,,,,,,,,,,,,,,,,,
+2026-11-25,ACC,ACC Limited,Basic Materials,WATCH,-0.05,0.2,-0.5,,1262.3,,,,,32.12,-0.0991,-0.155,True,MACD histogram positive,ROE 4.3% (weak) | Debt/Equity 0.02x (good) | Revenue growth -3.9% (weak) | Earnings growth -91.7% (weak) | Net margin 3.5% (weak) | P/E 27.1,not fetched (no strategy can reach BUY),238226915328,27.06058,1.1527519,0.04344,2.481,-0.039,-0.917,0.03532,1.869,0.61,

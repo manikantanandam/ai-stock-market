@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,CAPLIPOINT,Caplin Point Laboratories Limited,Healthcare,WATCH,0.3,0.0,1.0,,2085.3,,,,,102.53
-2026-11-19,CAPLIPOINT,Caplin Point Laboratories Limited,Healthcare,WATCH,0.3,0.0,1.0,,2084.6,,,,,103.2
-2026-11-20,CAPLIPOINT,Caplin Point Laboratories Limited,Healthcare,WATCH,0.3,0.0,1.0,,2029.1,,,,,103.4
-2026-11-23,CAPLIPOINT,Caplin Point Laboratories Limited,Healthcare,WATCH,0.3,0.0,1.0,,2033.3,,,,,101.82
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,CAPLIPOINT,Caplin Point Laboratories Limited,Healthcare,WATCH,0.3,0.0,1.0,,2085.3,,,,,102.53,,,,,,,,,,,,,,,,,
+2026-11-19,CAPLIPOINT,Caplin Point Laboratories Limited,Healthcare,WATCH,0.3,0.0,1.0,,2084.6,,,,,103.2,,,,,,,,,,,,,,,,,
+2026-11-20,CAPLIPOINT,Caplin Point Laboratories Limited,Healthcare,WATCH,0.3,0.0,1.0,,2029.1,,,,,103.4,,,,,,,,,,,,,,,,,
+2026-11-23,CAPLIPOINT,Caplin Point Laboratories Limited,Healthcare,WATCH,0.3,0.0,1.0,,2033.3,,,,,101.82,,,,,,,,,,,,,,,,,
+2026-11-25,CAPLIPOINT,Caplin Point Laboratories Limited,Healthcare,WATCH,0.3,0.0,1.0,,2024.8,,,,,98.22,-0.2727,-0.0866,True,RSI oversold (28) | MACD histogram negative,ROE 19.6% (good) | Debt/Equity 0.00x (good) | Revenue growth 17.9% (good) | Earnings growth 15.4% (good) | Net margin 28.9% (good) | P/E 23.1 (good),not fetched (no strategy can reach BUY),158453989376,23.059734,4.137819,0.19579001,0.117,0.179,0.154,0.28882998,7.367,0.38,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,NSLNISP,NMDC Steel Limited,Basic Materials,WATCH,-0.025,-0.2,0.25,,38.78,,,,,1.23
-2026-11-19,NSLNISP,NMDC Steel Limited,Basic Materials,WATCH,-0.025,-0.2,0.25,,39.08,,,,,1.21
-2026-11-20,NSLNISP,NMDC Steel Limited,Basic Materials,WATCH,-0.025,-0.2,0.25,,38.85,,,,,1.21
-2026-11-23,NSLNISP,NMDC Steel Limited,Basic Materials,AVOID,-0.225,-0.6,0.25,,38.5,,,,,1.17
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,NSLNISP,NMDC Steel Limited,Basic Materials,WATCH,-0.025,-0.2,0.25,,38.78,,,,,1.23,,,,,,,,,,,,,,,,,
+2026-11-19,NSLNISP,NMDC Steel Limited,Basic Materials,WATCH,-0.025,-0.2,0.25,,39.08,,,,,1.21,,,,,,,,,,,,,,,,,
+2026-11-20,NSLNISP,NMDC Steel Limited,Basic Materials,WATCH,-0.025,-0.2,0.25,,38.85,,,,,1.21,,,,,,,,,,,,,,,,,
+2026-11-23,NSLNISP,NMDC Steel Limited,Basic Materials,AVOID,-0.225,-0.6,0.25,,38.5,,,,,1.17,,,,,,,,,,,,,,,,,
+2026-11-25,NSLNISP,NMDC Steel Limited,Basic Materials,AVOID,-0.225,-0.6,0.25,,38.06,,,,,1.13,-0.1081,-0.2267,False,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE: n/a | Debt/Equity 0.35x (good) | Revenue growth 8.8% | Earnings growth 111.1% (good) | Net margin 0.6% (weak) | P/E 43.9,not fetched (no strategy can reach BUY),114528083968,43.910114,0.86941046,,35.019,0.088,1.111,0.006,,0.0,

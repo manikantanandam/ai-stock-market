@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,634.6,,,,,21.85
-2026-11-19,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,650.05,,,,,22.08
-2026-11-20,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,639.3,,,,,23.48
-2026-11-23,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,652.05,,,,,23.85
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,634.6,,,,,21.85,,,,,,,,,,,,,,,,,
+2026-11-19,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,650.05,,,,,22.08,,,,,,,,,,,,,,,,,
+2026-11-20,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,639.3,,,,,23.48,,,,,,,,,,,,,,,,,
+2026-11-23,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,652.05,,,,,23.85,,,,,,,,,,,,,,,,,
+2026-11-25,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,663.1,,,,,23.63,-0.0066,-0.191,False,MACD histogram positive,ROE -9.4% (weak) | Debt/Equity 0.34x (good) | Revenue growth 7.7% | Earnings growth: n/a | Net margin -15.3% (weak) | P/E: n/a,not fetched (no strategy can reach BUY),165604311040,,0.75521606,-0.09397,33.81,0.077,,-0.15331,1.136,1.73,

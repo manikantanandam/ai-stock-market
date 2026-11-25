@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,MARUTI,Maruti Suzuki India Limited,Consumer Cyclical,WATCH,0.175,0.2,0.25,,12632.0,,,,,289.81
-2026-11-19,MARUTI,Maruti Suzuki India Limited,Consumer Cyclical,WATCH,0.075,0.0,0.25,,13589.0,,,,,341.61
-2026-11-20,MARUTI,Maruti Suzuki India Limited,Consumer Cyclical,WATCH,0.075,0.0,0.25,,14011.0,,,,,355.93
-2026-11-23,MARUTI,Maruti Suzuki India Limited,Consumer Cyclical,WATCH,0.075,0.0,0.25,,14010.0,,,,,355.07
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,MARUTI,Maruti Suzuki India Limited,Consumer Cyclical,WATCH,0.175,0.2,0.25,,12632.0,,,,,289.81,,,,,,,,,,,,,,,,,
+2026-11-19,MARUTI,Maruti Suzuki India Limited,Consumer Cyclical,WATCH,0.075,0.0,0.25,,13589.0,,,,,341.61,,,,,,,,,,,,,,,,,
+2026-11-20,MARUTI,Maruti Suzuki India Limited,Consumer Cyclical,WATCH,0.075,0.0,0.25,,14011.0,,,,,355.93,,,,,,,,,,,,,,,,,
+2026-11-23,MARUTI,Maruti Suzuki India Limited,Consumer Cyclical,WATCH,0.075,0.0,0.25,,14010.0,,,,,355.07,,,,,,,,,,,,,,,,,
+2026-11-25,MARUTI,Maruti Suzuki India Limited,Consumer Cyclical,WATCH,0.075,0.0,0.25,,14200.0,,,,,346.57,-0.0178,0.0158,True,RSI overbought (78) | MACD histogram positive,ROE 12.9% | Debt/Equity 0.00x (good) | Revenue growth 26.0% (good) | Earnings growth -26.4% (weak) | Net margin 6.5% | P/E 31.8,not fetched (no strategy can reach BUY),4272416358400,31.762617,3.9194477,0.12888,0.076,0.26,-0.264,0.06461,0.838,1.11,

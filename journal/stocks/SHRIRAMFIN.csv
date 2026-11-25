@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,SHRIRAMFIN,Shriram Finance Limited,Financial Services,WATCH,0.265,0.2,0.55,,970.0,,,,,30.54
-2026-11-19,SHRIRAMFIN,Shriram Finance Limited,Financial Services,WATCH,0.265,0.2,0.55,,973.3,,,,,29.93
-2026-11-20,SHRIRAMFIN,Shriram Finance Limited,Financial Services,WATCH,0.265,0.2,0.55,,972.0,,,,,29.52
-2026-11-23,SHRIRAMFIN,Shriram Finance Limited,Financial Services,WATCH,0.265,0.2,0.55,,995.9,,,,,30.48
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,SHRIRAMFIN,Shriram Finance Limited,Financial Services,WATCH,0.265,0.2,0.55,,970.0,,,,,30.54,,,,,,,,,,,,,,,,,
+2026-11-19,SHRIRAMFIN,Shriram Finance Limited,Financial Services,WATCH,0.265,0.2,0.55,,973.3,,,,,29.93,,,,,,,,,,,,,,,,,
+2026-11-20,SHRIRAMFIN,Shriram Finance Limited,Financial Services,WATCH,0.265,0.2,0.55,,972.0,,,,,29.52,,,,,,,,,,,,,,,,,
+2026-11-23,SHRIRAMFIN,Shriram Finance Limited,Financial Services,WATCH,0.265,0.2,0.55,,995.9,,,,,30.48,,,,,,,,,,,,,,,,,
+2026-11-25,SHRIRAMFIN,Shriram Finance Limited,Financial Services,WATCH,0.265,0.2,0.55,,989.95,,,,,31.21,-0.1817,-0.0222,True,MACD histogram positive,ROE 14.8% | Debt/Equity 1.46x | Revenue growth 37.9% (good) | Earnings growth 27.4% (good) | Net margin 51.9% (good) | P/E 16.2 (good),not fetched (no strategy can reach BUY),2290313330688,16.221666,2.0546281,0.1475,146.073,0.379,0.274,0.51901,4.341,1.29,

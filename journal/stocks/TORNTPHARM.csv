@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,TORNTPHARM,Torrent Pharmaceuticals Limited,Healthcare,WATCH,0.19,0.2,0.3,,4610.7,,,,,97.43
-2026-11-19,TORNTPHARM,Torrent Pharmaceuticals Limited,Healthcare,WATCH,0.19,0.2,0.3,,4611.0,,,,,96.02
-2026-11-20,TORNTPHARM,Torrent Pharmaceuticals Limited,Healthcare,WATCH,0.19,0.2,0.3,,4689.5,,,,,94.77
-2026-11-23,TORNTPHARM,Torrent Pharmaceuticals Limited,Healthcare,BUY,0.39,0.6,0.3,0.001,4763.7,,,,trend,100.65
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,TORNTPHARM,Torrent Pharmaceuticals Limited,Healthcare,WATCH,0.19,0.2,0.3,,4610.7,,,,,97.43,,,,,,,,,,,,,,,,,
+2026-11-19,TORNTPHARM,Torrent Pharmaceuticals Limited,Healthcare,WATCH,0.19,0.2,0.3,,4611.0,,,,,96.02,,,,,,,,,,,,,,,,,
+2026-11-20,TORNTPHARM,Torrent Pharmaceuticals Limited,Healthcare,WATCH,0.19,0.2,0.3,,4689.5,,,,,94.77,,,,,,,,,,,,,,,,,
+2026-11-23,TORNTPHARM,Torrent Pharmaceuticals Limited,Healthcare,BUY,0.39,0.6,0.3,0.001,4763.7,,,,trend,100.65,,,,,,,,,,,,,,,,,
+2026-11-25,TORNTPHARM,Torrent Pharmaceuticals Limited,Healthcare,BUY,0.405,0.6,0.3,0.074,4895.5,,,,swing;trend,102.88,-0.0648,0.0049,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 15.7% (good) | Debt/Equity 0.77x | Revenue growth 50.8% (good) | Earnings growth -19.5% (weak) | Net margin 12.2% (good) | P/E 77.9 (weak),"40 headlines: 10 positive, 4 negative, 26 neutral | +0.91 2026-11-25 Suven Pharmaceuticals Ltd. (COHANCE) Share Price Rises 8.62% Today to Rs 515.55 (Univest) | -0.95 2026-11-23 Alembic Pharmaceuticals Share Price falls 2.32% today (Univest) | +0.62 2026-11-23 4 Healthcare Stocks That Attracted Both FIIs and DIIs in Q2 FY27 (The Financial Express) | +0.32 2026-11-25 Torrent Pharmaceuticals Ltd. Share Price Rise Streak Today (Univest)",1753876267008,77.88851,9.5385065,0.15653,76.781,0.508,-0.195,0.12209,1.317,0.82,

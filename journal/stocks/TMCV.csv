@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,443.8,,,,,15.9
-2026-11-19,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,445.85,,,,,15.45
-2026-11-20,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,456.75,,,,,15.67
-2026-11-23,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,453.8,,,,,15.42
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,443.8,,,,,15.9,,,,,,,,,,,,,,,,,
+2026-11-19,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,445.85,,,,,15.45,,,,,,,,,,,,,,,,,
+2026-11-20,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,456.75,,,,,15.67,,,,,,,,,,,,,,,,,
+2026-11-23,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,453.8,,,,,15.42,,,,,,,,,,,,,,,,,
+2026-11-25,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,442.0,,,,,16.03,-0.1293,0.0787,False,MACD histogram positive,ROE: n/a | Debt/Equity 0.25x (good) | Revenue growth 35.1% (good) | Earnings growth: n/a | Net margin 6.7% | P/E 26.0,not fetched (no strategy can reach BUY),1641990324224,25.997086,10.750368,,24.605,0.351,,0.06724,0.822,0.9,

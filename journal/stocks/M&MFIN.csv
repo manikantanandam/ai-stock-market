@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,M&MFIN,Mahindra & Mahindra Financial Services Limited,Financial Services,WATCH,0.005,-0.2,0.35,,287.0,,,,,11.09
-2026-11-19,M&MFIN,Mahindra & Mahindra Financial Services Limited,Financial Services,WATCH,0.005,-0.2,0.35,,283.25,,,,,10.93
-2026-11-20,M&MFIN,Mahindra & Mahindra Financial Services Limited,Financial Services,WATCH,0.005,-0.2,0.35,,288.3,,,,,11.01
-2026-11-23,M&MFIN,Mahindra & Mahindra Financial Services Limited,Financial Services,WATCH,0.005,-0.2,0.35,,286.85,,,,,10.84
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,M&MFIN,Mahindra & Mahindra Financial Services Limited,Financial Services,WATCH,0.005,-0.2,0.35,,287.0,,,,,11.09,,,,,,,,,,,,,,,,,
+2026-11-19,M&MFIN,Mahindra & Mahindra Financial Services Limited,Financial Services,WATCH,0.005,-0.2,0.35,,283.25,,,,,10.93,,,,,,,,,,,,,,,,,
+2026-11-20,M&MFIN,Mahindra & Mahindra Financial Services Limited,Financial Services,WATCH,0.005,-0.2,0.35,,288.3,,,,,11.01,,,,,,,,,,,,,,,,,
+2026-11-23,M&MFIN,Mahindra & Mahindra Financial Services Limited,Financial Services,WATCH,0.005,-0.2,0.35,,286.85,,,,,10.84,,,,,,,,,,,,,,,,,
+2026-11-25,M&MFIN,Mahindra & Mahindra Financial Services Limited,Financial Services,WATCH,0.005,-0.2,0.35,,292.45,,,,,11.17,-0.2982,-0.0903,True,downtrend: price < SMA50 < SMA200 | MACD histogram positive,ROE 13.8% | Debt/Equity 4.90x (weak) | Revenue growth 34.9% (good) | Earnings growth 61.1% (good) | Net margin 32.0% (good) | P/E 10.9 (good),not fetched (no strategy can reach BUY),393611051008,10.944745,1.4329438,0.13774,490.012,0.349,0.611,0.31957,10.442,2.61,

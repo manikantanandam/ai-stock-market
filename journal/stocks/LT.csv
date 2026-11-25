@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,LT,Larsen & Toubro Limited,Industrials,WATCH,0.18,0.0,0.6,,4159.0,,,,,78.48
-2026-11-19,LT,Larsen & Toubro Limited,Industrials,WATCH,0.18,0.0,0.6,,4211.0,,,,,80.02
-2026-11-20,LT,Larsen & Toubro Limited,Industrials,WATCH,0.18,0.0,0.6,,4209.1,,,,,80.15
-2026-11-23,LT,Larsen & Toubro Limited,Industrials,WATCH,0.28,0.2,0.6,,4099.9,,,,,83.86
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,LT,Larsen & Toubro Limited,Industrials,WATCH,0.18,0.0,0.6,,4159.0,,,,,78.48,,,,,,,,,,,,,,,,,
+2026-11-19,LT,Larsen & Toubro Limited,Industrials,WATCH,0.18,0.0,0.6,,4211.0,,,,,80.02,,,,,,,,,,,,,,,,,
+2026-11-20,LT,Larsen & Toubro Limited,Industrials,WATCH,0.18,0.0,0.6,,4209.1,,,,,80.15,,,,,,,,,,,,,,,,,
+2026-11-23,LT,Larsen & Toubro Limited,Industrials,WATCH,0.28,0.2,0.6,,4099.9,,,,,83.86,,,,,,,,,,,,,,,,,
+2026-11-25,LT,Larsen & Toubro Limited,Industrials,WATCH,0.28,0.2,0.6,,4156.0,,,,,84.24,-0.0492,-0.0301,False,MACD histogram positive,ROE 17.9% (good) | Debt/Equity 1.05x | Revenue growth 16.9% (good) | Earnings growth 32.5% (good) | Net margin 5.8% | P/E 32.4,not fetched (no strategy can reach BUY),5793861074944,32.437218,5.125877,0.17875,105.287,0.169,0.325,0.05789,1.235,0.91,

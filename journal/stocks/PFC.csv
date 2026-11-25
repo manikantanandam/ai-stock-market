@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,PFC,Power Finance Corporation Limited,Financial Services,WATCH,-0.085,-0.2,0.05,,323.55,,,,,8.13
-2026-11-19,PFC,Power Finance Corporation Limited,Financial Services,WATCH,0.115,0.2,0.05,,331.6,,,,,8.32
-2026-11-20,PFC,Power Finance Corporation Limited,Financial Services,WATCH,0.115,0.2,0.05,,332.9,,,,,8.21
-2026-11-23,PFC,Power Finance Corporation Limited,Financial Services,WATCH,-0.085,-0.2,0.05,,324.25,,,,,8.3
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,PFC,Power Finance Corporation Limited,Financial Services,WATCH,-0.085,-0.2,0.05,,323.55,,,,,8.13,,,,,,,,,,,,,,,,,
+2026-11-19,PFC,Power Finance Corporation Limited,Financial Services,WATCH,0.115,0.2,0.05,,331.6,,,,,8.32,,,,,,,,,,,,,,,,,
+2026-11-20,PFC,Power Finance Corporation Limited,Financial Services,WATCH,0.115,0.2,0.05,,332.9,,,,,8.21,,,,,,,,,,,,,,,,,
+2026-11-23,PFC,Power Finance Corporation Limited,Financial Services,WATCH,-0.085,-0.2,0.05,,324.25,,,,,8.3,,,,,,,,,,,,,,,,,
+2026-11-25,PFC,Power Finance Corporation Limited,Financial Services,WATCH,0.115,0.2,0.05,,333.8,,,,,8.62,-0.1235,-0.2877,True,MACD histogram positive,ROE 18.7% (good) | Debt/Equity 5.31x (weak) | Revenue growth -1.8% (weak) | Earnings growth 5.1% | Net margin 49.2% (good) | P/E 4.2 (good),not fetched (no strategy can reach BUY),1094313705472,4.154868,0.7450698,0.18652001,531.392,-0.018,0.051,0.49222,36.754,5.07,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,KEI,KEI Industries Limited,Industrials,WATCH,0.065,-0.2,0.55,,3725.0,,,,,147.59
-2026-11-19,KEI,KEI Industries Limited,Industrials,WATCH,0.065,-0.2,0.55,,3826.2,,,,,150.05
-2026-11-20,KEI,KEI Industries Limited,Industrials,WATCH,0.065,-0.2,0.55,,3828.1,,,,,149.96
-2026-11-23,KEI,KEI Industries Limited,Industrials,WATCH,0.065,-0.2,0.55,,3800.6,,,,,144.9
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,KEI,KEI Industries Limited,Industrials,WATCH,0.065,-0.2,0.55,,3725.0,,,,,147.59,,,,,,,,,,,,,,,,,
+2026-11-19,KEI,KEI Industries Limited,Industrials,WATCH,0.065,-0.2,0.55,,3826.2,,,,,150.05,,,,,,,,,,,,,,,,,
+2026-11-20,KEI,KEI Industries Limited,Industrials,WATCH,0.065,-0.2,0.55,,3828.1,,,,,149.96,,,,,,,,,,,,,,,,,
+2026-11-23,KEI,KEI Industries Limited,Industrials,WATCH,0.065,-0.2,0.55,,3800.6,,,,,144.9,,,,,,,,,,,,,,,,,
+2026-11-25,KEI,KEI Industries Limited,Industrials,WATCH,-0.135,-0.6,0.55,,3652.0,,,,,148.86,-0.4039,-0.3943,False,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE: n/a | Debt/Equity 0.04x (good) | Revenue growth 23.0% (good) | Earnings growth 40.0% (good) | Net margin 8.1% | P/E 34.7,not fetched (no strategy can reach BUY),365959151616,34.667027,5.4882193,,3.796,0.23,0.4,0.08076,,0.11,

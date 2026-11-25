@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,DLF,DLF Limited,Real Estate,BUY,0.467,0.6,0.25,0.461,764.3,,,,swing;trend,18.39
-2026-11-19,DLF,DLF Limited,Real Estate,BUY,0.379,0.4,0.25,0.522,768.0,,,,trend,17.82
-2026-11-20,DLF,DLF Limited,Real Estate,BUY,0.3,0.4,0.25,0.125,785.0,,,,trend;breakout,18.76
-2026-11-23,DLF,DLF Limited,Real Estate,BUY,0.302,0.4,0.25,0.134,794.1,,,,trend,18.21
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,DLF,DLF Limited,Real Estate,BUY,0.467,0.6,0.25,0.461,764.3,,,,swing;trend,18.39,,,,,,,,,,,,,,,,,
+2026-11-19,DLF,DLF Limited,Real Estate,BUY,0.379,0.4,0.25,0.522,768.0,,,,trend,17.82,,,,,,,,,,,,,,,,,
+2026-11-20,DLF,DLF Limited,Real Estate,BUY,0.3,0.4,0.25,0.125,785.0,,,,trend;breakout,18.76,,,,,,,,,,,,,,,,,
+2026-11-23,DLF,DLF Limited,Real Estate,BUY,0.302,0.4,0.25,0.134,794.1,,,,trend,18.21,,,,,,,,,,,,,,,,,
+2026-11-25,DLF,DLF Limited,Real Estate,BUY,0.272,0.4,0.25,-0.016,795.0,,,,trend;leaders;leaders-slope,18.08,0.1078,0.2835,True,uptrend: price > SMA50 > SMA200 | RSI overbought (76) | MACD histogram positive,ROE 10.3% | Debt/Equity 0.01x (good) | Revenue growth -23.3% (weak) | Earnings growth 10.1% (good) | Net margin 71.6% (good) | P/E 41.6,"35 headlines: 12 positive, 5 negative, 18 neutral | -0.89 2026-11-24 Chandigarh: Town Planning Department orders removal of DG sets from DLF Phase I parks (The Tribune) | -0.59 2026-11-25 DLF starts to remove DG sets from green spaces (The Times of India) | +0.81 2026-11-23 Nifty REITs and Realty Prediction for Wednesday (25 Nov 2026): DLF Holds Above Friday's Close as Nifty Falls (Univest) | -0.65 2026-11-24 Haryana orders removal of generator sets from parks, green belts in Gurugrams DLF Phase I (The Tribune)",1901039321088,41.64859,4.17591,0.10311,0.69,-0.233,0.101,0.71639997,1.596,1.05,

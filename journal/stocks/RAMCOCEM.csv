@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,RAMCOCEM,The Ramco Cements Limited,Basic Materials,WATCH,0.1,0.2,0.0,,821.1,,,,,24.7
-2026-11-19,RAMCOCEM,The Ramco Cements Limited,Basic Materials,WATCH,0.1,0.2,0.0,,827.8,,,,,24.67
-2026-11-20,RAMCOCEM,The Ramco Cements Limited,Basic Materials,WATCH,0.1,0.2,0.0,,836.65,,,,,24.83
-2026-11-23,RAMCOCEM,The Ramco Cements Limited,Basic Materials,WATCH,-0.1,-0.2,0.0,,814.8,,,,,24.87
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,RAMCOCEM,The Ramco Cements Limited,Basic Materials,WATCH,0.1,0.2,0.0,,821.1,,,,,24.7,,,,,,,,,,,,,,,,,
+2026-11-19,RAMCOCEM,The Ramco Cements Limited,Basic Materials,WATCH,0.1,0.2,0.0,,827.8,,,,,24.67,,,,,,,,,,,,,,,,,
+2026-11-20,RAMCOCEM,The Ramco Cements Limited,Basic Materials,WATCH,0.1,0.2,0.0,,836.65,,,,,24.83,,,,,,,,,,,,,,,,,
+2026-11-23,RAMCOCEM,The Ramco Cements Limited,Basic Materials,WATCH,-0.1,-0.2,0.0,,814.8,,,,,24.87,,,,,,,,,,,,,,,,,
+2026-11-25,RAMCOCEM,The Ramco Cements Limited,Basic Materials,WATCH,0.1,0.2,0.0,,832.5,,,,,24.59,-0.1386,-0.1758,True,MACD histogram positive,ROE 7.8% (weak) | Debt/Equity 0.49x (good) | Revenue growth 10.0% (good) | Earnings growth -47.7% (weak) | Net margin 6.4% | P/E 32.2,not fetched (no strategy can reach BUY),195602825216,32.18507,2.414678,0.07762,49.127,0.1,-0.477,0.06432,0.496,0.3,

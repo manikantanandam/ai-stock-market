@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,BOSCHLTD,Bosch Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,49170.0,,,,,1244.36
-2026-11-19,BOSCHLTD,Bosch Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,49400.0,,,,,1206.19
-2026-11-20,BOSCHLTD,Bosch Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,49360.0,,,,,1177.18
-2026-11-23,BOSCHLTD,Bosch Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,48800.0,,,,,1163.45
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,BOSCHLTD,Bosch Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,49170.0,,,,,1244.36,,,,,,,,,,,,,,,,,
+2026-11-19,BOSCHLTD,Bosch Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,49400.0,,,,,1206.19,,,,,,,,,,,,,,,,,
+2026-11-20,BOSCHLTD,Bosch Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,49360.0,,,,,1177.18,,,,,,,,,,,,,,,,,
+2026-11-23,BOSCHLTD,Bosch Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,48800.0,,,,,1163.45,,,,,,,,,,,,,,,,,
+2026-11-25,BOSCHLTD,Bosch Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,49130.0,,,,,1136.77,-0.0453,0.2827,True,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE 23.3% (good) | Debt/Equity 0.03x (good) | Revenue growth 59.7% (good) | Earnings growth 51.6% (good) | Net margin 11.1% | P/E 52.9,not fetched (no strategy can reach BUY),,52.85288,19.003536,0.23295,2.68,0.597,0.516,0.11091,1.313,0.55,

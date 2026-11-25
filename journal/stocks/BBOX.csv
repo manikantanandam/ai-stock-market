@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,BBOX,Black Box Limited,Technology,BUY,0.52,0.6,0.4,0.502,880.0,,,,swing;trend,44.11
-2026-11-19,BBOX,Black Box Limited,Technology,BUY,0.508,0.6,0.4,0.439,907.4,,,,swing;trend,44.77
-2026-11-20,BBOX,Black Box Limited,Technology,BUY,0.435,0.6,0.4,0.074,896.4,,,,swing;trend,43.1
-2026-11-23,BBOX,Black Box Limited,Technology,BUY,0.43,0.6,0.4,0.048,854.05,,,,swing;trend,44.26
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,BBOX,Black Box Limited,Technology,BUY,0.52,0.6,0.4,0.502,880.0,,,,swing;trend,44.11,,,,,,,,,,,,,,,,,
+2026-11-19,BBOX,Black Box Limited,Technology,BUY,0.508,0.6,0.4,0.439,907.4,,,,swing;trend,44.77,,,,,,,,,,,,,,,,,
+2026-11-20,BBOX,Black Box Limited,Technology,BUY,0.435,0.6,0.4,0.074,896.4,,,,swing;trend,43.1,,,,,,,,,,,,,,,,,
+2026-11-23,BBOX,Black Box Limited,Technology,BUY,0.43,0.6,0.4,0.048,854.05,,,,swing;trend,44.26,,,,,,,,,,,,,,,,,
+2026-11-25,BBOX,Black Box Limited,Technology,BUY,0.431,0.6,0.4,0.056,857.3,,,,swing;trend,43.84,0.0421,-0.1899,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 20.9% (good) | Debt/Equity 1.10x | Revenue growth 22.4% (good) | Earnings growth 25.8% (good) | Net margin 3.5% (weak) | P/E 65.4 (weak),"44 headlines: 20 positive, 6 negative, 18 neutral | -0.91 2026-11-23 Black Box Ltd pays ₹1.26 crore RBI penalty for FEMA violations (scanx.trade) | +0.80 2026-11-23 Troupe CEO Austin Webb’s ‘Messaging Intelligence’ Hits Bestseller Status, Giving B2B Leaders a Way to Measure Messaging (Knoxville News Sentinel) | -0.86 2026-11-22 Drivers forced to constantly share location to get cheaper insurance (The Times) | +0.74 2026-11-19 Black Box rises 3.38% in Thursday's session (Global Banking & Finance Review)",161153515520,65.37464,11.389196,0.20944999,109.552,0.224,0.258,0.03467,1.793,0.11,

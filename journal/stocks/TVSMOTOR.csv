@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.44,0.6,0.4,0.102,4369.0,,,,swing;trend,114.82
-2026-11-19,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.464,0.6,0.4,0.22,4601.4,,,,swing;trend,123.21
-2026-11-20,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.459,0.6,0.4,0.197,4590.0,,,,swing;trend,118.74
-2026-11-23,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.449,0.6,0.4,0.143,4528.2,,,,swing;trend,117.75
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.44,0.6,0.4,0.102,4369.0,,,,swing;trend,114.82,,,,,,,,,,,,,,,,,
+2026-11-19,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.464,0.6,0.4,0.22,4601.4,,,,swing;trend,123.21,,,,,,,,,,,,,,,,,
+2026-11-20,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.459,0.6,0.4,0.197,4590.0,,,,swing;trend,118.74,,,,,,,,,,,,,,,,,
+2026-11-23,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.449,0.6,0.4,0.143,4528.2,,,,swing;trend,117.75,,,,,,,,,,,,,,,,,
+2026-11-25,TVSMOTOR,TVS Motor Company Limited,Consumer Cyclical,BUY,0.467,0.6,0.4,0.234,4610.0,,,,swing;trend,118.74,-0.0145,0.2604,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 37.2% (good) | Debt/Equity 3.21x (weak) | Revenue growth 39.4% (good) | Earnings growth 50.2% (good) | Net margin 5.8% | P/E 57.1,"31 headlines: 12 positive, 4 negative, 15 neutral | +0.91 2026-11-25 TVS Motor Signs ₹2,000 Crore Investment MoU With Tamil Nadu Government; Shares Rise 1.70% (HDFC Sky) | +0.68 2026-11-25 TVS Motor plans to invest ₹2,000 crore in Tamil Nadu, create 1,000 jobs (Business Standard) | +0.64 2026-11-25 TVS Motor Plans ₹2,000 Cr Capex In Tamil Nadu To Create 1,000 Jobs (Trade Brains) | +0.64 2026-11-25 TVS Motor signs MoU for ₹2,000 crore investment in Tamil Nadu (scanx.trade)",,57.124763,19.266424,0.3723,320.877,0.394,0.502,0.05819,1.095,0.27,
