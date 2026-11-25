@@ -1,6 +1,7 @@
-# Weekly refresh of the strategy comparison, so backtest results don't go stale.
-# Runs Monday 03:23 UTC (08:53 IST, before the open; avoids :00 cron delays).
-# Results go to the job summary and an artifact; nothing is committed.
+# Weekly refresh of the strategy comparison, per-year returns and the rule
+# sweep, so backtest results don't go stale. Runs Monday 03:23 UTC (08:53 IST,
+# before the open; avoids :00 cron delays). Results go to the job summary and
+# artifacts (read by the Pages workflow); nothing is committed.
 name: Weekly backtest
 
 on:
@@ -33,7 +34,45 @@ jobs:
           uv run aistock compare --watchlist nifty500 | tee compare.txt
           { echo '## Strategy comparison (nifty500)'; echo '```'; cat compare.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Yearly returns
+        env:
+          NO_COLOR: "1"
+          COLUMNS: "140"
+        run: |
+          uv run aistock yearly --watchlist nifty500 | tee yearly.txt
+          { echo '## Return per calendar year (nifty500)'; echo '```'; cat yearly.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: compare-reports
+          path: reports/
+          if-no-files-found: ignore
+
+  # Separate job: the sweep is the slowest step, and a timeout here shouldn't
+  # cost the compare/yearly reports.
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: Sweep rules, filters and exits
+        env:
+          NO_COLOR: "1"
+          COLUMNS: "160"
+        run: |
+          uv run aistock sweep --watchlist nifty500 | tee sweep.txt
+          { echo '## Rule sweep (nifty500)'; echo '```'; cat sweep.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sweep-reports
           path: reports/

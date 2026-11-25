@@ -38,19 +38,23 @@ jobs:
       - name: Install
         run: uv sync --locked
 
-      # reports/ isn't committed; take the latest weekly compare output if any.
+      # reports/ isn't committed; take every *-reports artifact of the latest
+      # finished weekly run (one failed job still leaves the other's reports).
       # continue-on-error only covers a failed download (e.g. an expired artifact).
       - name: Fetch latest backtest reports
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          id=$(gh run list -w weekly-backtest.yml -s success -L 1 --json databaseId -q '.[0].databaseId')
+          id=$(gh run list -w weekly-backtest.yml -s completed -L 1 --json databaseId -q '.[0].databaseId')
           if [ -z "$id" ]; then
-            echo "No successful weekly backtest yet; building without reports"
+            echo "No finished weekly backtest yet; building without reports"
             exit 0
           fi
-          gh run download "$id" -n compare-reports -D reports
+          gh run download "$id" -p '*-reports' -D artifacts
+          mkdir -p reports
+          find artifacts -name '*.csv' -exec mv {} reports/ \;
+          ls reports
 
       - name: Build site
         run: uv run aistock site --out _site
