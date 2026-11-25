@@ -32,7 +32,7 @@ No linter is configured.
 
 Package `src/aistock/` (uv `--package` layout; the console script `aistock` maps to `aistock.cli:app`, a Typer app):
 
-- `data/`: yfinance prices, cached in `.cache/prices/` per IST date and market phase (`pre`/`live`/`close`), so intraday partial bars are never reused after the close. Also fundamentals, Google News headlines, watchlist CSVs, and `sectors` (equal-weight sector indices built from NIFTY 500 members per `Industry`, because Yahoo lacks many NSE sector indices).
+- `data/`: yfinance prices, cached in `.cache/prices/` per IST date and market phase (`pre`/`live`/`close`), so intraday partial bars are never reused after the close. Also fundamentals, news headlines (Google News RSS plus publisher RSS feeds in `news.FEEDS`, fetched once per process and matched by company name or symbol), watchlist CSVs, and `sectors` (equal-weight sector indices built from NIFTY 500 members per `Industry`, because Yahoo lacks many NSE sector indices).
 - `technical/`: `add_indicators` adds indicator columns. `score_series`/`technical_score` give a per-bar or latest technical score. `rules.py` holds entry rules: bool Series, True = enter at the next bar's open. It also has the entry filters: market regime, relative strength (`outperforms`: beat NIFTY over 63 and 126 bars) and `sector_trend` (sector above its SMA50).
 - `llm/notes.py`: explains a BUY from the signal's numbers and reasons via Ollama (temperature 0); a note quoting any figure not in those facts is withheld.
 - `fundamental/`, `sentiment/`: each returns `(score in [-1, 1], reasons)`; sentiment runs FinBERT.
