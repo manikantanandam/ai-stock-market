@@ -12,6 +12,7 @@ from aistock.backtest import engine, portfolio, sweep, universe, walkforward
 from aistock.data import fundamentals, prices, sectors, watchlists
 from aistock.data.prices import get_prices, market_phase
 from aistock.data.watchlists import WATCHLISTS
+from aistock.llm import backfill
 from aistock.llm import notes as llm_notes
 from aistock.ml import features as ml_features
 from aistock.ml import model as ml_model
@@ -197,6 +198,26 @@ def scan(
             journal.record_notes(written)
             print(f"Notes logged to {journal.NOTES}")
     _print_skipped(failed)
+
+
+@app.command("backfill-notes")
+def backfill_notes(
+    date_: str = typer.Option(None, "--date", help="One session (YYYY-MM-DD); default: every session without notes"),
+    sessions: int = typer.Option(None, help="Most sessions to fill this run, newest first"),
+    notes_max: int = typer.Option(50, help="Most BUYs to explain per session"),
+):
+    """Write LLM notes for journaled sessions that have none, from their journal rows."""
+    days = [date_] if date_ else backfill.sessions_without_notes()[:sessions]
+    if not days:
+        print("Every journaled session has notes.")
+        return
+    for day in days:
+        print(f"[bold]{day}[/bold]")
+        written = _print_notes([(s, s.buys[0]) for s in backfill.session_signals(day, notes_max)])
+        if not written:
+            break  # Ollama unavailable, or nothing to explain
+        journal.record_notes(written, source="backfill")
+        print(f"{len(written)} notes logged to {journal.NOTES / f'{day}.csv'}")
 
 
 @app.command()

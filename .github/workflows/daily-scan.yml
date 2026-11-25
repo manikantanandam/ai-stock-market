@@ -89,7 +89,7 @@ jobs:
         run: uv sync --locked
 
       # LLM notes on the top BUYs (journal/notes/). Ollama runs on CPU here,
-      # ~30s per note (50 notes ~25 min, within the 90-min limit); the binary and model (~2.5GB) are cached between runs.
+      # ~13s per note (50 notes ~11 min); the binary and model (~2.5GB) are cached between runs.
       # If Ollama fails to start, the scan logs a warning and skips notes.
       - name: Cache Ollama
         uses: actions/cache@v4
@@ -120,6 +120,16 @@ jobs:
         run: |
           uv run aistock scan --watchlist nifty500 --top 50 --notes --notes-max 50 | tee scan.txt
           { echo '```'; cat scan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      # Notes for journaled sessions that have none (from before notes were
+      # saved, or a day Ollama failed); ~13s per note, so 4 sessions of 50 BUYs
+      # fit in the job limit. Normally nothing is missing and this is a no-op.
+      - name: Backfill notes
+        continue-on-error: true
+        env:
+          NO_COLOR: "1"
+          COLUMNS: "120"
+        run: uv run aistock backfill-notes --sessions 4 --notes-max 50
 
       # Yahoo can lag after the close; flag a scan whose latest bar is older
       # than the expected session (also fires on market holidays).

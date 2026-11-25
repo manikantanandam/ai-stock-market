@@ -13,6 +13,7 @@ FIELDS = [
     "returnOnEquity", "debtToEquity", "revenueGrowth", "earningsGrowth",
     "profitMargins", "currentRatio", "dividendYield", "trailingPegRatio",
 ]
+RATIOS = FIELDS[3:]  # the numbers, without name / sector / industry
 
 
 def get_fundamentals(symbol: str) -> dict:
