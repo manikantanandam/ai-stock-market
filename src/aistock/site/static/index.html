@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Stock Dashboard</title>
+  <meta name="description" content="Daily NSE swing-trading signals, paper accounts and backtest reports.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%232a78d6'/><polyline points='12,44 26,30 36,38 52,18' fill='none' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <script>
+    // Apply the saved theme before paint to avoid a flash.
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (t) document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="top">
+    <button id="menu" class="icon-btn" aria-label="Toggle file list">☰</button>
+    <h1>AI Stock Dashboard</h1>
+    <span id="built" class="muted"></span>
+    <button id="theme" class="icon-btn" aria-label="Toggle dark mode">◐</button>
+  </header>
+  <div class="layout">
+    <nav id="nav" aria-label="Files"></nav>
+    <main id="main"><p class="muted">Loading…</p></main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

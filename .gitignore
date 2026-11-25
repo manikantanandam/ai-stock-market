@@ -12,3 +12,6 @@ wheels/
 # Regenerable data and backtest outputs
 .cache/
 reports/
+
+# Built dashboard (uv run aistock site)
+/site/

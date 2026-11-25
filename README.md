@@ -32,6 +32,7 @@ uv run aistock scan --watchlist nifty500 --news candidates --top 20
 
 # Refresh index constituents from niftyindices.com (NSE rebalances twice a year)
 uv run aistock update-watchlists
+uv run aistock site --serve    # dashboard of journal + reports at localhost:8000
 
 # Strategy presets (swing, trend, breakout, pullback, ema-cross)
 uv run aistock strategies

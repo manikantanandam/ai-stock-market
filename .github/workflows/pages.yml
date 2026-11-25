@@ -1,0 +1,65 @@
+# Publishes the dashboard (journal + latest weekly backtest reports) to GitHub Pages.
+# Journal PRs are merged by GITHUB_TOKEN, which doesn't fire push events, so
+# scheduled runs follow the daily scan (12:37 and 15:37 UTC, after each scan's
+# PR has had time to merge) and the Monday backtest (05:13 UTC).
+# One-time setup: Settings > Pages > Source: GitHub Actions.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "37 12 * * 1-5"
+    - cron: "37 15 * * 1-5"
+    - cron: "13 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read  # to download the weekly backtest artifact
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --locked
+
+      # reports/ isn't committed; take the latest weekly compare output if any.
+      - name: Fetch latest backtest reports
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          id=$(gh run list -w weekly-backtest.yml -s success -L 1 --json databaseId -q '.[0].databaseId')
+          [ -n "$id" ] && gh run download "$id" -n compare-reports -D reports
+
+      - name: Build site
+        run: uv run aistock site --out _site
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
