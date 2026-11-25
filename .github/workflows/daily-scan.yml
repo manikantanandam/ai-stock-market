@@ -11,6 +11,11 @@ on:
     - cron: "17 11 * * 1-5"
     - cron: "47 14 * * 1-5"
   workflow_dispatch:
+    inputs:
+      backfill_dates:
+        description: "Sessions to rewrite notes for, even if they have some (YYYY-MM-DD, comma-separated)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -130,6 +135,24 @@ jobs:
           NO_COLOR: "1"
           COLUMNS: "120"
         run: uv run aistock backfill-notes --sessions 4 --notes-max 50
+
+      # Manual runs can rewrite notes for chosen sessions, e.g. after the
+      # backfill learns new reasons. Each date replaces that session's notes.
+      - name: Rewrite notes for chosen sessions
+        if: inputs.backfill_dates != ''
+        continue-on-error: true
+        env:
+          NO_COLOR: "1"
+          COLUMNS: "120"
+          DATES: ${{ inputs.backfill_dates }}
+        run: |
+          for d in $(echo "$DATES" | tr ',' ' '); do
+            if ! [[ "$d" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || [ ! -f "journal/days/$d.csv" ]; then
+              echo "::warning::Skipping '$d': not a journaled session (YYYY-MM-DD)"
+              continue
+            fi
+            uv run aistock backfill-notes --date "$d" --notes-max 50
+          done
 
       # Yahoo can lag after the close; flag a scan whose latest bar is older
       # than the expected session (also fires on market holidays).
