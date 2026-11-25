@@ -7,7 +7,7 @@ from rich import print
 from rich.progress import track
 from rich.table import Table
 
-from aistock.backtest import engine, portfolio, sweep, universe
+from aistock.backtest import engine, portfolio, sweep, universe, walkforward
 from aistock.data import fundamentals, prices, watchlists
 from aistock.data.prices import get_prices, market_phase
 from aistock.data.watchlists import WATCHLISTS
@@ -409,6 +409,77 @@ def compare(watchlist: str = WATCHLIST, strategy: str = typer.Option("all", "--s
     _print_skipped(skipped)
 
 
+def _sweep_walk_forward(data, watchlist, years, grid, rank_by, min_trades, min_train_years):
+    index = add_indicators(get_prices(universe.INDEX, years))
+    wins = walkforward.windows(index.index[index.sma200.notna()], min_train_years)
+    if not wins:
+        raise typer.BadParameter("not enough history for one test year; lower --min-train-years or raise --years")
+    rows, pooled = sweep.walk_forward(data, rules.market_regime(index), years, rank_by, min_trades, wins, grid,
+                                      progress=lambda xs: track(xs, description=f"Running {len(xs)} combos"))
+    universe.REPORTS.mkdir(exist_ok=True)
+    path = universe.REPORTS / f"sweep_wf_{watchlist}_{date.today()}.csv"
+    rows.to_csv(path, index=False)
+
+    table = Table(title=f"Walk-forward: best in-sample {rank_by} (min {min_trades} trades) on earlier years, "
+                        f"tested on each year")
+    for col in ["Year", "Rule", "Mkt", "RS", "Sec", "Stop", "Tgt", "Trail", "Hold", "Train PF",
+                "Test n", "Test PF", "Test avg", "Test win", "Base n", "Base PF", "Base avg"]:
+        table.add_column(col, justify="left" if col in ("Rule", "Mkt", "RS", "Sec") else "right")
+    on_off = lambda v: "on" if v else "off"
+    opt = lambda v: "-" if v is None or pd.isna(v) else f"{v:g}"
+    fmt = lambda r, k, f: f(r[k]) if k in r and not pd.isna(r[k]) else "-"
+    for r in rows.to_dict("records"):
+        picked = "rule" in r and isinstance(r["rule"], str)
+        table.add_row(str(r["year"]), r["rule"] if picked else "(none)",
+                      *([on_off(r["regime"]), on_off(r["rs"]), on_off(r["sector"]), opt(r["stop_atr"]),
+                         opt(r["target_atr"]), opt(r["trail_atr"]), opt(r["max_hold"])] if picked else ["-"] * 7),
+                      fmt(r, "train_profit_factor", num), fmt(r, "test_trades", lambda v: f"{v:.0f}"),
+                      fmt(r, "test_profit_factor", num), fmt(r, "test_avg_trade", pct), fmt(r, "test_win_rate", pct),
+                      fmt(r, "base_trades", lambda v: f"{v:.0f}"), fmt(r, "base_profit_factor", num),
+                      fmt(r, "base_avg_trade", pct))
+    for name, st in pooled.items():
+        if st["trades"]:
+            table.add_row(f"All ({name})", "", "", "", "", "", "", "", "", "", str(st["trades"]),
+                          num(st["profit_factor"]), pct(st["avg_trade"]), pct(st["win_rate"]), "", "", "",
+                          style="bold" if name == "picked" else "dim")
+    print(table)
+    print(f"Saved to {path}")
+
+
+@app.command()
+def yearly(watchlist: str = WATCHLIST, strategy: str = typer.Option("all", "--strategy", "-s",
+                                                                    help="'all' or comma-separated preset names"),
+           years: int = YEARS, positions: int = POSITIONS):
+    """Portfolio return per calendar year for each preset, vs NIFTY 50 and an equal-weight hold of the watchlist."""
+    chosen = _strategy_list(strategy)
+    data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
+    index = add_indicators(get_prices(universe.INDEX, years))
+    dates = index.index[index.sma200.notna()]
+    cols = {}
+    for st in track(chosen, description="Backtesting strategies"):
+        entries = universe.strategy_entries(data, st, years, rules.market_regime(index))
+        eq, _, _ = portfolio.run(data, entries, dates, st.params(), positions)
+        cols[st.name] = walkforward.yearly_returns(eq)
+    cols["EW hold"] = walkforward.yearly_returns(portfolio.equal_weight(data, dates))
+    cols["NIFTY 50"] = walkforward.yearly_returns(index.Close.reindex(dates))
+    res = pd.DataFrame(cols)
+
+    table = Table(title=f"{watchlist}: yearly return, {positions} slots ({dates[0]:%Y-%m-%d} to {dates[-1]:%Y-%m-%d})")
+    for col in ["Year", *res.columns]:
+        table.add_column(col, justify="right")
+    for year, r in res.iterrows():
+        table.add_row(str(year), *(pct(v) for v in r))
+    excess = res[[st.name for st in chosen]].sub(res["EW hold"], axis=0)
+    table.add_row("Beat EW", *(f"{(excess[c] > 0).sum()}/{len(res)}" for c in excess), "", "", style="bold")
+    table.add_row("Median vs EW", *(pct(excess[c].median()) for c in excess), "", "", style="bold")
+    print(table)
+    universe.REPORTS.mkdir(exist_ok=True)
+    path = universe.REPORTS / f"yearly_{watchlist}_{date.today()}.csv"
+    res.to_csv(path)
+    print(f"Saved to {path}")
+    _print_skipped(skipped)
+
+
 @app.command("sweep")
 def sweep_cmd(watchlist: str = WATCHLIST, years: int = YEARS, oos: float = OOS,
               rank_by: str = typer.Option("profit_factor", help=f"One of: {', '.join(sweep.RANK_BY)}"),
@@ -416,12 +487,20 @@ def sweep_cmd(watchlist: str = WATCHLIST, years: int = YEARS, oos: float = OOS,
               top: int = typer.Option(10, help="Combos to re-test out-of-sample"),
               regime: bool = typer.Option(None, "--regime/--no-regime", help="Pin the market filter instead of sweeping it"),
               rs: bool = typer.Option(None, "--rs/--no-rs", help="Pin the RS filter instead of sweeping it"),
-              sector: bool = typer.Option(None, "--sector/--no-sector", help="Pin the sector filter instead of sweeping it")):
+              sector: bool = typer.Option(None, "--sector/--no-sector", help="Pin the sector filter instead of sweeping it"),
+              walk_forward: bool = typer.Option(False, "--walk-forward",
+                                                help="Pick the best combo on earlier years, test it on each next year"),
+              min_train_years: float = typer.Option(3.0, help="Walk-forward: years of history before the first test year")):
     """Grid-search rules, market/RS/sector filters and exits; rank in-sample, then check the top picks out-of-sample."""
-    if rank_by not in sweep.RANK_BY:
-        raise typer.BadParameter(f"rank-by must be one of {sweep.RANK_BY}")
+    allowed = sweep.WF_RANK_BY if walk_forward else sweep.RANK_BY
+    if rank_by not in allowed:
+        raise typer.BadParameter(f"rank-by must be one of {allowed}")
     data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
     grid = sweep.pinned(regime=regime, rs=rs, sector=sector)
+    if walk_forward:
+        _sweep_walk_forward(data, watchlist, years, grid, rank_by, min_trades, min_train_years)
+        _print_skipped(skipped)
+        return
     results, final = sweep.run(data, universe.regime(years), oos, rank_by, min_trades, top, years, grid,
                                progress=lambda xs: track(xs, description=f"Sweeping {len(xs)} combos"))
     path = sweep.save(results, watchlist)
