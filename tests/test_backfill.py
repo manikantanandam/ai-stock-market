@@ -17,8 +17,17 @@ def test_signal_from_row_recomputes_levels_and_marks_unsaved_reasons():
     s = backfill.signal_from_row(row())
     assert s.buys == ["swing", "trend"] and s.as_of == "2026-11-18" and s.sentiment is None
     assert (s.strategies["swing"].stop, s.strategies["swing"].target) == (90.0, 115.0)  # 2 ATR stop, 3 ATR target
-    assert s.reasons == {p: [backfill.UNSAVED] for p in ("technical", "fundamental", "sentiment")}
+    assert s.reasons == {"technical": [backfill.UNSAVED], "fundamental": [backfill.UNSAVED],
+                         "sentiment": ["news not fetched for this session"]}
     assert "fundamental reason: " + backfill.UNSAVED in notes.facts(s, "swing")
+
+
+def test_rebuilt_news_reasons_only_where_the_day_had_a_sentiment_score():
+    why = ["headlines re-fetched later ...", "+0.80 2026-11-17 ABC wins order (Mint)"]
+    assert backfill.signal_from_row(row(sentiment=0.4), sentiment_why=why).reasons["sentiment"] == why
+    assert backfill.signal_from_row(row(sentiment=0.4)).reasons["sentiment"] == [backfill.UNSAVED]
+    assert backfill.signal_from_row(row(), sentiment_why=why).reasons["sentiment"] == [
+        "news not fetched for this session"]
 
 
 def test_signal_from_row_uses_saved_reasons_and_skips_unknown_presets():

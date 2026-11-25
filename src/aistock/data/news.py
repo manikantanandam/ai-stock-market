@@ -27,7 +27,11 @@ USER_AGENT = "aistock/0.1 (+https://github.com/manikantanandam/ai-stock-market)"
 
 
 def _google_news(query: str, days: int) -> list[dict]:
-    q = urllib.parse.quote(f"{query} when:{days}d")
+    return _google_news_query(f"{query} when:{days}d")
+
+
+def _google_news_query(query: str) -> list[dict]:
+    q = urllib.parse.quote(query)
     feed = feedparser.parse(f"https://news.google.com/rss/search?q={q}&hl=en-IN&gl=IN&ceid=IN:en")
     out = []
     for e in feed.entries:
@@ -80,6 +84,34 @@ def mentions(title: str, keyword: str, symbol: str) -> bool:
 def _publisher_news(symbol: str, keyword: str, days: int) -> list[dict]:
     since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
     return [n for n in _publisher_items() if n["published"] >= since and mentions(n["title"], keyword, symbol)]
+
+
+def session_cutoff(day: date) -> datetime:
+    """When the daily scan reads news for a session: 17:30 IST on that day."""
+    return datetime(day.year, day.month, day.day, 12, 0, tzinfo=timezone.utc)
+
+
+def get_news_as_of(symbol: str, company: str | None, day: date, days: int = 14) -> list[dict]:
+    """Headlines a scan on `day` could have seen: Google News limited to the
+    `days` before the session's cutoff, newest first, cached. Publisher feeds and
+    Yahoo only hold recent items, so they aren't used. Coverage thins out for
+    older dates and smaller companies."""
+    CACHE.mkdir(parents=True, exist_ok=True)
+    path = CACHE / f"{symbol}_{days}d_asof_{day}.json"
+    if path.exists():
+        return json.loads(path.read_text())
+    keyword = (company or symbol).replace(" Limited", "").replace(" Ltd", "").strip()
+    start, cutoff = day - timedelta(days=days), session_cutoff(day).isoformat()
+    # Google's before: is exclusive, so ask through the next day and cut at the session
+    query = f'"{keyword}" share after:{start} before:{day + timedelta(days=1)}'
+    items = [n for n in _google_news_query(query) if n["published"] <= cutoff]
+    seen, news = set(), []
+    for n in sorted(items, key=lambda n: n["published"], reverse=True):
+        if n["title"].lower() not in seen:
+            seen.add(n["title"].lower())
+            news.append(n)
+    path.write_text(json.dumps(news))
+    return news
 
 
 def get_news(symbol: str, company: str | None, days: int = 14) -> list[dict]:

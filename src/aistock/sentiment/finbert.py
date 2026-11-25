@@ -45,11 +45,12 @@ def classify(texts: list[str]) -> list[dict]:
     return out
 
 
-def sentiment_score(news: list[dict]) -> tuple[float, list[str]]:
-    """Recency-weighted mean of headline scores in [-1, 1], with the strongest headlines as reasons."""
+def sentiment_score(news: list[dict], now: datetime | None = None) -> tuple[float, list[str]]:
+    """Recency-weighted mean of headline scores in [-1, 1], with the strongest headlines as reasons.
+    now: the moment ages are measured from (a past session's cutoff when backfilling)."""
     if not news:
         return 0.0, ["no recent headlines"]
-    now = datetime.now(timezone.utc)
+    now = now or datetime.now(timezone.utc)
     scored = []
     for n, s in zip(news, classify([n["title"] for n in news])):
         age = (now - datetime.fromisoformat(n["published"])).total_seconds() / 86400
