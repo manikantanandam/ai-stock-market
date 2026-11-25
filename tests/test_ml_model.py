@@ -61,3 +61,11 @@ def test_target_is_centred_rank_per_date():
     t = ml.target(df)
     assert t.groupby(level="date").mean().abs().max() == pytest.approx(0.1)  # ranks 0.2..1.0 minus 0.5
     assert t.groupby(level="date").nunique().eq(5).all()
+
+
+def test_ranked_inputs_are_per_date_percentiles_except_market():
+    df = panel(signal=0.0, years=1, n_sym=5)
+    x = ml.inputs(df)
+    assert x.drop(columns="market").groupby(level="date").max().eq(1.0).all().all()
+    pd.testing.assert_series_equal(x.market, df.market)
+    pd.testing.assert_frame_equal(ml.inputs(df, ranked=False), df[FEATURES])

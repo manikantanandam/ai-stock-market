@@ -509,7 +509,8 @@ def _ml_panel(watchlist: str, years: int, rebuild: bool = False):
 def ml_eval(watchlist: str = typer.Option("nifty500", help=f"One of: {', '.join(WATCHLISTS)}"),
             years: int = YEARS,
             min_train_years: float = typer.Option(3.0, help="Years of history before the first test year"),
-            step: int = typer.Option(ml_model.STEP, help="Train on every Nth date (labels overlap)")):
+            step: int = typer.Option(ml_model.STEP, help="Train on every Nth date (labels overlap)"),
+            raw: bool = typer.Option(False, "--raw", help="Use raw feature values instead of per-date ranks")):
     """Walk-forward test of the ML ranker vs today's ranking: rank IC and decile returns per year."""
     df, _, skipped = _ml_panel(watchlist, years)
     dates = df.index.get_level_values("date").unique().sort_values()
@@ -517,10 +518,11 @@ def ml_eval(watchlist: str = typer.Option("nifty500", help=f"One of: {', '.join(
     if not wins:
         raise typer.BadParameter("not enough history for one test year")
     rows, preds, last_model, last_test = ml_model.walk_forward(
-        df, wins, step, lambda xs: track(xs, description=f"Training {len(xs)} yearly models"))
+        df, wins, step, not raw, lambda xs: track(xs, description=f"Training {len(xs)} yearly models"))
 
     h = ml_features.HORIZON
-    table = Table(title=f"{watchlist}: ML ranker walk-forward ({h}-session excess return vs the average stock)")
+    table = Table(title=f"{watchlist}: ML ranker walk-forward, {'raw' if raw else 'per-date ranked'} features "
+                        f"({h}-session excess return vs the average stock)")
     for col in ["Year", "Train rows", "Test rows", "IC", "IC>0 days", "Base IC", "Top 10%", "Bottom 10%",
                 "Base top 10%"]:
         table.add_column(col, justify="right")
@@ -531,7 +533,7 @@ def ml_eval(watchlist: str = typer.Option("nifty500", help=f"One of: {', '.join(
                   pct(rows.top.mean()), pct(rows.bottom.mean()), pct(rows.top_base.mean()), style="bold")
     print(table)
 
-    imp = ml_model.importance(last_model, last_test)
+    imp = ml_model.importance(last_model, last_test, not raw)
     print(f"Feature importance ({wins[-1].year} model, IC drop when shuffled): "
           + ", ".join(f"{f} {v:+.3f}" for f, v in imp.head(8).items()))
     ok, why = ml_model.verdict(rows)

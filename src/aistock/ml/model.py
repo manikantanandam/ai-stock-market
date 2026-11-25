@@ -6,6 +6,11 @@ skew and market-wide level, which is all a ranker needs. A fixed seed and no
 early stopping keep it deterministic. Training uses every STEP-th date, since
 20-session labels on neighbouring dates overlap heavily.
 
+Features are ranked per date by default (percentile among that day's stocks),
+like the target: raw levels such as ATR% or returns shift with the market
+regime, so a split learned in one year misplaces stocks in another. `market`
+is the same for every stock on a date, so it stays raw.
+
 Evaluation per test year (each model trained only on earlier years, see
 backtest.walkforward): mean daily rank IC of the predictions, the share of days
 with IC > 0, and the excess 20-session return of the top / bottom decile over
@@ -29,16 +34,26 @@ def make_model() -> HistGradientBoostingRegressor:
                                          early_stopping=False, random_state=0)
 
 
+def inputs(df: pd.DataFrame, ranked: bool = True) -> pd.DataFrame:
+    """Model inputs: FEATURES, ranked per date (except `market`) unless ranked=False."""
+    x = df[FEATURES]
+    if not ranked:
+        return x
+    cols = [f for f in FEATURES if f != "market"]
+    r = x[cols].groupby(level="date").rank(pct=True).astype("float32")
+    return r.assign(market=x.market)[FEATURES]
+
+
 def target(df: pd.DataFrame) -> pd.Series:
     """Per-date percentile rank of the label, centred on 0."""
     return df.label.groupby(level="date").rank(pct=True) - 0.5
 
 
-def fit(train: pd.DataFrame, step: int = STEP) -> HistGradientBoostingRegressor:
+def fit(train: pd.DataFrame, step: int = STEP, ranked: bool = True) -> HistGradientBoostingRegressor:
     d = train.dropna(subset=["label"])
     dates = d.index.get_level_values("date")
     d = d[dates.isin(dates.unique()[::step])]
-    return make_model().fit(d[FEATURES], target(d))
+    return make_model().fit(inputs(d, ranked), target(d))
 
 
 def baseline(df: pd.DataFrame) -> pd.Series:
@@ -65,7 +80,7 @@ def evaluate(test: pd.DataFrame) -> dict:
             "ic_base": float(ic.base.mean()), "top": top, "bottom": bottom, "top_base": base_top}
 
 
-def walk_forward(df: pd.DataFrame, wins: list[Window], step: int = STEP,
+def walk_forward(df: pd.DataFrame, wins: list[Window], step: int = STEP, ranked: bool = True,
                  progress=iter) -> tuple[pd.DataFrame, pd.Series, HistGradientBoostingRegressor, pd.DataFrame]:
     """Returns (one row per test year, out-of-sample predictions for every test
     row, the last window's model, and its test rows) for importance."""
@@ -75,21 +90,23 @@ def walk_forward(df: pd.DataFrame, wins: list[Window], step: int = STEP,
     for w in progress(wins):
         train = df[dates <= w.train_end]
         test = df[(dates >= w.test_start) & (dates <= w.test_end)]
-        model = fit(train, step)
-        test = test.assign(pred=model.predict(test[FEATURES]))
+        model = fit(train, step, ranked)
+        test = test.assign(pred=model.predict(inputs(test, ranked)))
         preds.append(test.pred)
         rows.append({"year": w.year, "train_rows": int(train.label.notna().sum()), **evaluate(test)})
     return pd.DataFrame(rows), pd.concat(preds), model, test
 
 
-def importance(model: HistGradientBoostingRegressor, test: pd.DataFrame, seed: int = 0) -> pd.Series:
+def importance(model: HistGradientBoostingRegressor, test: pd.DataFrame, ranked: bool = True,
+               seed: int = 0) -> pd.Series:
     """Drop in mean daily IC when each feature is shuffled across the test rows (bigger = more useful)."""
     t = test.dropna(subset=["label"])
     rng = np.random.default_rng(seed)
-    base_ic = daily_ic(t.assign(pred=model.predict(t[FEATURES])), ["pred"]).pred.mean()
+    xs = inputs(t, ranked)
+    base_ic = daily_ic(t.assign(pred=model.predict(xs)), ["pred"]).pred.mean()
     out = {}
     for f in FEATURES:
-        x = t[FEATURES].copy()
+        x = xs.copy()
         x[f] = rng.permutation(x[f].to_numpy())
         out[f] = base_ic - daily_ic(t.assign(pred=model.predict(x)), ["pred"]).pred.mean()
     return pd.Series(out).sort_values(ascending=False)
