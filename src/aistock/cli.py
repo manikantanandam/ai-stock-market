@@ -204,7 +204,7 @@ def scan(
 def backfill_notes(
     date_: str = typer.Option(None, "--date", help="One session (YYYY-MM-DD); default: every session without notes"),
     sessions: int = typer.Option(None, help="Most sessions to fill this run, newest first"),
-    notes_max: int = typer.Option(50, help="Most BUYs to explain per session"),
+    notes_max: int = typer.Option(25, help="Most BUYs to explain per session"),
 ):
     """Write LLM notes for journaled sessions that have none, from their journal rows."""
     days = [date_] if date_ else backfill.sessions_without_notes()[:sessions]
