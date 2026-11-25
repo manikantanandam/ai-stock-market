@@ -85,19 +85,23 @@ def analyze(
         _print_notes([(s, name) for name in s.buys])
 
 
-def _print_notes(items: list[tuple]) -> None:
-    """LLM notes for (signal, strategy) pairs; stops at the first sign Ollama is unavailable."""
+def _print_notes(items: list[tuple]) -> list[tuple]:
+    """LLM notes for (signal, strategy) pairs; stops at the first sign Ollama is unavailable.
+    Returns the (signal, strategy, note) triples written."""
     if not items:
         print("No BUY to explain.")
-        return
+        return []
+    written = []
     for s, name in track(items, description="Writing notes", transient=True):
         try:
             text = llm_notes.note(s, name)
         except llm_notes.Unavailable as e:
             print(f"[yellow]Notes skipped: {e}. Run `brew services start ollama` and "
                   f"`ollama pull {llm_notes.MODEL}`.[/yellow]")
-            return
+            break
         print(f"\n[bold]{s.symbol} · {name}[/bold]: {text}")
+        written.append((s, name, text))
+    return written
 
 
 @app.command("paper-account")
@@ -143,6 +147,7 @@ def scan(
                                           "auto = all for <= 60 stocks, else candidates"),
     top: int = typer.Option(15, help="Rows to show"),
     notes: bool = typer.Option(False, "--notes", help="Add a local-LLM (Ollama) note for each BUY shown"),
+    notes_max: int = typer.Option(15, help="Most BUYs to explain with --notes (each takes ~30s on CPU)"),
 ):
     """Run every strategy over a watchlist, list BUYs first, and log to journal/ (day and stock files)."""
     names = [x.strip().upper() for x in symbols.split(",") if x.strip()] or WATCHLISTS[watchlist]
@@ -187,7 +192,10 @@ def scan(
     print(f"Stocks: BUY {counts['BUY']}  WATCH {counts['WATCH']}  AVOID {counts['AVOID']}  · "
           f"news for {with_news}/{len(results)} · {logged}")
     if notes:
-        _print_notes([(s, s.buys[0]) for s in results[:top] if s.buys])
+        written = _print_notes([(s, s.buys[0]) for s in results[:top] if s.buys][:notes_max])
+        if written and market_phase() != "live":
+            journal.record_notes(written)
+            print(f"Notes logged to {journal.NOTES}")
     _print_skipped(failed)
 
 

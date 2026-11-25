@@ -6,9 +6,10 @@ The page in static/ reads the manifest and draws each file by its kind, so
 new reports show up without changes here. Pages can't list directories,
 hence the manifest.
 
-Kinds: "day" (one scan session), "stock" (one stock's signal history),
-"trades" (entry/exit rows), "series" (Date column + numeric columns, e.g.
-equity curves), "yearly" (returns per calendar year), "table" (anything else).
+Kinds: "day" (one scan session), "notes" (LLM notes on a session's BUYs),
+"stock" (one stock's signal history), "trades" (entry/exit rows), "series"
+(Date column + numeric columns, e.g. equity curves), "yearly" (returns per
+calendar year), "table" (anything else).
 """
 import csv
 import json
@@ -19,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 STATIC = Path(__file__).parent / "static"
 
-GROUPS = ["Signals", "Paper accounts", "Reports", "Stocks"]
+GROUPS = ["Signals", "LLM notes", "Paper accounts", "Reports", "Stocks"]
 
 
 def kind_of(rel: str, columns: list[str]) -> str:
@@ -30,6 +31,8 @@ def kind_of(rel: str, columns: list[str]) -> str:
         return "day"
     if parts[:2] == ["journal", "stocks"]:
         return "stock"
+    if parts[:2] == ["journal", "notes"]:
+        return "notes"
     if {"entry_date", "ret"} <= set(columns):
         return "trades"
     if name.startswith("yearly_"):
@@ -45,6 +48,8 @@ def group_of(rel: str) -> str:
         return "Signals"
     if parts[:2] == ["journal", "stocks"]:
         return "Stocks"
+    if parts[:2] == ["journal", "notes"]:
+        return "LLM notes"
     if parts[:2] == ["journal", "paper"]:
         return "Paper accounts"
     return "Reports"

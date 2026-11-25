@@ -6,6 +6,8 @@ from aistock import site
 def test_kind_of_routes_by_path_and_header():
     assert site.kind_of("journal/days/2026-11-23.csv", ["date", "symbol"]) == "day"
     assert site.kind_of("journal/stocks/INFY.csv", ["date", "symbol"]) == "stock"
+    assert site.kind_of("journal/notes/2026-11-23.csv", ["date", "symbol", "note"]) == "notes"
+    assert site.group_of("journal/notes/2026-11-23.csv") == "LLM notes"
     assert site.kind_of("reports/paper_trades.csv", ["strategy", "entry_date", "ret"]) == "trades"
     assert site.kind_of("journal/paper/trend/trades.csv", ["symbol", "entry_date", "ret"]) == "trades"
     assert site.kind_of("reports/yearly_nifty500_2026-11-25.csv", ["Date", "breakout"]) == "yearly"

@@ -177,7 +177,24 @@ function barConfig(labels, data, opts = {}) {
   };
 }
 
-function renderDay(file, rows) {
+// LLM notes explain BUYs the rules already chose; they never pick trades.
+function notesCard(rows, title) {
+  return card(title,
+    h('p', { class: 'sub' }, 'Written by a local LLM (qwen2.5:3b) from the signal\'s numbers; the rules made the decision.'),
+    rows.map(r => h('div', { class: 'note' },
+      h('div', { class: 'note-head' }, h('a', { href: stockHref(r.symbol) }, r.symbol), ' ',
+        h('span', { class: 'muted' }, [r.name, r.strategy].filter(Boolean).join(' · '))),
+      h('p', {}, r.note))));
+}
+
+function renderNotes(file, rows) {
+  return [notesCard(rows, null)];
+}
+
+async function renderDay(file, rows) {
+  const date = file.path.split('/').pop();
+  const notesFile = manifest.files.find(f => f.path === 'journal/notes/' + date);
+  const notes = notesFile ? await load(notesFile.path) : [];
   const actions = countBy(rows, 'action');
   const buys = rows.filter(r => r.action === 'BUY');
   const sectors = countBy(buys.length ? buys : rows.filter(r => r.action === 'WATCH'), 'sector').slice(0, 15);
@@ -192,6 +209,7 @@ function renderDay(file, rows) {
       chartCard('Combined score distribution', barConfig(hist.edges.map(e => e.toFixed(1)), hist.counts, {
         colors: hist.edges.map(e => e < 0 ? css('--s8') : css('--s3')),
       }))),
+    notes.length ? notesCard(notes, `LLM notes on ${notes.length} BUY${notes.length > 1 ? 's' : ''}`) : null,
     table(rows, file.columns, { filters: ['action', 'sector'], link: { symbol: stockHref }, sort: 'combined' }),
   ];
 }
@@ -319,7 +337,7 @@ function renderAccounts() {
   return [table(names.map(n => ({ strategy: n, ...accounts[n] })), ['strategy', ...new Set(names.flatMap(n => Object.keys(accounts[n])))], { pageSize: 50 })];
 }
 
-const RENDER = { day: renderDay, stock: renderStock, trades: renderTrades, series: renderSeries,
+const RENDER = { day: renderDay, notes: renderNotes, stock: renderStock, trades: renderTrades, series: renderSeries,
   yearly: renderYearly, table: (f, rows) => [table(rows, f.columns)] };
 
 async function show(path) {
@@ -336,10 +354,11 @@ async function show(path) {
   if (!file) { main.replaceChildren(h('p', { class: 'muted' }, 'File not found: ' + path)); return; }
   main.replaceChildren(h('p', { class: 'muted' }, 'Loading…'));
   const rows = await load(path);
+  const parts = await RENDER[file.kind](file, rows);
   main.replaceChildren(
     h('h2', {}, file.title),
     h('p', { class: 'sub' }, `${file.path} · ${file.rows.toLocaleString()} rows · `, h('a', { href: 'data/' + file.path, download: '' }, 'download CSV')),
-    ...RENDER[file.kind](file, rows).filter(Boolean));
+    ...parts.filter(Boolean));
 }
 
 // ---------- navigation ----------
@@ -352,7 +371,7 @@ function buildNav() {
     if (g === 'Paper accounts' && Object.keys(manifest.accounts || {}).length) {
       nav.append(h('h2', {}, g), h('a', { href: '#accounts' }, 'Account settings'));
     } else if (files.length) nav.append(h('h2', {}, g));
-    if (g === 'Signals') files = files.slice().reverse();  // newest session first
+    if (g === 'Signals' || g === 'LLM notes') files = files.slice().reverse();  // newest session first
     if (g === 'Reports') files = files.slice().sort((a, b) => b.path.localeCompare(a.path) || 0);
     if (g === 'Stocks') {
       // ~500 stocks: a search box instead of a long list.
