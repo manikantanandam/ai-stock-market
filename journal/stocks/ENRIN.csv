@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ENRIN,Siemens Energy India Limited,Utilities,WATCH,0.065,-0.2,0.55,,2965.1,,,,,118.98
-2026-11-19,ENRIN,Siemens Energy India Limited,Utilities,WATCH,0.065,-0.2,0.55,,3010.0,,,,,115.15
-2026-11-20,ENRIN,Siemens Energy India Limited,Utilities,WATCH,0.065,-0.2,0.55,,2944.0,,,,,114.95
-2026-11-23,ENRIN,Siemens Energy India Limited,Utilities,WATCH,0.065,-0.2,0.55,,2976.5,,,,,112.52
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ENRIN,Siemens Energy India Limited,Utilities,WATCH,0.065,-0.2,0.55,,2965.1,,,,,118.98,,,,,,,,,,,,,,,,,
+2026-11-19,ENRIN,Siemens Energy India Limited,Utilities,WATCH,0.065,-0.2,0.55,,3010.0,,,,,115.15,,,,,,,,,,,,,,,,,
+2026-11-20,ENRIN,Siemens Energy India Limited,Utilities,WATCH,0.065,-0.2,0.55,,2944.0,,,,,114.95,,,,,,,,,,,,,,,,,
+2026-11-23,ENRIN,Siemens Energy India Limited,Utilities,WATCH,0.065,-0.2,0.55,,2976.5,,,,,112.52,,,,,,,,,,,,,,,,,
+2026-11-25,ENRIN,Siemens Energy India Limited,Utilities,WATCH,0.065,-0.2,0.55,,2970.0,,,,,110.86,-0.2001,-0.242,False,downtrend: price < SMA50 < SMA200 | MACD histogram positive,ROE: n/a | Debt/Equity 0.04x (good) | Revenue growth 39.3% (good) | Earnings growth 67.8% (good) | Net margin 15.8% (good) | P/E 72.0 (weak),not fetched (no strategy can reach BUY),1071922741248,72.0268,22.276989,,4.483,0.393,0.678,0.15769,,0.13,

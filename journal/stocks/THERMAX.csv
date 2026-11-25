@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,THERMAX,Thermax Limited,Industrials,WATCH,-0.185,-0.4,0.05,,2681.7,,,,,119.44
-2026-11-19,THERMAX,Thermax Limited,Industrials,AVOID,-0.285,-0.6,0.05,,2726.9,,,,,116.19
-2026-11-20,THERMAX,Thermax Limited,Industrials,AVOID,-0.285,-0.6,0.05,,2718.1,,,,,110.24
-2026-11-23,THERMAX,Thermax Limited,Industrials,AVOID,-0.285,-0.6,0.05,,2705.5,,,,,105.56
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,THERMAX,Thermax Limited,Industrials,WATCH,-0.185,-0.4,0.05,,2681.7,,,,,119.44,,,,,,,,,,,,,,,,,
+2026-11-19,THERMAX,Thermax Limited,Industrials,AVOID,-0.285,-0.6,0.05,,2726.9,,,,,116.19,,,,,,,,,,,,,,,,,
+2026-11-20,THERMAX,Thermax Limited,Industrials,AVOID,-0.285,-0.6,0.05,,2718.1,,,,,110.24,,,,,,,,,,,,,,,,,
+2026-11-23,THERMAX,Thermax Limited,Industrials,AVOID,-0.285,-0.6,0.05,,2705.5,,,,,105.56,,,,,,,,,,,,,,,,,
+2026-11-25,THERMAX,Thermax Limited,Industrials,AVOID,-0.285,-0.6,0.05,,2663.4,,,,,103.99,-0.3934,-0.4882,False,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE 11.0% | Debt/Equity 0.53x | Revenue growth 11.4% (good) | Earnings growth -4.3% (weak) | Net margin 5.3% | P/E 52.2,not fetched (no strategy can reach BUY),307181649920,52.23946,5.599855,0.11047,52.661,0.114,-0.043,0.05289,1.317,0.52,

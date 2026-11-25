@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,CANBK,Canara Bank,Financial Services,WATCH,0.22,0.2,0.4,,133.4,,,,,3.27
-2026-11-19,CANBK,Canara Bank,Financial Services,WATCH,0.12,0.0,0.4,,136.03,,,,,3.35
-2026-11-20,CANBK,Canara Bank,Financial Services,WATCH,0.12,0.0,0.4,,138.92,,,,,3.53
-2026-11-23,CANBK,Canara Bank,Financial Services,WATCH,0.22,0.2,0.4,,133.75,,,,,3.75
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,CANBK,Canara Bank,Financial Services,WATCH,0.22,0.2,0.4,,133.4,,,,,3.27,,,,,,,,,,,,,,,,,
+2026-11-19,CANBK,Canara Bank,Financial Services,WATCH,0.12,0.0,0.4,,136.03,,,,,3.35,,,,,,,,,,,,,,,,,
+2026-11-20,CANBK,Canara Bank,Financial Services,WATCH,0.12,0.0,0.4,,138.92,,,,,3.53,,,,,,,,,,,,,,,,,
+2026-11-23,CANBK,Canara Bank,Financial Services,WATCH,0.22,0.2,0.4,,133.75,,,,,3.75,,,,,,,,,,,,,,,,,
+2026-11-25,CANBK,Canara Bank,Financial Services,WATCH,0.22,0.2,0.4,,133.46,,,,,3.73,-0.0377,-0.0134,True,MACD histogram positive,ROE 15.1% (good) | Debt/Equity: n/a | Revenue growth -13.0% (weak) | Earnings growth 10.8% (good) | Net margin 46.5% (good) | P/E 6.1 (good),not fetched (no strategy can reach BUY),1233880743936,6.0538497,0.96430045,0.1512,,-0.13,0.108,0.46546,,3.15,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,301.75,,,,,13.46
-2026-11-19,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,298.85,,,,,13.48
-2026-11-20,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,303.15,,,,,13.8
-2026-11-23,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,304.7,,,,,14.04
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,301.75,,,,,13.46,,,,,,,,,,,,,,,,,
+2026-11-19,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,298.85,,,,,13.48,,,,,,,,,,,,,,,,,
+2026-11-20,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,303.15,,,,,13.8,,,,,,,,,,,,,,,,,
+2026-11-23,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,304.7,,,,,14.04,,,,,,,,,,,,,,,,,
+2026-11-25,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,299.25,,,,,14.07,-0.0701,-0.1545,True,MACD histogram negative,ROE 15.3% (good) | Debt/Equity 0.04x (good) | Revenue growth 6.6% | Earnings growth 36.8% (good) | Net margin 11.2% | P/E 13.7 (good),not fetched (no strategy can reach BUY),83578503168,13.677345,1.92799,0.15286,3.903,0.066,0.368,0.11225,4.746,2.32,

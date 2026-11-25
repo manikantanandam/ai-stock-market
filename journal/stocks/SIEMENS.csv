@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,SIEMENS,Siemens Limited,Industrials,WATCH,0.22,0.2,0.4,,3520.0,,,,,118.6
-2026-11-19,SIEMENS,Siemens Limited,Industrials,WATCH,0.22,0.2,0.4,,3610.0,,,,,118.56
-2026-11-20,SIEMENS,Siemens Limited,Industrials,WATCH,0.22,0.2,0.4,,3582.6,,,,,119.72
-2026-11-23,SIEMENS,Siemens Limited,Industrials,WATCH,0.22,0.2,0.4,,3578.1,,,,,115.08
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,SIEMENS,Siemens Limited,Industrials,WATCH,0.22,0.2,0.4,,3520.0,,,,,118.6,,,,,,,,,,,,,,,,,
+2026-11-19,SIEMENS,Siemens Limited,Industrials,WATCH,0.22,0.2,0.4,,3610.0,,,,,118.56,,,,,,,,,,,,,,,,,
+2026-11-20,SIEMENS,Siemens Limited,Industrials,WATCH,0.22,0.2,0.4,,3582.6,,,,,119.72,,,,,,,,,,,,,,,,,
+2026-11-23,SIEMENS,Siemens Limited,Industrials,WATCH,0.22,0.2,0.4,,3578.1,,,,,115.08,,,,,,,,,,,,,,,,,
+2026-11-25,SIEMENS,Siemens Limited,Industrials,WATCH,0.22,0.2,0.4,,3581.1,,,,,116.08,-0.1511,-0.1444,False,MACD histogram positive,ROE: n/a | Debt/Equity 0.02x (good) | Revenue growth 17.0% (good) | Earnings growth 3.9% | Net margin 18.2% (good) | P/E 87.3 (weak),not fetched (no strategy can reach BUY),1285595070464,87.34575,8.125708,,2.436,0.17,0.039,0.1825,2.767,0.51,

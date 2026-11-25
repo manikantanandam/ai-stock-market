@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.509,0.6,0.5,0.294,1050.0,,,,swing;trend,44.82
-2026-11-19,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.474,0.6,0.5,0.118,1071.75,,,,swing;trend,44.91
-2026-11-20,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.46,0.6,0.5,0.052,1052.45,,,,swing;trend,44.61
-2026-11-23,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.448,0.6,0.5,-0.01,1042.95,,,,swing;trend,43.93
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.509,0.6,0.5,0.294,1050.0,,,,swing;trend,44.82,,,,,,,,,,,,,,,,,
+2026-11-19,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.474,0.6,0.5,0.118,1071.75,,,,swing;trend,44.91,,,,,,,,,,,,,,,,,
+2026-11-20,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.46,0.6,0.5,0.052,1052.45,,,,swing;trend,44.61,,,,,,,,,,,,,,,,,
+2026-11-23,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.448,0.6,0.5,-0.01,1042.95,,,,swing;trend,43.93,,,,,,,,,,,,,,,,,
+2026-11-25,JYOTICNC,Jyoti CNC Automation Limited,Industrials,BUY,0.447,0.6,0.5,-0.013,1019.2,,,,swing;trend,44.52,-0.0339,0.4372,False,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 15.6% (good) | Debt/Equity 0.44x (good) | Revenue growth 18.5% (good) | Earnings growth -15.2% (weak) | Net margin 13.5% (good) | P/E 79.0 (weak),"10 headlines: 1 positive, 1 negative, 8 neutral | -0.95 2026-11-17 Zetwerk Manufacturing Share Price Falls 2.04%: Analysis (Univest) | +0.31 2026-11-20 5 Small-Cap Stocks with Large Order Books and Expansion Plans (Equitymaster)",243740704768,78.97937,11.404629,0.15561,44.234,0.185,-0.152,0.13510999,2.206,0.0,

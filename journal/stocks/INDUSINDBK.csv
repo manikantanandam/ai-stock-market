@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,INDUSINDBK,IndusInd Bank Limited,Financial Services,WATCH,0.145,0.2,0.15,,911.85,,,,,25.33
-2026-11-19,INDUSINDBK,IndusInd Bank Limited,Financial Services,WATCH,0.145,0.2,0.15,,923.65,,,,,24.84
-2026-11-20,INDUSINDBK,IndusInd Bank Limited,Financial Services,WATCH,0.145,0.2,0.15,,1003.0,,,,,29.99
-2026-11-23,INDUSINDBK,IndusInd Bank Limited,Financial Services,WATCH,0.145,0.2,0.15,,963.0,,,,,30.9
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,INDUSINDBK,IndusInd Bank Limited,Financial Services,WATCH,0.145,0.2,0.15,,911.85,,,,,25.33,,,,,,,,,,,,,,,,,
+2026-11-19,INDUSINDBK,IndusInd Bank Limited,Financial Services,WATCH,0.145,0.2,0.15,,923.65,,,,,24.84,,,,,,,,,,,,,,,,,
+2026-11-20,INDUSINDBK,IndusInd Bank Limited,Financial Services,WATCH,0.145,0.2,0.15,,1003.0,,,,,29.99,,,,,,,,,,,,,,,,,
+2026-11-23,INDUSINDBK,IndusInd Bank Limited,Financial Services,WATCH,0.145,0.2,0.15,,963.0,,,,,30.9,,,,,,,,,,,,,,,,,
+2026-11-25,INDUSINDBK,IndusInd Bank Limited,Financial Services,WATCH,0.145,0.2,0.15,,973.7,,,,,29.95,-0.0963,-0.017,True,MACD histogram positive,ROE 4.5% (weak) | Debt/Equity: n/a | Revenue growth 63.1% (good) | Earnings growth: n/a | Net margin 15.7% (good) | P/E 24.0 (good),not fetched (no strategy can reach BUY),719657041920,24.022106,1.0594043,0.04513,,0.631,,0.15682,,0.16,

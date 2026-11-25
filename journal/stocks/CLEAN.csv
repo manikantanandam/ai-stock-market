@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,CLEAN,Clean Science and Technology Limited,Basic Materials,WATCH,0.25,0.2,0.5,,698.95,,,,,26.68
-2026-11-19,CLEAN,Clean Science and Technology Limited,Basic Materials,WATCH,0.05,-0.2,0.5,,696.95,,,,,25.78
-2026-11-20,CLEAN,Clean Science and Technology Limited,Basic Materials,WATCH,0.05,-0.2,0.5,,690.2,,,,,24.8
-2026-11-23,CLEAN,Clean Science and Technology Limited,Basic Materials,WATCH,0.05,-0.2,0.5,,689.35,,,,,24.1
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,CLEAN,Clean Science and Technology Limited,Basic Materials,WATCH,0.25,0.2,0.5,,698.95,,,,,26.68,,,,,,,,,,,,,,,,,
+2026-11-19,CLEAN,Clean Science and Technology Limited,Basic Materials,WATCH,0.05,-0.2,0.5,,696.95,,,,,25.78,,,,,,,,,,,,,,,,,
+2026-11-20,CLEAN,Clean Science and Technology Limited,Basic Materials,WATCH,0.05,-0.2,0.5,,690.2,,,,,24.8,,,,,,,,,,,,,,,,,
+2026-11-23,CLEAN,Clean Science and Technology Limited,Basic Materials,WATCH,0.05,-0.2,0.5,,689.35,,,,,24.1,,,,,,,,,,,,,,,,,
+2026-11-25,CLEAN,Clean Science and Technology Limited,Basic Materials,WATCH,0.05,-0.2,0.5,,691.4,,,,,23.85,-0.2231,-0.1705,False,downtrend: price < SMA50 < SMA200 | MACD histogram positive,ROE 14.7% | Debt/Equity 0.00x (good) | Revenue growth 22.4% (good) | Earnings growth 0.6% | Net margin 22.5% (good) | P/E 31.8,not fetched (no strategy can reach BUY),74074718208,31.809677,4.4333267,0.14706999,0.128,0.224,0.006,0.22493,4.466,0.86,

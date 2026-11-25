@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,PRIVISCL,Privi Speciality Chemicals Limited,Basic Materials,BUY,0.513,0.6,0.7,0.013,3438.3,,,,swing;trend,123.58
-2026-11-19,PRIVISCL,Privi Speciality Chemicals Limited,Basic Materials,BUY,0.51,0.6,0.7,-0.001,3535.0,,,,swing;trend,127.07
-2026-11-20,PRIVISCL,Privi Speciality Chemicals Limited,Basic Materials,BUY,0.506,0.6,0.7,-0.02,3565.5,,,,swing;trend,122.99
-2026-11-23,PRIVISCL,Privi Speciality Chemicals Limited,Basic Materials,BUY,0.508,0.6,0.7,-0.011,3617.1,,,,swing;trend,125.27
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,PRIVISCL,Privi Speciality Chemicals Limited,Basic Materials,BUY,0.513,0.6,0.7,0.013,3438.3,,,,swing;trend,123.58,,,,,,,,,,,,,,,,,
+2026-11-19,PRIVISCL,Privi Speciality Chemicals Limited,Basic Materials,BUY,0.51,0.6,0.7,-0.001,3535.0,,,,swing;trend,127.07,,,,,,,,,,,,,,,,,
+2026-11-20,PRIVISCL,Privi Speciality Chemicals Limited,Basic Materials,BUY,0.506,0.6,0.7,-0.02,3565.5,,,,swing;trend,122.99,,,,,,,,,,,,,,,,,
+2026-11-23,PRIVISCL,Privi Speciality Chemicals Limited,Basic Materials,BUY,0.508,0.6,0.7,-0.011,3617.1,,,,swing;trend,125.27,,,,,,,,,,,,,,,,,
+2026-11-25,PRIVISCL,Privi Speciality Chemicals Limited,Basic Materials,BUY,0.486,0.6,0.7,-0.118,3651.6,,,,swing;trend,124.82,-0.0136,0.0167,False,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 25.9% (good) | Debt/Equity 0.62x | Revenue growth 12.0% (good) | Earnings growth 24.6% (good) | Net margin 13.5% (good) | P/E 37.1,"11 headlines: 3 positive, 2 negative, 6 neutral | -0.89 2026-11-20 Atul Ltd. Share Price at Fresh 52-Week Low, Valuation Check (Univest) | -0.95 2026-11-15 Privi Speciality Chemicals Downgraded to Sell Amid Mixed Technicals and Valuation Concerns (MarketsMojo)",138086662144,37.105072,8.766231,0.25929,61.888,0.12,0.246,0.13547,1.447,0.44,

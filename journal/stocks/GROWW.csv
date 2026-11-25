@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,GROWW,Billionbrains Garage Ventures Limited,Financial Services,BUY,0.598,0.6,0.9,0.139,223.52,,,,swing;trend,7.8
-2026-11-19,GROWW,Billionbrains Garage Ventures Limited,Financial Services,BUY,0.595,0.6,0.9,0.127,220.89,,,,swing;trend,7.77
-2026-11-20,GROWW,Billionbrains Garage Ventures Limited,Financial Services,BUY,0.578,0.6,0.9,0.04,224.57,,,,swing;trend,7.88
-2026-11-23,GROWW,Billionbrains Garage Ventures Limited,Financial Services,BUY,0.615,0.6,0.9,0.224,216.46,,,,swing;trend,8.02
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,GROWW,Billionbrains Garage Ventures Limited,Financial Services,BUY,0.598,0.6,0.9,0.139,223.52,,,,swing;trend,7.8,,,,,,,,,,,,,,,,,
+2026-11-19,GROWW,Billionbrains Garage Ventures Limited,Financial Services,BUY,0.595,0.6,0.9,0.127,220.89,,,,swing;trend,7.77,,,,,,,,,,,,,,,,,
+2026-11-20,GROWW,Billionbrains Garage Ventures Limited,Financial Services,BUY,0.578,0.6,0.9,0.04,224.57,,,,swing;trend,7.88,,,,,,,,,,,,,,,,,
+2026-11-23,GROWW,Billionbrains Garage Ventures Limited,Financial Services,BUY,0.615,0.6,0.9,0.224,216.46,,,,swing;trend,8.02,,,,,,,,,,,,,,,,,
+2026-11-25,GROWW,Billionbrains Garage Ventures Limited,Financial Services,WATCH,0.37,0.2,0.9,,217.48,,,,,7.79,0.0393,0.0696,True,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE 28.3% (good) | Debt/Equity 0.01x (good) | Revenue growth 44.9% (good) | Earnings growth 49.4% (good) | Net margin 46.0% (good) | P/E 51.6,not fetched (no strategy can reach BUY),1371939536896,51.60981,11.842697,0.28331,0.661,0.449,0.494,0.46,1.754,0.0,

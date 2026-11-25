@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1186.0,,,,,66.19
-2026-11-19,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1210.8,,,,,65.84
-2026-11-20,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1200.0,,,,,63.18
-2026-11-23,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1174.2,,,,,61.44
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1186.0,,,,,66.19,,,,,,,,,,,,,,,,,
+2026-11-19,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1210.8,,,,,65.84,,,,,,,,,,,,,,,,,
+2026-11-20,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1200.0,,,,,63.18,,,,,,,,,,,,,,,,,
+2026-11-23,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1174.2,,,,,61.44,,,,,,,,,,,,,,,,,
+2026-11-25,FINCABLES,Finolex Cables Limited,Industrials,WATCH,0.295,0.2,0.65,,1157.7,,,,,59.72,-0.1396,0.0421,False,MACD histogram positive,ROE 14.9% | Debt/Equity 0.00x (good) | Revenue growth 64.9% (good) | Earnings growth 67.9% (good) | Net margin 11.6% | P/E 20.3 (good),not fetched (no strategy can reach BUY),185178963968,20.339327,2.855142,0.14941,0.424,0.649,0.679,0.116239995,7.004,0.76,

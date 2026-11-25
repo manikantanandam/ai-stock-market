@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ADANIGREEN,Adani Green Energy Limited,Utilities,WATCH,0.28,0.6,-0.1,0.052,1404.1,,,,,43.33
-2026-11-19,ADANIGREEN,Adani Green Energy Limited,Utilities,WATCH,0.314,0.6,-0.1,0.219,1425.0,,,,,42.3
-2026-11-20,ADANIGREEN,Adani Green Energy Limited,Utilities,WATCH,0.292,0.6,-0.1,0.108,1435.0,,,,,41.58
-2026-11-23,ADANIGREEN,Adani Green Energy Limited,Utilities,WATCH,0.271,0.6,-0.1,0.007,1391.0,,,,,43.47
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ADANIGREEN,Adani Green Energy Limited,Utilities,WATCH,0.28,0.6,-0.1,0.052,1404.1,,,,,43.33,,,,,,,,,,,,,,,,,
+2026-11-19,ADANIGREEN,Adani Green Energy Limited,Utilities,WATCH,0.314,0.6,-0.1,0.219,1425.0,,,,,42.3,,,,,,,,,,,,,,,,,
+2026-11-20,ADANIGREEN,Adani Green Energy Limited,Utilities,WATCH,0.292,0.6,-0.1,0.108,1435.0,,,,,41.58,,,,,,,,,,,,,,,,,
+2026-11-23,ADANIGREEN,Adani Green Energy Limited,Utilities,WATCH,0.271,0.6,-0.1,0.007,1391.0,,,,,43.47,,,,,,,,,,,,,,,,,
+2026-11-25,ADANIGREEN,Adani Green Energy Limited,Utilities,WATCH,0.07,0.2,-0.1,,1364.5,,,,,44.9,-0.0309,-0.0869,False,uptrend: price > SMA50 > SMA200 | MACD histogram negative | volume spike vs 20d average,ROE 7.3% (weak) | Debt/Equity 3.75x (weak) | Revenue growth 41.6% (good) | Earnings growth 16.3% (good) | Net margin 12.6% (good) | P/E 129.5 (weak),not fetched (no strategy can reach BUY),2347226103808,129.54546,11.462263,0.07338,375.343,0.416,0.163,0.12599,0.57,0.0,

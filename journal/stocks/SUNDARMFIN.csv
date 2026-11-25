@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,SUNDARMFIN,Sundaram Finance Limited,Financial Services,WATCH,-0.04,-0.2,0.2,,4295.5,,,,,127.34
-2026-11-19,SUNDARMFIN,Sundaram Finance Limited,Financial Services,WATCH,0.16,0.2,0.2,,4360.5,,,,,129.67
-2026-11-20,SUNDARMFIN,Sundaram Finance Limited,Financial Services,WATCH,0.16,0.2,0.2,,4322.4,,,,,128.84
-2026-11-23,SUNDARMFIN,Sundaram Finance Limited,Financial Services,WATCH,-0.04,-0.2,0.2,,4295.7,,,,,128.47
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,SUNDARMFIN,Sundaram Finance Limited,Financial Services,WATCH,-0.04,-0.2,0.2,,4295.5,,,,,127.34,,,,,,,,,,,,,,,,,
+2026-11-19,SUNDARMFIN,Sundaram Finance Limited,Financial Services,WATCH,0.16,0.2,0.2,,4360.5,,,,,129.67,,,,,,,,,,,,,,,,,
+2026-11-20,SUNDARMFIN,Sundaram Finance Limited,Financial Services,WATCH,0.16,0.2,0.2,,4322.4,,,,,128.84,,,,,,,,,,,,,,,,,
+2026-11-23,SUNDARMFIN,Sundaram Finance Limited,Financial Services,WATCH,-0.04,-0.2,0.2,,4295.7,,,,,128.47,,,,,,,,,,,,,,,,,
+2026-11-25,SUNDARMFIN,Sundaram Finance Limited,Financial Services,WATCH,0.16,0.2,0.2,,4317.5,,,,,130.72,-0.1125,-0.1226,True,MACD histogram positive,ROE 14.4% | Debt/Equity 4.14x (weak) | Revenue growth 17.4% (good) | Earnings growth 5.8% | Net margin 45.1% (good) | P/E 21.4 (good),not fetched (no strategy can reach BUY),480603701248,21.377096,2.992576,0.14418,414.37,0.174,0.058,0.45064,8.975,0.93,

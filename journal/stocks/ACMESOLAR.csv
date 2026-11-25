@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ACMESOLAR,ACME Solar Holdings Limited,Utilities,WATCH,0.175,0.2,0.25,,409.7,,,,,16.64
-2026-11-19,ACMESOLAR,ACME Solar Holdings Limited,Utilities,WATCH,0.175,0.2,0.25,,409.15,,,,,15.81
-2026-11-20,ACMESOLAR,ACME Solar Holdings Limited,Utilities,WATCH,0.175,0.2,0.25,,405.4,,,,,15.48
-2026-11-23,ACMESOLAR,ACME Solar Holdings Limited,Utilities,WATCH,0.175,0.2,0.25,,411.6,,,,,15.5
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ACMESOLAR,ACME Solar Holdings Limited,Utilities,WATCH,0.175,0.2,0.25,,409.7,,,,,16.64,,,,,,,,,,,,,,,,,
+2026-11-19,ACMESOLAR,ACME Solar Holdings Limited,Utilities,WATCH,0.175,0.2,0.25,,409.15,,,,,15.81,,,,,,,,,,,,,,,,,
+2026-11-20,ACMESOLAR,ACME Solar Holdings Limited,Utilities,WATCH,0.175,0.2,0.25,,405.4,,,,,15.48,,,,,,,,,,,,,,,,,
+2026-11-23,ACMESOLAR,ACME Solar Holdings Limited,Utilities,WATCH,0.175,0.2,0.25,,411.6,,,,,15.5,,,,,,,,,,,,,,,,,
+2026-11-25,ACMESOLAR,ACME Solar Holdings Limited,Utilities,WATCH,0.175,0.2,0.25,,416.7,,,,,15.21,-0.027,0.3474,False,MACD histogram positive,ROE 11.5% | Debt/Equity 3.30x (weak) | Revenue growth 89.6% (good) | Earnings growth 99.5% (good) | Net margin 27.1% (good) | P/E 35.4,not fetched (no strategy can reach BUY),288853622784,35.393597,3.2831018,0.11504,330.058,0.896,0.995,0.27132,3.136,0.05,

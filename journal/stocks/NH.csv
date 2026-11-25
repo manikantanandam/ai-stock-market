@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,1891.3,,,,,49.59
-2026-11-19,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,1873.1,,,,,49.1
-2026-11-20,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,1943.7,,,,,52.17
-2026-11-23,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,1974.2,,,,,51.89
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,1891.3,,,,,49.59,,,,,,,,,,,,,,,,,
+2026-11-19,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,1873.1,,,,,49.1,,,,,,,,,,,,,,,,,
+2026-11-20,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,1943.7,,,,,52.17,,,,,,,,,,,,,,,,,
+2026-11-23,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,1974.2,,,,,51.89,,,,,,,,,,,,,,,,,
+2026-11-25,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,2003.7,,,,,54.89,0.0389,-0.0063,True,MACD histogram positive | volume spike vs 20d average,ROE 19.1% (good) | Debt/Equity 1.21x | Revenue growth 73.0% (good) | Earnings growth 16.5% (good) | Net margin 8.4% | P/E 44.0,not fetched (no strategy can reach BUY),380426289152,44.031498,7.6048913,0.19069,121.375,0.73,0.165,0.0836,2.151,0.24,

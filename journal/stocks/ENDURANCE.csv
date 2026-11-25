@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ENDURANCE,Endurance Technologies Limited,Consumer Cyclical,WATCH,0.14,-0.2,0.8,,2471.9,,,,,70.66
-2026-11-19,ENDURANCE,Endurance Technologies Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,2593.8,,,,,76.61
-2026-11-20,ENDURANCE,Endurance Technologies Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,2560.9,,,,,79.1
-2026-11-23,ENDURANCE,Endurance Technologies Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,2555.9,,,,,78.88
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ENDURANCE,Endurance Technologies Limited,Consumer Cyclical,WATCH,0.14,-0.2,0.8,,2471.9,,,,,70.66,,,,,,,,,,,,,,,,,
+2026-11-19,ENDURANCE,Endurance Technologies Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,2593.8,,,,,76.61,,,,,,,,,,,,,,,,,
+2026-11-20,ENDURANCE,Endurance Technologies Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,2560.9,,,,,79.1,,,,,,,,,,,,,,,,,
+2026-11-23,ENDURANCE,Endurance Technologies Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,2555.9,,,,,78.88,,,,,,,,,,,,,,,,,
+2026-11-25,ENDURANCE,Endurance Technologies Limited,Consumer Cyclical,BUY,0.354,0.2,0.8,0.069,2642.2,,,,ema-cross,82.46,-0.1925,-0.1138,True,MACD histogram positive,ROE 15.1% (good) | Debt/Equity 0.19x (good) | Revenue growth 33.6% (good) | Earnings growth 20.7% (good) | Net margin 6.1% | P/E 35.9,"12 headlines: 5 positive, 1 negative, 6 neutral | +0.92 2026-11-19 Endurance Technologies Ltd. Rallies 5.05% and Approaches 100 DMA Resistance — A Key Technical Test Ahead (MarketsMojo) | -0.95 2026-11-17 Endurance Technologies Downgraded to Sell Amid Bearish Technicals and Fair Valuation (MarketsMojo) | +0.48 2026-11-16 Endurance Technologies Ltd. Technical Momentum Shifts Amid Mixed Market Signals (MarketsMojo)",364851298304,35.88048,5.0505285,0.15086001,18.799,0.336,0.207,0.060549997,1.437,0.47,

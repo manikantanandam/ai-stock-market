@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,TRITURBINE,Triveni Turbine Limited,Industrials,WATCH,-0.04,-0.2,0.2,,470.3,,,,,20.13
-2026-11-19,TRITURBINE,Triveni Turbine Limited,Industrials,WATCH,-0.04,-0.2,0.2,,472.0,,,,,19.33
-2026-11-20,TRITURBINE,Triveni Turbine Limited,Industrials,AVOID,-0.24,-0.6,0.2,,466.25,,,,,18.66
-2026-11-23,TRITURBINE,Triveni Turbine Limited,Industrials,AVOID,-0.24,-0.6,0.2,,454.75,,,,,18.92
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,TRITURBINE,Triveni Turbine Limited,Industrials,WATCH,-0.04,-0.2,0.2,,470.3,,,,,20.13,,,,,,,,,,,,,,,,,
+2026-11-19,TRITURBINE,Triveni Turbine Limited,Industrials,WATCH,-0.04,-0.2,0.2,,472.0,,,,,19.33,,,,,,,,,,,,,,,,,
+2026-11-20,TRITURBINE,Triveni Turbine Limited,Industrials,AVOID,-0.24,-0.6,0.2,,466.25,,,,,18.66,,,,,,,,,,,,,,,,,
+2026-11-23,TRITURBINE,Triveni Turbine Limited,Industrials,AVOID,-0.24,-0.6,0.2,,454.75,,,,,18.92,,,,,,,,,,,,,,,,,
+2026-11-25,TRITURBINE,Triveni Turbine Limited,Industrials,AVOID,-0.24,-0.6,0.2,,447.8,,,,,18.57,-0.2829,-0.4529,False,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE 21.3% (good) | Debt/Equity 0.02x (good) | Revenue growth -3.0% (weak) | Earnings growth -41.5% (weak) | Net margin 13.3% (good) | P/E 50.3,not fetched (no strategy can reach BUY),150051602432,50.319828,10.007209,0.21292,2.239,-0.03,-0.415,0.13338,2.157,0.85,

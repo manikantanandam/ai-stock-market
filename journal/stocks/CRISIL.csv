@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,CRISIL,CRISIL Limited,Financial Services,WATCH,0.05,-0.2,0.5,,4189.0,,,,,126.48
-2026-11-19,CRISIL,CRISIL Limited,Financial Services,WATCH,0.15,0.0,0.5,,4155.0,,,,,121.23
-2026-11-20,CRISIL,CRISIL Limited,Financial Services,WATCH,0.15,0.0,0.5,,4082.0,,,,,121.0
-2026-11-23,CRISIL,CRISIL Limited,Financial Services,WATCH,0.15,0.0,0.5,,4034.8,,,,,119.39
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,CRISIL,CRISIL Limited,Financial Services,WATCH,0.05,-0.2,0.5,,4189.0,,,,,126.48,,,,,,,,,,,,,,,,,
+2026-11-19,CRISIL,CRISIL Limited,Financial Services,WATCH,0.15,0.0,0.5,,4155.0,,,,,121.23,,,,,,,,,,,,,,,,,
+2026-11-20,CRISIL,CRISIL Limited,Financial Services,WATCH,0.15,0.0,0.5,,4082.0,,,,,121.0,,,,,,,,,,,,,,,,,
+2026-11-23,CRISIL,CRISIL Limited,Financial Services,WATCH,0.15,0.0,0.5,,4034.8,,,,,119.39,,,,,,,,,,,,,,,,,
+2026-11-25,CRISIL,CRISIL Limited,Financial Services,WATCH,0.15,0.0,0.5,,3992.8,,,,,118.94,-0.177,-0.1054,True,RSI oversold (23) | MACD histogram negative,ROE: n/a | Debt/Equity 0.10x (good) | Revenue growth 20.2% (good) | Earnings growth 5.9% | Net margin 20.8% (good) | P/E 33.9,not fetched (no strategy can reach BUY),303855206400,33.92114,9.288134,,10.23,0.202,0.059,0.20784001,,1.62,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ABREL,Aditya Birla Real Estate Limited,Real Estate,WATCH,0.115,0.2,0.05,,1243.0,,,,,54.4
-2026-11-19,ABREL,Aditya Birla Real Estate Limited,Real Estate,WATCH,0.115,0.2,0.05,,1225.8,,,,,52.43
-2026-11-20,ABREL,Aditya Birla Real Estate Limited,Real Estate,WATCH,0.115,0.2,0.05,,1215.6,,,,,51.19
-2026-11-23,ABREL,Aditya Birla Real Estate Limited,Real Estate,WATCH,0.115,0.2,0.05,,1257.0,,,,,51.41
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ABREL,Aditya Birla Real Estate Limited,Real Estate,WATCH,0.115,0.2,0.05,,1243.0,,,,,54.4,,,,,,,,,,,,,,,,,
+2026-11-19,ABREL,Aditya Birla Real Estate Limited,Real Estate,WATCH,0.115,0.2,0.05,,1225.8,,,,,52.43,,,,,,,,,,,,,,,,,
+2026-11-20,ABREL,Aditya Birla Real Estate Limited,Real Estate,WATCH,0.115,0.2,0.05,,1215.6,,,,,51.19,,,,,,,,,,,,,,,,,
+2026-11-23,ABREL,Aditya Birla Real Estate Limited,Real Estate,WATCH,0.115,0.2,0.05,,1257.0,,,,,51.41,,,,,,,,,,,,,,,,,
+2026-11-25,ABREL,Aditya Birla Real Estate Limited,Real Estate,WATCH,0.115,0.2,0.05,,1282.9,,,,,50.64,-0.1524,-0.0602,True,MACD histogram positive,ROE -3.4% (weak) | Debt/Equity 0.79x | Revenue growth 743.2% (good) | Earnings growth: n/a | Net margin 64.0% (good) | P/E: n/a,not fetched (no strategy can reach BUY),135987396608,,2.9697285,-0.033570003,78.8,7.432,,0.63973,1.433,0.2,

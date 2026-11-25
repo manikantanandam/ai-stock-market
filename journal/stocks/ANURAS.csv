@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ANURAS,Anupam Rasayan India Ltd,Basic Materials,BUY,0.097,0.0,0.2,0.186,1321.1,,,,ema-cross,34.82
-2026-11-19,ANURAS,Anupam Rasayan India Ltd,Basic Materials,WATCH,0.06,0.0,0.2,,1327.0,,,,,33.85
-2026-11-20,ANURAS,Anupam Rasayan India Ltd,Basic Materials,WATCH,0.06,0.0,0.2,,1329.4,,,,,33.25
-2026-11-23,ANURAS,Anupam Rasayan India Ltd,Basic Materials,WATCH,0.06,0.0,0.2,,1313.6,,,,,34.05
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ANURAS,Anupam Rasayan India Ltd,Basic Materials,BUY,0.097,0.0,0.2,0.186,1321.1,,,,ema-cross,34.82,,,,,,,,,,,,,,,,,
+2026-11-19,ANURAS,Anupam Rasayan India Ltd,Basic Materials,WATCH,0.06,0.0,0.2,,1327.0,,,,,33.85,,,,,,,,,,,,,,,,,
+2026-11-20,ANURAS,Anupam Rasayan India Ltd,Basic Materials,WATCH,0.06,0.0,0.2,,1329.4,,,,,33.25,,,,,,,,,,,,,,,,,
+2026-11-23,ANURAS,Anupam Rasayan India Ltd,Basic Materials,WATCH,0.06,0.0,0.2,,1313.6,,,,,34.05,,,,,,,,,,,,,,,,,
+2026-11-25,ANURAS,Anupam Rasayan India Ltd,Basic Materials,WATCH,0.06,0.0,0.2,,1316.6,,,,,36.02,-0.0047,-0.1235,False,RSI overbought (71) | MACD histogram positive,ROE 4.4% (weak) | Debt/Equity 0.36x (good) | Revenue growth 10.2% (good) | Earnings growth 73.3% (good) | Net margin 6.9% | P/E 72.6 (weak),not fetched (no strategy can reach BUY),151078731776,72.63273,1.9314235,0.043730002,35.958,0.102,0.733,0.06913,1.696,0.11,

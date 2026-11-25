@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,KPITTECH,KPIT Technologies Limited,Technology,AVOID,-0.21,-0.6,0.3,,521.75,,,,,19.17
-2026-11-19,KPITTECH,KPIT Technologies Limited,Technology,AVOID,-0.21,-0.6,0.3,,522.5,,,,,18.72
-2026-11-20,KPITTECH,KPIT Technologies Limited,Technology,AVOID,-0.21,-0.6,0.3,,519.0,,,,,18.53
-2026-11-23,KPITTECH,KPIT Technologies Limited,Technology,AVOID,-0.21,-0.6,0.3,,525.5,,,,,18.43
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,KPITTECH,KPIT Technologies Limited,Technology,AVOID,-0.21,-0.6,0.3,,521.75,,,,,19.17,,,,,,,,,,,,,,,,,
+2026-11-19,KPITTECH,KPIT Technologies Limited,Technology,AVOID,-0.21,-0.6,0.3,,522.5,,,,,18.72,,,,,,,,,,,,,,,,,
+2026-11-20,KPITTECH,KPIT Technologies Limited,Technology,AVOID,-0.21,-0.6,0.3,,519.0,,,,,18.53,,,,,,,,,,,,,,,,,
+2026-11-23,KPITTECH,KPIT Technologies Limited,Technology,AVOID,-0.21,-0.6,0.3,,525.5,,,,,18.43,,,,,,,,,,,,,,,,,
+2026-11-25,KPITTECH,KPIT Technologies Limited,Technology,AVOID,-0.21,-0.6,0.3,,516.0,,,,,18.74,-0.189,-0.3957,True,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE 15.3% (good) | Debt/Equity 0.21x (good) | Revenue growth 6.5% | Earnings growth -28.8% (weak) | Net margin 8.0% | P/E 26.8,not fetched (no strategy can reach BUY),142238728192,26.794872,3.8583667,0.15335,20.694,0.065,-0.288,0.07979,1.046,1.44,

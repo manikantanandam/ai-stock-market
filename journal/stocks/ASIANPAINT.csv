@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ASIANPAINT,Asian Paints Limited,Basic Materials,WATCH,0.325,0.2,0.75,,2580.3,,,,,66.98
-2026-11-19,ASIANPAINT,Asian Paints Limited,Basic Materials,WATCH,0.325,0.2,0.75,,2595.0,,,,,65.48
-2026-11-20,ASIANPAINT,Asian Paints Limited,Basic Materials,WATCH,0.325,0.2,0.75,,2608.3,,,,,63.22
-2026-11-23,ASIANPAINT,Asian Paints Limited,Basic Materials,WATCH,0.325,0.2,0.75,,2580.4,,,,,62.91
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ASIANPAINT,Asian Paints Limited,Basic Materials,WATCH,0.325,0.2,0.75,,2580.3,,,,,66.98,,,,,,,,,,,,,,,,,
+2026-11-19,ASIANPAINT,Asian Paints Limited,Basic Materials,WATCH,0.325,0.2,0.75,,2595.0,,,,,65.48,,,,,,,,,,,,,,,,,
+2026-11-20,ASIANPAINT,Asian Paints Limited,Basic Materials,WATCH,0.325,0.2,0.75,,2608.3,,,,,63.22,,,,,,,,,,,,,,,,,
+2026-11-23,ASIANPAINT,Asian Paints Limited,Basic Materials,WATCH,0.325,0.2,0.75,,2580.4,,,,,62.91,,,,,,,,,,,,,,,,,
+2026-11-25,ASIANPAINT,Asian Paints Limited,Basic Materials,WATCH,0.325,0.2,0.75,,2621.2,,,,,62.46,-0.0694,-0.0846,True,MACD histogram positive,ROE 23.0% (good) | Debt/Equity 0.21x (good) | Revenue growth 16.9% (good) | Earnings growth 7.5% | Net margin 12.5% (good) | P/E 51.4,not fetched (no strategy can reach BUY),2487215456256,51.426872,11.442454,0.23019,20.508,0.169,0.075,0.12525,2.204,1.11,

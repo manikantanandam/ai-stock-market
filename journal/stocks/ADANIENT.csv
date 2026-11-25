@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ADANIENT,Adani Enterprises Limited,Energy,WATCH,0.04,0.2,-0.2,,2684.2,,,,,76.62
-2026-11-19,ADANIENT,Adani Enterprises Limited,Energy,WATCH,0.04,0.2,-0.2,,2703.1,,,,,73.65
-2026-11-20,ADANIENT,Adani Enterprises Limited,Energy,WATCH,0.04,0.2,-0.2,,2709.0,,,,,72.15
-2026-11-23,ADANIENT,Adani Enterprises Limited,Energy,WATCH,0.04,0.2,-0.2,,2677.9,,,,,74.85
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ADANIENT,Adani Enterprises Limited,Energy,WATCH,0.04,0.2,-0.2,,2684.2,,,,,76.62,,,,,,,,,,,,,,,,,
+2026-11-19,ADANIENT,Adani Enterprises Limited,Energy,WATCH,0.04,0.2,-0.2,,2703.1,,,,,73.65,,,,,,,,,,,,,,,,,
+2026-11-20,ADANIENT,Adani Enterprises Limited,Energy,WATCH,0.04,0.2,-0.2,,2709.0,,,,,72.15,,,,,,,,,,,,,,,,,
+2026-11-23,ADANIENT,Adani Enterprises Limited,Energy,WATCH,0.04,0.2,-0.2,,2677.9,,,,,74.85,,,,,,,,,,,,,,,,,
+2026-11-25,ADANIENT,Adani Enterprises Limited,Energy,WATCH,0.04,0.2,-0.2,,2668.5,,,,,75.51,-0.1742,-0.1061,False,MACD histogram positive | volume spike vs 20d average,ROE 6.4% (weak) | Debt/Equity 1.14x | Revenue growth 75.1% (good) | Earnings growth -59.6% (weak) | Net margin 4.3% | P/E 57.6,not fetched (no strategy can reach BUY),3659247648768,57.62311,3.7261937,0.06436,113.711,0.751,-0.596,0.04303,1.105,0.05,

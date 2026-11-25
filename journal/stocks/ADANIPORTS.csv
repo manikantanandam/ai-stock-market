@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,BUY,0.543,0.6,0.55,0.388,1902.6,,,,swing;trend,47.26
-2026-11-19,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,BUY,0.538,0.6,0.55,0.366,1917.1,,,,swing;trend,46.11
-2026-11-20,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,WATCH,0.265,0.2,0.55,,1917.0,,,,,44.78
-2026-11-23,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,WATCH,0.265,0.2,0.55,,1919.0,,,,,44.89
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,BUY,0.543,0.6,0.55,0.388,1902.6,,,,swing;trend,47.26,,,,,,,,,,,,,,,,,
+2026-11-19,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,BUY,0.538,0.6,0.55,0.366,1917.1,,,,swing;trend,46.11,,,,,,,,,,,,,,,,,
+2026-11-20,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,WATCH,0.265,0.2,0.55,,1917.0,,,,,44.78,,,,,,,,,,,,,,,,,
+2026-11-23,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,WATCH,0.265,0.2,0.55,,1919.0,,,,,44.89,,,,,,,,,,,,,,,,,
+2026-11-25,ADANIPORTS,Adani Ports and Special Economic Zone Limited,Industrials,WATCH,0.265,0.2,0.55,,1926.3,,,,,43.88,0.0685,-0.006,True,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE 15.6% (good) | Debt/Equity 0.63x | Revenue growth 23.7% (good) | Earnings growth 9.2% | Net margin 32.0% (good) | P/E 32.0,not fetched (no strategy can reach BUY),4416919830528,31.994326,4.3202934,0.15635,62.663,0.237,0.092,0.31981,0.781,0.39,

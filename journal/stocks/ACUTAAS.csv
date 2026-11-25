@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ACUTAAS,Acutaas Chemicals Limited,Basic Materials,BUY,0.514,0.6,0.8,-0.131,3991.3,,,,swing;trend,162.04
-2026-11-19,ACUTAAS,Acutaas Chemicals Limited,Basic Materials,WATCH,0.34,0.2,0.8,,3977.1,,,,,156.17
-2026-11-20,ACUTAAS,Acutaas Chemicals Limited,Basic Materials,WATCH,0.34,0.2,0.8,,3833.5,,,,,157.63
-2026-11-23,ACUTAAS,Acutaas Chemicals Limited,Basic Materials,WATCH,0.34,0.2,0.8,,3875.0,,,,,160.07
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ACUTAAS,Acutaas Chemicals Limited,Basic Materials,BUY,0.514,0.6,0.8,-0.131,3991.3,,,,swing;trend,162.04,,,,,,,,,,,,,,,,,
+2026-11-19,ACUTAAS,Acutaas Chemicals Limited,Basic Materials,WATCH,0.34,0.2,0.8,,3977.1,,,,,156.17,,,,,,,,,,,,,,,,,
+2026-11-20,ACUTAAS,Acutaas Chemicals Limited,Basic Materials,WATCH,0.34,0.2,0.8,,3833.5,,,,,157.63,,,,,,,,,,,,,,,,,
+2026-11-23,ACUTAAS,Acutaas Chemicals Limited,Basic Materials,WATCH,0.34,0.2,0.8,,3875.0,,,,,160.07,,,,,,,,,,,,,,,,,
+2026-11-25,ACUTAAS,Acutaas Chemicals Limited,Basic Materials,WATCH,0.34,0.2,0.8,,3993.0,,,,,161.84,0.1963,0.2655,True,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE 26.1% (good) | Debt/Equity 0.01x (good) | Revenue growth 42.7% (good) | Earnings growth 72.8% (good) | Net margin 27.6% (good) | P/E 74.4 (weak),not fetched (no strategy can reach BUY),325609652224,74.449646,17.528296,0.26114,0.789,0.427,0.728,0.27576,3.994,0.06,

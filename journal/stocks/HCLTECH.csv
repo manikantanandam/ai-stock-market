@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,HCLTECH,HCL Technologies Limited,Technology,WATCH,0.34,0.2,0.8,,1344.7,,,,,36.94
-2026-11-19,HCLTECH,HCL Technologies Limited,Technology,WATCH,0.34,0.2,0.8,,1332.9,,,,,36.83
-2026-11-20,HCLTECH,HCL Technologies Limited,Technology,WATCH,0.34,0.2,0.8,,1344.4,,,,,37.45
-2026-11-23,HCLTECH,HCL Technologies Limited,Technology,WATCH,0.34,0.2,0.8,,1364.3,,,,,37.16
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,HCLTECH,HCL Technologies Limited,Technology,WATCH,0.34,0.2,0.8,,1344.7,,,,,36.94,,,,,,,,,,,,,,,,,
+2026-11-19,HCLTECH,HCL Technologies Limited,Technology,WATCH,0.34,0.2,0.8,,1332.9,,,,,36.83,,,,,,,,,,,,,,,,,
+2026-11-20,HCLTECH,HCL Technologies Limited,Technology,WATCH,0.34,0.2,0.8,,1344.4,,,,,37.45,,,,,,,,,,,,,,,,,
+2026-11-23,HCLTECH,HCL Technologies Limited,Technology,WATCH,0.34,0.2,0.8,,1364.3,,,,,37.16,,,,,,,,,,,,,,,,,
+2026-11-25,HCLTECH,HCL Technologies Limited,Technology,WATCH,0.34,0.2,0.8,,1380.0,,,,,36.82,0.0043,0.1198,True,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE 24.6% (good) | Debt/Equity 0.08x (good) | Revenue growth 2.2% | Earnings growth 10.8% (good) | Net margin 13.2% (good) | P/E 19.7 (good),not fetched (no strategy can reach BUY),3607661117440,19.720375,4.8168845,0.24648,7.905,0.022,0.108,0.13247,1.983,3.57,

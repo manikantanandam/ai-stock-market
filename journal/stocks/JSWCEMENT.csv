@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,123.21,,,,,3.06
-2026-11-19,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,124.05,,,,,2.97
-2026-11-20,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,126.47,,,,,3.04
-2026-11-23,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,125.74,,,,,3.06
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,123.21,,,,,3.06,,,,,,,,,,,,,,,,,
+2026-11-19,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,124.05,,,,,2.97,,,,,,,,,,,,,,,,,
+2026-11-20,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,126.47,,,,,3.04,,,,,,,,,,,,,,,,,
+2026-11-23,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,125.74,,,,,3.06,,,,,,,,,,,,,,,,,
+2026-11-25,JSWCEMENT,JSW Cement Limited,Basic Materials,WATCH,0.145,0.2,0.15,,126.88,,,,,3.0,-0.058,-0.1656,True,MACD histogram positive,ROE 11.3% | Debt/Equity 0.71x | Revenue growth 31.0% (good) | Earnings growth -10.0% (weak) | Net margin 10.1% | P/E 22.0 (good),not fetched (no strategy can reach BUY),167798521856,22.033749,2.472544,0.11292,71.17,0.31,-0.1,0.101009995,0.624,0.41,

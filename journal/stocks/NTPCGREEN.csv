@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,NTPCGREEN,NTPC Green Energy Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,82.38,,,,,1.98
-2026-11-19,NTPCGREEN,NTPC Green Energy Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,82.48,,,,,1.9
-2026-11-20,NTPCGREEN,NTPC Green Energy Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,83.27,,,,,1.91
-2026-11-23,NTPCGREEN,NTPC Green Energy Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,82.3,,,,,1.88
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,NTPCGREEN,NTPC Green Energy Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,82.38,,,,,1.98,,,,,,,,,,,,,,,,,
+2026-11-19,NTPCGREEN,NTPC Green Energy Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,82.48,,,,,1.9,,,,,,,,,,,,,,,,,
+2026-11-20,NTPCGREEN,NTPC Green Energy Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,83.27,,,,,1.91,,,,,,,,,,,,,,,,,
+2026-11-23,NTPCGREEN,NTPC Green Energy Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,82.3,,,,,1.88,,,,,,,,,,,,,,,,,
+2026-11-25,NTPCGREEN,NTPC Green Energy Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,81.7,,,,,1.83,-0.171,-0.3059,False,downtrend: price < SMA50 < SMA200 | MACD histogram positive,ROE 3.4% (weak) | Debt/Equity 1.92x (weak) | Revenue growth 53.2% (good) | Earnings growth 60.0% (good) | Net margin 18.2% (good) | P/E 107.1 (weak),not fetched (no strategy can reach BUY),695003709440,107.11689,3.6518197,0.034089997,191.669,0.532,0.6,0.18191,0.364,0.0,

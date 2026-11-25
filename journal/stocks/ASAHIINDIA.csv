@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.39,0.4,0.35,0.427,1157.3,,,,trend,35.4
-2026-11-19,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.366,0.4,0.35,0.305,1192.05,,,,trend,35.85
-2026-11-20,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.373,0.4,0.35,0.342,1163.6,,,,trend,35.78
-2026-11-23,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.321,0.4,0.35,0.08,1178.45,,,,trend,34.89
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.39,0.4,0.35,0.427,1157.3,,,,trend,35.4,,,,,,,,,,,,,,,,,
+2026-11-19,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.366,0.4,0.35,0.305,1192.05,,,,trend,35.85,,,,,,,,,,,,,,,,,
+2026-11-20,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.373,0.4,0.35,0.342,1163.6,,,,trend,35.78,,,,,,,,,,,,,,,,,
+2026-11-23,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.321,0.4,0.35,0.08,1178.45,,,,trend,34.89,,,,,,,,,,,,,,,,,
+2026-11-25,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.343,0.4,0.35,0.19,1195.3,,,,trend;leaders;leaders-slope,35.97,0.1756,0.3106,True,uptrend: price > SMA50 > SMA200 | RSI overbought (77) | MACD histogram positive,ROE 13.9% | Debt/Equity 0.54x | Revenue growth 37.8% (good) | Earnings growth 195.5% (good) | Net margin 9.8% | P/E 55.4,"10 headlines: 4 positive, 1 negative, 5 neutral | +0.82 2026-11-19 Asahi India Glass Ltd. 52 Week High Streak and Valuation (Univest) | +0.92 2026-11-16 Strong Momentum Meets Stretched Valuations as Asahi India Glass Ltd Reaches All-Time High (MarketsMojo) | +0.92 2026-11-16 Broad-Based Technical Strength Lifts Asahi India Glass Ltd to 52-Week High of Rs 1126.95 (MarketsMojo) | +0.84 2026-11-16 Asahi India Glass Share Price: Fresh 52-Week High Analysis (Univest)",303885975552,55.41841,7.2412663,0.1388,54.403,0.378,1.955,0.09789,1.456,0.17,

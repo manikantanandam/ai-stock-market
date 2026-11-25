@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,COLPAL,Colgate-Palmolive (India) Limited,Consumer Defensive,WATCH,0.125,-0.2,0.75,,1688.4,,,,,42.98
-2026-11-19,COLPAL,Colgate-Palmolive (India) Limited,Consumer Defensive,WATCH,0.325,0.2,0.75,,1776.6,,,,,46.8
-2026-11-20,COLPAL,Colgate-Palmolive (India) Limited,Consumer Defensive,WATCH,0.325,0.2,0.75,,1760.0,,,,,45.3
-2026-11-23,COLPAL,Colgate-Palmolive (India) Limited,Consumer Defensive,WATCH,0.325,0.2,0.75,,1755.5,,,,,45.03
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,COLPAL,Colgate-Palmolive (India) Limited,Consumer Defensive,WATCH,0.125,-0.2,0.75,,1688.4,,,,,42.98,,,,,,,,,,,,,,,,,
+2026-11-19,COLPAL,Colgate-Palmolive (India) Limited,Consumer Defensive,WATCH,0.325,0.2,0.75,,1776.6,,,,,46.8,,,,,,,,,,,,,,,,,
+2026-11-20,COLPAL,Colgate-Palmolive (India) Limited,Consumer Defensive,WATCH,0.325,0.2,0.75,,1760.0,,,,,45.3,,,,,,,,,,,,,,,,,
+2026-11-23,COLPAL,Colgate-Palmolive (India) Limited,Consumer Defensive,WATCH,0.325,0.2,0.75,,1755.5,,,,,45.03,,,,,,,,,,,,,,,,,
+2026-11-25,COLPAL,Colgate-Palmolive (India) Limited,Consumer Defensive,WATCH,0.325,0.2,0.75,,1825.0,,,,,46.78,-0.0838,-0.2194,True,MACD histogram positive | volume spike vs 20d average,ROE 85.1% (good) | Debt/Equity 0.03x (good) | Revenue growth 12.3% (good) | Earnings growth 4.3% | Net margin 21.3% (good) | P/E 35.5,not fetched (no strategy can reach BUY),483209674752,35.482323,29.867355,0.85115,3.012,0.123,0.043,0.2131,1.284,2.84,

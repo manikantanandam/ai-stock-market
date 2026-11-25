@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,LTFOODS,LT Foods Limited,Consumer Defensive,BUY,0.559,0.6,0.65,0.319,419.25,,,,swing;trend,12.04
-2026-11-19,LTFOODS,LT Foods Limited,Consumer Defensive,BUY,0.508,0.6,0.65,0.065,438.75,,,,swing;trend,14.18
-2026-11-20,LTFOODS,LT Foods Limited,Consumer Defensive,BUY,0.556,0.6,0.65,0.304,432.4,,,,swing;trend,14.42
-2026-11-23,LTFOODS,LT Foods Limited,Consumer Defensive,BUY,0.57,0.6,0.65,0.375,423.95,,,,swing;trend,14.28
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,LTFOODS,LT Foods Limited,Consumer Defensive,BUY,0.559,0.6,0.65,0.319,419.25,,,,swing;trend,12.04,,,,,,,,,,,,,,,,,
+2026-11-19,LTFOODS,LT Foods Limited,Consumer Defensive,BUY,0.508,0.6,0.65,0.065,438.75,,,,swing;trend,14.18,,,,,,,,,,,,,,,,,
+2026-11-20,LTFOODS,LT Foods Limited,Consumer Defensive,BUY,0.556,0.6,0.65,0.304,432.4,,,,swing;trend,14.42,,,,,,,,,,,,,,,,,
+2026-11-23,LTFOODS,LT Foods Limited,Consumer Defensive,BUY,0.57,0.6,0.65,0.375,423.95,,,,swing;trend,14.28,,,,,,,,,,,,,,,,,
+2026-11-25,LTFOODS,LT Foods Limited,Consumer Defensive,BUY,0.573,0.6,0.65,0.392,423.1,,,,swing;trend,14.27,-0.0728,-0.0188,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 14.4% | Debt/Equity 0.37x (good) | Revenue growth 17.3% (good) | Earnings growth 10.0% (good) | Net margin 5.4% | P/E 23.2 (good),"36 headlines: 17 positive, 2 negative, 17 neutral | +0.91 2026-11-23 L T Foods Ltd Upgraded to Strong Buy on Robust Financials and Bullish Technicals (MarketsMojo) | +0.90 2026-11-19 LT Foods shares rocket 10%, nears peak! Daawat rice-parent makes a big US acquisition, jumps 545% in 5 yrs | Details (Livemint) | +0.89 2026-11-19 LT Foods shares rise 9% as company to acquire 100% stake in US-based Maya Kaimal parent for $5.8 mn (Moneycontrol.com) | +0.85 2026-11-19 LT Foods acquires Maya Kaimal for $5.8 million to deepen U.S. presence (BusinessLine)",152357224448,23.20201,3.1083515,0.14446001,36.657,0.173,0.1,0.054229997,1.854,0.95,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,NIACL,The New India Assurance Company Limited,Financial Services,AVOID,-0.205,-0.2,-0.35,,149.64,,,,,6.42
-2026-11-19,NIACL,The New India Assurance Company Limited,Financial Services,AVOID,-0.205,-0.2,-0.35,,153.31,,,,,6.4
-2026-11-20,NIACL,The New India Assurance Company Limited,Financial Services,AVOID,-0.205,-0.2,-0.35,,152.63,,,,,6.13
-2026-11-23,NIACL,The New India Assurance Company Limited,Financial Services,AVOID,-0.205,-0.2,-0.35,,149.34,,,,,6.06
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,NIACL,The New India Assurance Company Limited,Financial Services,AVOID,-0.205,-0.2,-0.35,,149.64,,,,,6.42,,,,,,,,,,,,,,,,,
+2026-11-19,NIACL,The New India Assurance Company Limited,Financial Services,AVOID,-0.205,-0.2,-0.35,,153.31,,,,,6.4,,,,,,,,,,,,,,,,,
+2026-11-20,NIACL,The New India Assurance Company Limited,Financial Services,AVOID,-0.205,-0.2,-0.35,,152.63,,,,,6.13,,,,,,,,,,,,,,,,,
+2026-11-23,NIACL,The New India Assurance Company Limited,Financial Services,AVOID,-0.205,-0.2,-0.35,,149.34,,,,,6.06,,,,,,,,,,,,,,,,,
+2026-11-25,NIACL,The New India Assurance Company Limited,Financial Services,AVOID,-0.205,-0.2,-0.35,,149.36,,,,,5.83,-0.2535,-0.1739,True,MACD histogram negative,ROE -1.2% (weak) | Debt/Equity: n/a | Revenue growth 2.0% | Earnings growth: n/a | Net margin -1.0% (weak) | P/E: n/a,not fetched (no strategy can reach BUY),252654878720,,0.6041059,-0.012359999,,0.02,,-0.010290001,0.364,1.0,

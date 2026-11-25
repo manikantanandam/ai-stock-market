@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.463,0.6,0.35,0.291,11345.0,,,,swing;trend,415.66
-2026-11-19,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.369,0.4,0.35,0.321,11930.0,,,,trend;breakout,453.04
-2026-11-20,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.444,0.6,0.35,0.195,11723.0,,,,swing;trend,450.61
-2026-11-23,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.44,0.6,0.35,0.176,11649.0,,,,swing;trend,457.99
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.463,0.6,0.35,0.291,11345.0,,,,swing;trend,415.66,,,,,,,,,,,,,,,,,
+2026-11-19,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.369,0.4,0.35,0.321,11930.0,,,,trend;breakout,453.04,,,,,,,,,,,,,,,,,
+2026-11-20,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.444,0.6,0.35,0.195,11723.0,,,,swing;trend,450.61,,,,,,,,,,,,,,,,,
+2026-11-23,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.44,0.6,0.35,0.176,11649.0,,,,swing;trend,457.99,,,,,,,,,,,,,,,,,
+2026-11-25,CRAFTSMAN,Craftsman Automation Limited,Consumer Cyclical,BUY,0.429,0.6,0.35,0.118,11769.0,,,,swing;trend;leaders;leaders-slope,454.35,0.041,0.2656,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 12.3% | Debt/Equity 0.71x | Revenue growth 47.1% (good) | Earnings growth 53.8% (good) | Net margin 5.5% | P/E 55.7,"9 headlines: 1 positive, 0 negative, 8 neutral | +0.89 2026-11-19 Craftsman Automation Share Price near 52-week high, up 3.51% (Univest)",312022368256,55.656635,5.6618156,0.12347,70.635,0.471,0.538,0.054580003,1.438,0.1,

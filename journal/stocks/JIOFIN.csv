@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,0.1,0.2,0.0,,224.5,,,,,5.31
-2026-11-19,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,0.1,0.2,0.0,,226.8,,,,,5.21
-2026-11-20,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,0.1,0.2,0.0,,224.97,,,,,5.05
-2026-11-23,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,-0.1,-0.2,0.0,,219.7,,,,,5.34
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,0.1,0.2,0.0,,224.5,,,,,5.31,,,,,,,,,,,,,,,,,
+2026-11-19,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,0.1,0.2,0.0,,226.8,,,,,5.21,,,,,,,,,,,,,,,,,
+2026-11-20,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,0.1,0.2,0.0,,224.97,,,,,5.05,,,,,,,,,,,,,,,,,
+2026-11-23,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,-0.1,-0.2,0.0,,219.7,,,,,5.34,,,,,,,,,,,,,,,,,
+2026-11-25,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,-0.1,-0.2,0.0,,222.85,,,,,5.38,-0.1513,-0.1507,True,MACD histogram negative,ROE 1.3% (weak) | Debt/Equity 0.32x (good) | Revenue growth 26.7% (good) | Earnings growth -53.6% (weak) | Net margin 42.8% (good) | P/E 86.2 (weak),not fetched (no strategy can reach BUY),1554292539392,86.23574,1.1682171,0.012949999,31.949,0.267,-0.536,0.42805,113.494,0.27,

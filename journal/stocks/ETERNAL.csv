@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ETERNAL,Eternal Limited,Consumer Cyclical,BUY,0.388,0.6,0.1,0.291,366.0,,,,trend,9.8
-2026-11-19,ETERNAL,Eternal Limited,Consumer Cyclical,BUY,0.349,0.6,0.1,0.096,366.85,,,,trend,9.9
-2026-11-20,ETERNAL,Eternal Limited,Consumer Cyclical,BUY,0.348,0.6,0.1,0.088,364.0,,,,trend,9.65
-2026-11-23,ETERNAL,Eternal Limited,Consumer Cyclical,WATCH,0.13,0.2,0.1,,362.1,,,,,9.57
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ETERNAL,Eternal Limited,Consumer Cyclical,BUY,0.388,0.6,0.1,0.291,366.0,,,,trend,9.8,,,,,,,,,,,,,,,,,
+2026-11-19,ETERNAL,Eternal Limited,Consumer Cyclical,BUY,0.349,0.6,0.1,0.096,366.85,,,,trend,9.9,,,,,,,,,,,,,,,,,
+2026-11-20,ETERNAL,Eternal Limited,Consumer Cyclical,BUY,0.348,0.6,0.1,0.088,364.0,,,,trend,9.65,,,,,,,,,,,,,,,,,
+2026-11-23,ETERNAL,Eternal Limited,Consumer Cyclical,WATCH,0.13,0.2,0.1,,362.1,,,,,9.57,,,,,,,,,,,,,,,,,
+2026-11-25,ETERNAL,Eternal Limited,Consumer Cyclical,BUY,0.354,0.6,0.1,0.118,371.7,,,,trend;leaders;leaders-slope,9.92,0.0686,0.4477,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 1.6% (weak) | Debt/Equity 0.18x (good) | Revenue growth 77.6% (good) | Earnings growth 85.7% (good) | Net margin 0.6% (weak) | P/E 692.2 (weak),"33 headlines: 5 positive, 2 negative, 26 neutral | +0.83 2026-11-25 Sensex jumps over 2,000 points, Nifty surges to 25,951 on foreign fund inflows, lower crude oil (The New Indian Express) | +0.93 2026-11-24 Eternal Beauty Holdings Announces 2026/2027 Interim Results, Adjusted Profit* Increased By 13.8% Period-On-Period To RMB130.5 Million, Declares Interim Dividend Of HK7.0 Cents Per Share (Menafn)",3379706462208,692.16986,10.47305,0.01588,18.412,0.776,0.857,0.00632,1.853,0.0,

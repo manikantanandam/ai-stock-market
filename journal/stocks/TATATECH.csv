@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,TATATECH,Tata Technologies Limited,Technology,WATCH,0.295,0.2,0.65,,656.7,,,,,21.23
-2026-11-19,TATATECH,Tata Technologies Limited,Technology,BUY,0.617,0.6,0.65,0.61,703.75,,,,swing;trend,24.69
-2026-11-20,TATATECH,Tata Technologies Limited,Technology,BUY,0.547,0.6,0.65,0.261,727.9,,,,swing;trend;breakout,26.08
-2026-11-23,TATATECH,Tata Technologies Limited,Technology,BUY,0.566,0.6,0.65,0.354,707.9,,,,swing;trend,26.13
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,TATATECH,Tata Technologies Limited,Technology,WATCH,0.295,0.2,0.65,,656.7,,,,,21.23,,,,,,,,,,,,,,,,,
+2026-11-19,TATATECH,Tata Technologies Limited,Technology,BUY,0.617,0.6,0.65,0.61,703.75,,,,swing;trend,24.69,,,,,,,,,,,,,,,,,
+2026-11-20,TATATECH,Tata Technologies Limited,Technology,BUY,0.547,0.6,0.65,0.261,727.9,,,,swing;trend;breakout,26.08,,,,,,,,,,,,,,,,,
+2026-11-23,TATATECH,Tata Technologies Limited,Technology,BUY,0.566,0.6,0.65,0.354,707.9,,,,swing;trend,26.13,,,,,,,,,,,,,,,,,
+2026-11-25,TATATECH,Tata Technologies Limited,Technology,WATCH,0.295,0.2,0.65,,692.35,,,,,26.61,-0.2211,-0.0414,True,MACD histogram positive,ROE 15.2% (good) | Debt/Equity 0.29x (good) | Revenue growth 28.4% (good) | Earnings growth 3.4% | Net margin 8.9% | P/E 50.8,not fetched (no strategy can reach BUY),285758980096,50.775616,7.4597993,0.15218,28.96,0.284,0.034,0.08935001,1.476,1.27,

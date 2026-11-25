@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,PTCIL,PTC Industries Limited,Industrials,WATCH,0.265,0.2,0.55,,23725.0,,,,,908.31
-2026-11-19,PTCIL,PTC Industries Limited,Industrials,WATCH,0.265,0.2,0.55,,23845.0,,,,,877.0
-2026-11-20,PTCIL,PTC Industries Limited,Industrials,WATCH,0.265,0.2,0.55,,24120.0,,,,,848.65
-2026-11-23,PTCIL,PTC Industries Limited,Industrials,WATCH,0.265,0.2,0.55,,24425.0,,,,,839.1
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,PTCIL,PTC Industries Limited,Industrials,WATCH,0.265,0.2,0.55,,23725.0,,,,,908.31,,,,,,,,,,,,,,,,,
+2026-11-19,PTCIL,PTC Industries Limited,Industrials,WATCH,0.265,0.2,0.55,,23845.0,,,,,877.0,,,,,,,,,,,,,,,,,
+2026-11-20,PTCIL,PTC Industries Limited,Industrials,WATCH,0.265,0.2,0.55,,24120.0,,,,,848.65,,,,,,,,,,,,,,,,,
+2026-11-23,PTCIL,PTC Industries Limited,Industrials,WATCH,0.265,0.2,0.55,,24425.0,,,,,839.1,,,,,,,,,,,,,,,,,
+2026-11-25,PTCIL,PTC Industries Limited,Industrials,WATCH,0.265,0.2,0.55,,24380.0,,,,,848.81,0.1172,0.4465,False,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE 9.4% | Debt/Equity 0.25x (good) | Revenue growth 84.1% (good) | Earnings growth 83.4% (good) | Net margin 17.8% (good) | P/E 254.2 (weak),not fetched (no strategy can reach BUY),377877659648,254.18399,22.717941,0.09413999,24.825,0.841,0.834,0.17843,2.616,0.0,

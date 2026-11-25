@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,KPRMILL,K.P.R. Mill Limited,Consumer Cyclical,BUY,0.613,0.6,0.9,0.214,1207.5,,,,swing;trend,41.49
-2026-11-19,KPRMILL,K.P.R. Mill Limited,Consumer Cyclical,BUY,0.604,0.6,0.9,0.17,1189.4,,,,swing;trend,41.88
-2026-11-20,KPRMILL,K.P.R. Mill Limited,Consumer Cyclical,BUY,0.624,0.6,0.9,0.268,1191.3,,,,swing;trend,41.39
-2026-11-23,KPRMILL,K.P.R. Mill Limited,Consumer Cyclical,BUY,0.629,0.6,0.9,0.294,1206.9,,,,swing;trend,40.67
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,KPRMILL,K.P.R. Mill Limited,Consumer Cyclical,BUY,0.613,0.6,0.9,0.214,1207.5,,,,swing;trend,41.49,,,,,,,,,,,,,,,,,
+2026-11-19,KPRMILL,K.P.R. Mill Limited,Consumer Cyclical,BUY,0.604,0.6,0.9,0.17,1189.4,,,,swing;trend,41.88,,,,,,,,,,,,,,,,,
+2026-11-20,KPRMILL,K.P.R. Mill Limited,Consumer Cyclical,BUY,0.624,0.6,0.9,0.268,1191.3,,,,swing;trend,41.39,,,,,,,,,,,,,,,,,
+2026-11-23,KPRMILL,K.P.R. Mill Limited,Consumer Cyclical,BUY,0.629,0.6,0.9,0.294,1206.9,,,,swing;trend,40.67,,,,,,,,,,,,,,,,,
+2026-11-25,KPRMILL,K.P.R. Mill Limited,Consumer Cyclical,BUY,0.632,0.6,0.9,0.309,1173.0,,,,swing;trend,41.03,-0.046,0.1598,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive | volume spike vs 20d average,ROE 18.0% (good) | Debt/Equity 0.05x (good) | Revenue growth 18.9% (good) | Earnings growth 58.2% (good) | Net margin 14.6% (good) | P/E 39.1,"9 headlines: 3 positive, 0 negative, 6 neutral | +0.89 2026-11-22 KPR Mill FY26 Net Profit Rises 6.3% to ₹866.50 Cr (scanx.trade) | +0.92 2026-11-17 K P R Mill Ltd Upgraded to Buy by MarketsMOJO on Strong Financial and Valuation Metrics (MarketsMojo) | +0.69 2026-11-17 Closing Bell: Nifty at 25,400, Sensex jumps 427 pts led by realty, financial stocks (IndiaIPO)",407396352000,39.112137,6.5428586,0.17977,5.474,0.189,0.582,0.14581999,6.242,0.41,

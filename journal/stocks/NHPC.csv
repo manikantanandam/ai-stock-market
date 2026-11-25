@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,NHPC,NHPC Limited,Utilities,WATCH,-0.135,-0.6,0.55,,74.46,,,,,1.93
-2026-11-19,NHPC,NHPC Limited,Utilities,WATCH,0.065,-0.2,0.55,,76.3,,,,,1.98
-2026-11-20,NHPC,NHPC Limited,Utilities,WATCH,0.065,-0.2,0.55,,76.61,,,,,1.92
-2026-11-23,NHPC,NHPC Limited,Utilities,WATCH,0.065,-0.2,0.55,,75.36,,,,,1.95
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,NHPC,NHPC Limited,Utilities,WATCH,-0.135,-0.6,0.55,,74.46,,,,,1.93,,,,,,,,,,,,,,,,,
+2026-11-19,NHPC,NHPC Limited,Utilities,WATCH,0.065,-0.2,0.55,,76.3,,,,,1.98,,,,,,,,,,,,,,,,,
+2026-11-20,NHPC,NHPC Limited,Utilities,WATCH,0.065,-0.2,0.55,,76.61,,,,,1.92,,,,,,,,,,,,,,,,,
+2026-11-23,NHPC,NHPC Limited,Utilities,WATCH,0.065,-0.2,0.55,,75.36,,,,,1.95,,,,,,,,,,,,,,,,,
+2026-11-25,NHPC,NHPC Limited,Utilities,WATCH,0.065,-0.2,0.55,,75.65,,,,,1.94,-0.0712,-0.1205,False,MACD histogram negative,ROE 9.6% | Debt/Equity 1.18x | Revenue growth 33.2% (good) | Earnings growth 51.0% (good) | Net margin 32.4% (good) | P/E 17.7 (good),not fetched (no strategy can reach BUY),766436179968,17.744186,1.7546684,0.09624,118.326,0.332,0.51,0.32446998,1.018,2.16,

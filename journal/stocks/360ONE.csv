@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,360ONE,360 One Wam Limited,Financial Services,WATCH,-0.015,0.0,-0.05,,1211.05,,,,,34.84
-2026-11-19,360ONE,360 One Wam Limited,Financial Services,WATCH,0.085,0.2,-0.05,,1197.9,,,,,33.94
-2026-11-20,360ONE,360 One Wam Limited,Financial Services,WATCH,0.085,0.2,-0.05,,1208.1,,,,,33.88
-2026-11-23,360ONE,360 One Wam Limited,Financial Services,WATCH,0.085,0.2,-0.05,,1201.15,,,,,34.31
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,360ONE,360 One Wam Limited,Financial Services,WATCH,-0.015,0.0,-0.05,,1211.05,,,,,34.84,,,,,,,,,,,,,,,,,
+2026-11-19,360ONE,360 One Wam Limited,Financial Services,WATCH,0.085,0.2,-0.05,,1197.9,,,,,33.94,,,,,,,,,,,,,,,,,
+2026-11-20,360ONE,360 One Wam Limited,Financial Services,WATCH,0.085,0.2,-0.05,,1208.1,,,,,33.88,,,,,,,,,,,,,,,,,
+2026-11-23,360ONE,360 One Wam Limited,Financial Services,WATCH,0.085,0.2,-0.05,,1201.15,,,,,34.31,,,,,,,,,,,,,,,,,
+2026-11-25,360ONE,360 One Wam Limited,Financial Services,WATCH,0.085,0.2,-0.05,,1165.2,,,,,36.14,-0.0858,-0.0335,True,MACD histogram positive,ROE 12.7% | Debt/Equity 1.67x (weak) | Revenue growth 13.9% (good) | Earnings growth -6.2% (weak) | Net margin 25.4% (good) | P/E 40.5,not fetched (no strategy can reach BUY),513753612288,40.469593,4.708134,0.1265,167.375,0.139,-0.062,0.25353,15.322,1.11,

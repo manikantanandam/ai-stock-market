@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,TATAELXSI,Tata Elxsi Limited,Technology,WATCH,0.17,-0.2,0.9,,3670.0,,,,,107.68
-2026-11-19,TATAELXSI,Tata Elxsi Limited,Technology,WATCH,0.17,-0.2,0.9,,3725.0,,,,,106.36
-2026-11-20,TATAELXSI,Tata Elxsi Limited,Technology,WATCH,0.17,-0.2,0.9,,3850.0,,,,,117.26
-2026-11-23,TATAELXSI,Tata Elxsi Limited,Technology,WATCH,0.17,-0.2,0.9,,3822.4,,,,,115.29
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,TATAELXSI,Tata Elxsi Limited,Technology,WATCH,0.17,-0.2,0.9,,3670.0,,,,,107.68,,,,,,,,,,,,,,,,,
+2026-11-19,TATAELXSI,Tata Elxsi Limited,Technology,WATCH,0.17,-0.2,0.9,,3725.0,,,,,106.36,,,,,,,,,,,,,,,,,
+2026-11-20,TATAELXSI,Tata Elxsi Limited,Technology,WATCH,0.17,-0.2,0.9,,3850.0,,,,,117.26,,,,,,,,,,,,,,,,,
+2026-11-23,TATAELXSI,Tata Elxsi Limited,Technology,WATCH,0.17,-0.2,0.9,,3822.4,,,,,115.29,,,,,,,,,,,,,,,,,
+2026-11-25,TATAELXSI,Tata Elxsi Limited,Technology,WATCH,0.17,-0.2,0.9,,3819.4,,,,,114.68,-0.0346,-0.1867,True,MACD histogram negative,ROE 23.9% (good) | Debt/Equity 0.05x (good) | Revenue growth 15.0% (good) | Earnings growth 10.0% (good) | Net margin 16.6% (good) | P/E 34.6,not fetched (no strategy can reach BUY),232091402240,34.628613,7.965819,0.23868,4.903,0.15,0.1,0.16554001,3.75,2.04,

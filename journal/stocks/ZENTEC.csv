@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ZENTEC,Zen Technologies Limited,Industrials,BUY,0.469,0.6,0.55,0.021,1724.0,,,,swing;trend,62.22
-2026-11-19,ZENTEC,Zen Technologies Limited,Industrials,BUY,0.469,0.6,0.55,0.021,1706.0,,,,swing;trend,60.33
-2026-11-20,ZENTEC,Zen Technologies Limited,Industrials,WATCH,0.265,0.2,0.55,,1680.9,,,,,59.21
-2026-11-23,ZENTEC,Zen Technologies Limited,Industrials,WATCH,0.265,0.2,0.55,,1694.6,,,,,58.07
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ZENTEC,Zen Technologies Limited,Industrials,BUY,0.469,0.6,0.55,0.021,1724.0,,,,swing;trend,62.22,,,,,,,,,,,,,,,,,
+2026-11-19,ZENTEC,Zen Technologies Limited,Industrials,BUY,0.469,0.6,0.55,0.021,1706.0,,,,swing;trend,60.33,,,,,,,,,,,,,,,,,
+2026-11-20,ZENTEC,Zen Technologies Limited,Industrials,WATCH,0.265,0.2,0.55,,1680.9,,,,,59.21,,,,,,,,,,,,,,,,,
+2026-11-23,ZENTEC,Zen Technologies Limited,Industrials,WATCH,0.265,0.2,0.55,,1694.6,,,,,58.07,,,,,,,,,,,,,,,,,
+2026-11-25,ZENTEC,Zen Technologies Limited,Industrials,WATCH,0.265,0.2,0.55,,1715.0,,,,,57.56,-0.1743,-0.0115,False,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE 12.1% | Debt/Equity 0.01x (good) | Revenue growth 98.8% (good) | Earnings growth 50.9% (good) | Net margin 25.0% (good) | P/E 72.9 (weak),not fetched (no strategy can reach BUY),153445548032,72.90598,7.708435,0.12149,1.392,0.988,0.509,0.24957001,8.341,0.06,

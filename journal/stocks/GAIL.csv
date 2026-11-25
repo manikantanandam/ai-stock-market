@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,GAIL,GAIL (India) Limited,Utilities,BUY,0.453,0.4,0.65,0.292,190.0,,,,swing;trend,3.98
-2026-11-19,GAIL,GAIL (India) Limited,Utilities,BUY,0.498,0.4,0.65,0.514,192.1,,,,swing;trend,3.86
-2026-11-20,GAIL,GAIL (India) Limited,Utilities,BUY,0.461,0.4,0.65,0.329,191.44,,,,swing;trend,3.82
-2026-11-23,GAIL,GAIL (India) Limited,Utilities,BUY,0.566,0.6,0.65,0.353,185.6,,,,swing;trend,3.98
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,GAIL,GAIL (India) Limited,Utilities,BUY,0.453,0.4,0.65,0.292,190.0,,,,swing;trend,3.98,,,,,,,,,,,,,,,,,
+2026-11-19,GAIL,GAIL (India) Limited,Utilities,BUY,0.498,0.4,0.65,0.514,192.1,,,,swing;trend,3.86,,,,,,,,,,,,,,,,,
+2026-11-20,GAIL,GAIL (India) Limited,Utilities,BUY,0.461,0.4,0.65,0.329,191.44,,,,swing;trend,3.82,,,,,,,,,,,,,,,,,
+2026-11-23,GAIL,GAIL (India) Limited,Utilities,BUY,0.566,0.6,0.65,0.353,185.6,,,,swing;trend,3.98,,,,,,,,,,,,,,,,,
+2026-11-25,GAIL,GAIL (India) Limited,Utilities,BUY,0.529,0.6,0.65,0.172,187.5,,,,swing;trend;leaders;leaders-slope,3.98,0.0287,0.0811,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 13.6% | Debt/Equity 0.25x (good) | Revenue growth 32.6% (good) | Earnings growth 139.3% (good) | Net margin 7.9% | P/E 10.0 (good),"23 headlines: 10 positive, 1 negative, 12 neutral | -0.93 2026-11-24 GAIL Share Price Falls 2.06% as Valuation Stays in Focus (Univest) | +0.92 2026-11-23 4 City Gas Distribution Stocks with Strong Growth Plans (Univest) | +0.92 2026-11-22 GAIL (India) Ltd Sees Sharp Open Interest Surge Signalling Strong Market Positioning (MarketsMojo) | +0.82 2026-11-20 Intellect Design Arena Expands Cloud Banking Footprint | Vectras Enprocon Bags Pipeline Construction Order from GAIL | Top Buzzing Stocks Today (Equitymaster)",1263072837632,10.005208,1.3053908,0.13597,24.939,0.326,1.393,0.07936,1.085,2.89,

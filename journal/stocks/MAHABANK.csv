@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.487,0.4,0.8,0.235,96.0,,,,swing;trend,2.65
-2026-11-19,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.534,0.4,0.8,0.471,97.98,,,,swing;trend,2.67
-2026-11-20,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.468,0.4,0.8,0.139,99.45,,,,swing;trend,2.76
-2026-11-23,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.435,0.4,0.8,-0.025,97.56,,,,swing;trend,2.83
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.487,0.4,0.8,0.235,96.0,,,,swing;trend,2.65,,,,,,,,,,,,,,,,,
+2026-11-19,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.534,0.4,0.8,0.471,97.98,,,,swing;trend,2.67,,,,,,,,,,,,,,,,,
+2026-11-20,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.468,0.4,0.8,0.139,99.45,,,,swing;trend,2.76,,,,,,,,,,,,,,,,,
+2026-11-23,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.435,0.4,0.8,-0.025,97.56,,,,swing;trend,2.83,,,,,,,,,,,,,,,,,
+2026-11-25,MAHABANK,Bank of Maharashtra,Financial Services,BUY,0.424,0.4,0.8,-0.082,98.71,,,,swing;trend;leaders;leaders-slope,2.82,0.1653,0.1635,True,uptrend: price > SMA50 > SMA200 | RSI overbought (74) | MACD histogram positive,ROE 23.3% (good) | Debt/Equity: n/a | Revenue growth 32.7% (good) | Earnings growth 28.1% (good) | Net margin 52.7% (good) | P/E 9.4 (good),"31 headlines: 12 positive, 6 negative, 13 neutral | -0.95 2026-11-24 Bank Of Maharashtra Share Price Fall and Sector Comparison (Univest) | -0.90 2026-11-24 Pune: Cyber Fraudsters Dupe Kothrud Doctor of Rs 10 Lakh Over Fake Pension Card (Punekar News) | -0.90 2026-11-23 Union Bank, BoB, Canara, BoI, PNB, SBI shares fall up to 5%: What experts say on PSU bank stocks (Business Today) | +0.63 2026-11-22 Bank of Maharashtra’s Valuation Shifts to Fair Amid Strong Market Outperformance (MarketsMojo)",753618583552,9.421155,2.0160496,0.23286,,0.327,0.281,0.52651,,2.29,

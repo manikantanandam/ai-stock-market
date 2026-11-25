@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,UBL,United Breweries Limited,Consumer Defensive,WATCH,0.235,0.2,0.45,,1223.0,,,,,37.05
-2026-11-19,UBL,United Breweries Limited,Consumer Defensive,WATCH,0.235,0.2,0.45,,1271.6,,,,,39.32
-2026-11-20,UBL,United Breweries Limited,Consumer Defensive,WATCH,0.235,0.2,0.45,,1244.5,,,,,39.58
-2026-11-23,UBL,United Breweries Limited,Consumer Defensive,WATCH,0.235,0.2,0.45,,1254.3,,,,,38.79
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,UBL,United Breweries Limited,Consumer Defensive,WATCH,0.235,0.2,0.45,,1223.0,,,,,37.05,,,,,,,,,,,,,,,,,
+2026-11-19,UBL,United Breweries Limited,Consumer Defensive,WATCH,0.235,0.2,0.45,,1271.6,,,,,39.32,,,,,,,,,,,,,,,,,
+2026-11-20,UBL,United Breweries Limited,Consumer Defensive,WATCH,0.235,0.2,0.45,,1244.5,,,,,39.58,,,,,,,,,,,,,,,,,
+2026-11-23,UBL,United Breweries Limited,Consumer Defensive,WATCH,0.235,0.2,0.45,,1254.3,,,,,38.79,,,,,,,,,,,,,,,,,
+2026-11-25,UBL,United Breweries Limited,Consumer Defensive,WATCH,0.235,0.2,0.45,,1274.5,,,,,39.06,-0.1198,-0.1126,True,MACD histogram positive,ROE 10.9% | Debt/Equity 0.25x (good) | Revenue growth 23.6% (good) | Earnings growth 190.9% (good) | Net margin 4.9% | P/E 69.4 (weak),not fetched (no strategy can reach BUY),336217571328,69.41048,7.3716793,0.108610004,24.508,0.236,1.909,0.048800003,1.367,0.82,

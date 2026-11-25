@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,TATACONSUM,Tata Consumer Products Limited,Consumer Defensive,WATCH,0.06,0.0,0.2,,1130.9,,,,,24.61
-2026-11-19,TATACONSUM,Tata Consumer Products Limited,Consumer Defensive,WATCH,0.06,0.0,0.2,,1144.0,,,,,24.64
-2026-11-20,TATACONSUM,Tata Consumer Products Limited,Consumer Defensive,WATCH,0.06,0.0,0.2,,1155.9,,,,,24.76
-2026-11-23,TATACONSUM,Tata Consumer Products Limited,Consumer Defensive,WATCH,0.16,0.2,0.2,,1133.0,,,,,24.75
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,TATACONSUM,Tata Consumer Products Limited,Consumer Defensive,WATCH,0.06,0.0,0.2,,1130.9,,,,,24.61,,,,,,,,,,,,,,,,,
+2026-11-19,TATACONSUM,Tata Consumer Products Limited,Consumer Defensive,WATCH,0.06,0.0,0.2,,1144.0,,,,,24.64,,,,,,,,,,,,,,,,,
+2026-11-20,TATACONSUM,Tata Consumer Products Limited,Consumer Defensive,WATCH,0.06,0.0,0.2,,1155.9,,,,,24.76,,,,,,,,,,,,,,,,,
+2026-11-23,TATACONSUM,Tata Consumer Products Limited,Consumer Defensive,WATCH,0.16,0.2,0.2,,1133.0,,,,,24.75,,,,,,,,,,,,,,,,,
+2026-11-25,TATACONSUM,Tata Consumer Products Limited,Consumer Defensive,WATCH,0.06,0.0,0.2,,1185.8,,,,,26.76,0.0658,-0.0851,True,RSI overbought (75) | MACD histogram positive | volume spike vs 20d average,ROE 7.6% (weak) | Debt/Equity 0.11x (good) | Revenue growth 14.0% (good) | Earnings growth 15.9% (good) | Net margin 7.9% | P/E 66.6 (weak),not fetched (no strategy can reach BUY),1132229951488,66.62784,5.113809,0.0759,10.772,0.14,0.159,0.07886,1.615,0.88,

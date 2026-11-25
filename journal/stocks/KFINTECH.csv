@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,KFINTECH,KFin Technologies Limited,Technology,WATCH,0.325,0.2,0.75,,932.75,,,,,33.19
-2026-11-19,KFINTECH,KFin Technologies Limited,Technology,WATCH,0.325,0.2,0.75,,936.0,,,,,31.78
-2026-11-20,KFINTECH,KFin Technologies Limited,Technology,WATCH,0.325,0.2,0.75,,934.9,,,,,31.73
-2026-11-23,KFINTECH,KFin Technologies Limited,Technology,WATCH,0.325,0.2,0.75,,929.75,,,,,30.9
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,KFINTECH,KFin Technologies Limited,Technology,WATCH,0.325,0.2,0.75,,932.75,,,,,33.19,,,,,,,,,,,,,,,,,
+2026-11-19,KFINTECH,KFin Technologies Limited,Technology,WATCH,0.325,0.2,0.75,,936.0,,,,,31.78,,,,,,,,,,,,,,,,,
+2026-11-20,KFINTECH,KFin Technologies Limited,Technology,WATCH,0.325,0.2,0.75,,934.9,,,,,31.73,,,,,,,,,,,,,,,,,
+2026-11-23,KFINTECH,KFin Technologies Limited,Technology,WATCH,0.325,0.2,0.75,,929.75,,,,,30.9,,,,,,,,,,,,,,,,,
+2026-11-25,KFINTECH,KFin Technologies Limited,Technology,WATCH,0.325,0.2,0.75,,934.0,,,,,29.93,-0.1116,0.0693,True,MACD histogram positive,ROE 22.6% (good) | Debt/Equity 0.05x (good) | Revenue growth 29.9% (good) | Earnings growth 7.4% | Net margin 23.4% (good) | P/E 46.6,not fetched (no strategy can reach BUY),161843052544,46.590343,9.969538,0.22589001,4.632,0.299,0.074,0.23358999,2.789,1.29,

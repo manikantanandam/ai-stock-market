@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,LGEINDIA,LG Electronics India Limited,Technology,WATCH,0.11,-0.2,0.7,,1679.7,,,,,51.87
-2026-11-19,LGEINDIA,LG Electronics India Limited,Technology,WATCH,0.31,0.2,0.7,,1716.2,,,,,51.4
-2026-11-20,LGEINDIA,LG Electronics India Limited,Technology,WATCH,0.31,0.2,0.7,,1740.7,,,,,54.09
-2026-11-23,LGEINDIA,LG Electronics India Limited,Technology,BUY,0.526,0.6,0.7,0.081,1777.5,,,,swing;trend,55.19
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,LGEINDIA,LG Electronics India Limited,Technology,WATCH,0.11,-0.2,0.7,,1679.7,,,,,51.87,,,,,,,,,,,,,,,,,
+2026-11-19,LGEINDIA,LG Electronics India Limited,Technology,WATCH,0.31,0.2,0.7,,1716.2,,,,,51.4,,,,,,,,,,,,,,,,,
+2026-11-20,LGEINDIA,LG Electronics India Limited,Technology,WATCH,0.31,0.2,0.7,,1740.7,,,,,54.09,,,,,,,,,,,,,,,,,
+2026-11-23,LGEINDIA,LG Electronics India Limited,Technology,BUY,0.526,0.6,0.7,0.081,1777.5,,,,swing;trend,55.19,,,,,,,,,,,,,,,,,
+2026-11-25,LGEINDIA,LG Electronics India Limited,Technology,BUY,0.527,0.6,0.7,0.084,1818.4,,,,swing;trend;leaders;leaders-slope,55.47,0.0556,0.1315,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive | volume spike vs 20d average,ROE 24.5% (good) | Debt/Equity 0.05x (good) | Revenue growth 19.5% (good) | Earnings growth 25.6% (good) | Net margin 7.2% | P/E 60.5 (weak),"36 headlines: 6 positive, 3 negative, 27 neutral | +0.84 2026-11-25 LG Electronics India parent launches up to $251 mn block deal to comply with MPS norms (Moneycontrol.com) | -0.93 2026-11-20 LG Electronics India Share Price Fall Streak After 2 (Univest) | +0.77 2026-11-20 LG ELECTRONICS INDIA LTD (LGEINDIA) Share Price Rise Streak: Second Straight Session Holds Above Rs 1,749 (Univest)",1164909215744,60.514805,13.222693,0.24545999,5.472,0.195,0.256,0.07186,1.89,0.0,

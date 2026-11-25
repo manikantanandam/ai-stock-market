@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,BANDHANBNK,Bandhan Bank Limited,Financial Services,WATCH,0.19,0.2,0.3,,170.06,,,,,6.03
-2026-11-19,BANDHANBNK,Bandhan Bank Limited,Financial Services,WATCH,0.19,0.2,0.3,,175.0,,,,,6.13
-2026-11-20,BANDHANBNK,Bandhan Bank Limited,Financial Services,WATCH,0.19,0.2,0.3,,175.07,,,,,6.06
-2026-11-23,BANDHANBNK,Bandhan Bank Limited,Financial Services,WATCH,0.19,0.2,0.3,,172.4,,,,,6.06
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,BANDHANBNK,Bandhan Bank Limited,Financial Services,WATCH,0.19,0.2,0.3,,170.06,,,,,6.03,,,,,,,,,,,,,,,,,
+2026-11-19,BANDHANBNK,Bandhan Bank Limited,Financial Services,WATCH,0.19,0.2,0.3,,175.0,,,,,6.13,,,,,,,,,,,,,,,,,
+2026-11-20,BANDHANBNK,Bandhan Bank Limited,Financial Services,WATCH,0.19,0.2,0.3,,175.07,,,,,6.06,,,,,,,,,,,,,,,,,
+2026-11-23,BANDHANBNK,Bandhan Bank Limited,Financial Services,WATCH,0.19,0.2,0.3,,172.4,,,,,6.06,,,,,,,,,,,,,,,,,
+2026-11-25,BANDHANBNK,Bandhan Bank Limited,Financial Services,WATCH,0.19,0.2,0.3,,171.69,,,,,6.11,-0.0841,-0.1987,True,MACD histogram positive,ROE 7.3% (weak) | Debt/Equity: n/a | Revenue growth 48.7% (good) | Earnings growth 459.4% (good) | Net margin 17.1% (good) | P/E 15.1 (good),not fetched (no strategy can reach BUY),281952092160,15.138408,1.0648979,0.07258,,0.487,4.594,0.17087,,0.88,

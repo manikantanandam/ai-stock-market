@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,ACE,Action Construction Equipment Limited,Industrials,BUY,0.579,0.6,0.65,0.419,1189.2,,,,swing;trend,45.06
-2026-11-19,ACE,Action Construction Equipment Limited,Industrials,BUY,0.576,0.6,0.65,0.407,1185.9,,,,swing;trend,43.57
-2026-11-20,ACE,Action Construction Equipment Limited,Industrials,BUY,0.491,0.6,0.65,-0.022,1170.35,,,,swing;trend,42.43
-2026-11-23,ACE,Action Construction Equipment Limited,Industrials,BUY,0.491,0.6,0.65,-0.022,1187.45,,,,swing;trend,41.42
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,ACE,Action Construction Equipment Limited,Industrials,BUY,0.579,0.6,0.65,0.419,1189.2,,,,swing;trend,45.06,,,,,,,,,,,,,,,,,
+2026-11-19,ACE,Action Construction Equipment Limited,Industrials,BUY,0.576,0.6,0.65,0.407,1185.9,,,,swing;trend,43.57,,,,,,,,,,,,,,,,,
+2026-11-20,ACE,Action Construction Equipment Limited,Industrials,BUY,0.491,0.6,0.65,-0.022,1170.35,,,,swing;trend,42.43,,,,,,,,,,,,,,,,,
+2026-11-23,ACE,Action Construction Equipment Limited,Industrials,BUY,0.491,0.6,0.65,-0.022,1187.45,,,,swing;trend,41.42,,,,,,,,,,,,,,,,,
+2026-11-25,ACE,Action Construction Equipment Limited,Industrials,BUY,0.489,0.6,0.65,-0.031,1190.35,,,,swing;trend,41.33,-0.0559,0.2637,False,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE: n/a | Debt/Equity 0.00x (good) | Revenue growth 20.5% (good) | Earnings growth 22.3% (good) | Net margin 12.8% (good) | P/E 27.6,"11 headlines: 4 positive, 1 negative, 6 neutral | -0.74 2026-11-22 Why Is Action Construction Equipment Share Price Falling Key Reasons 2026 (Univest) | +0.92 2026-11-17 Action Construction Equipment Q2 FY27 revenue rises 20.5% to ₹932 crore (Multibagg AI) | +0.93 2026-11-16 Action Construction Anticipates 18% To 20% Revenue Growth For FY27 (Sahi) | +0.88 2026-11-13 Action Construction rallies 6%, nears 52-week high on healthy Q2 results (Business Standard)",141099483136,27.624039,7.018697,,0.393,0.205,0.223,0.12796,,0.17,

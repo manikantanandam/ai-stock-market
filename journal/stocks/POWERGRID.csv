@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,259.1,,,,,6.05
-2026-11-19,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,264.5,,,,,6.15
-2026-11-20,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,269.0,,,,,6.35
-2026-11-23,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,264.85,,,,,6.53
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,259.1,,,,,6.05,,,,,,,,,,,,,,,,,
+2026-11-19,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,264.5,,,,,6.15,,,,,,,,,,,,,,,,,
+2026-11-20,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,269.0,,,,,6.35,,,,,,,,,,,,,,,,,
+2026-11-23,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,264.85,,,,,6.53,,,,,,,,,,,,,,,,,
+2026-11-25,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,266.75,,,,,6.72,-0.074,-0.1673,False,MACD histogram positive,ROE 15.7% (good) | Debt/Equity 1.46x | Revenue growth 3.0% | Earnings growth 8.3% | Net margin 34.2% (good) | P/E 15.2 (good),not fetched (no strategy can reach BUY),2460009627648,15.183697,2.3027632,0.15749,145.802,0.03,0.083,0.34188,0.583,4.63,

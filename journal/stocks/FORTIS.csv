@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,FORTIS,Fortis Healthcare Limited,Healthcare,WATCH,-0.025,-0.2,0.25,,793.55,,,,,23.94
-2026-11-19,FORTIS,Fortis Healthcare Limited,Healthcare,WATCH,0.175,0.2,0.25,,809.85,,,,,24.08
-2026-11-20,FORTIS,Fortis Healthcare Limited,Healthcare,WATCH,0.175,0.2,0.25,,825.0,,,,,24.26
-2026-11-23,FORTIS,Fortis Healthcare Limited,Healthcare,WATCH,0.175,0.2,0.25,,809.0,,,,,24.08
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,FORTIS,Fortis Healthcare Limited,Healthcare,WATCH,-0.025,-0.2,0.25,,793.55,,,,,23.94,,,,,,,,,,,,,,,,,
+2026-11-19,FORTIS,Fortis Healthcare Limited,Healthcare,WATCH,0.175,0.2,0.25,,809.85,,,,,24.08,,,,,,,,,,,,,,,,,
+2026-11-20,FORTIS,Fortis Healthcare Limited,Healthcare,WATCH,0.175,0.2,0.25,,825.0,,,,,24.26,,,,,,,,,,,,,,,,,
+2026-11-23,FORTIS,Fortis Healthcare Limited,Healthcare,WATCH,0.175,0.2,0.25,,809.0,,,,,24.08,,,,,,,,,,,,,,,,,
+2026-11-25,FORTIS,Fortis Healthcare Limited,Healthcare,WATCH,0.175,0.2,0.25,,826.0,,,,,24.04,-0.154,-0.2276,True,MACD histogram positive,ROE 10.4% | Debt/Equity 0.29x (good) | Revenue growth 17.3% (good) | Earnings growth -2.8% (weak) | Net margin 10.5% | P/E 58.9,not fetched (no strategy can reach BUY),611402842112,58.855373,5.8316708,0.103819996,29.404,0.173,-0.028,0.104779996,0.794,0.13,

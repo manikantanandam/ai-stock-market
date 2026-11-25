@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,IGIL,International Gemological Institute Limited,Basic Materials,BUY,0.422,0.4,0.65,0.134,444.1,,,,swing;trend,18.01
-2026-11-19,IGIL,International Gemological Institute Limited,Basic Materials,BUY,0.415,0.4,0.65,0.098,437.3,,,,swing;trend,17.41
-2026-11-20,IGIL,International Gemological Institute Limited,Basic Materials,WATCH,0.295,0.2,0.65,,422.2,,,,,17.54
-2026-11-23,IGIL,International Gemological Institute Limited,Basic Materials,WATCH,0.295,0.2,0.65,,431.1,,,,,17.06
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,IGIL,International Gemological Institute Limited,Basic Materials,BUY,0.422,0.4,0.65,0.134,444.1,,,,swing;trend,18.01,,,,,,,,,,,,,,,,,
+2026-11-19,IGIL,International Gemological Institute Limited,Basic Materials,BUY,0.415,0.4,0.65,0.098,437.3,,,,swing;trend,17.41,,,,,,,,,,,,,,,,,
+2026-11-20,IGIL,International Gemological Institute Limited,Basic Materials,WATCH,0.295,0.2,0.65,,422.2,,,,,17.54,,,,,,,,,,,,,,,,,
+2026-11-23,IGIL,International Gemological Institute Limited,Basic Materials,WATCH,0.295,0.2,0.65,,431.1,,,,,17.06,,,,,,,,,,,,,,,,,
+2026-11-25,IGIL,International Gemological Institute Limited,Basic Materials,WATCH,0.295,0.2,0.65,,432.5,,,,,17.45,0.2148,0.0799,True,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE: n/a | Debt/Equity 0.09x (good) | Revenue growth 31.0% (good) | Earnings growth 43.0% (good) | Net margin 45.7% (good) | P/E 29.4,not fetched (no strategy can reach BUY),188983427072,29.368702,10.793799,,8.552,0.31,0.43,0.45691,6.254,1.15,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,PERSISTENT,Persistent Systems Limited,Technology,WATCH,0.25,0.2,0.5,,5857.0,,,,,157.5
-2026-11-19,PERSISTENT,Persistent Systems Limited,Technology,WATCH,0.25,0.2,0.5,,5880.0,,,,,154.86
-2026-11-20,PERSISTENT,Persistent Systems Limited,Technology,WATCH,0.25,0.2,0.5,,6124.0,,,,,171.22
-2026-11-23,PERSISTENT,Persistent Systems Limited,Technology,BUY,0.414,0.6,0.5,-0.18,6282.5,,,,swing;trend;breakout,174.39
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,PERSISTENT,Persistent Systems Limited,Technology,WATCH,0.25,0.2,0.5,,5857.0,,,,,157.5,,,,,,,,,,,,,,,,,
+2026-11-19,PERSISTENT,Persistent Systems Limited,Technology,WATCH,0.25,0.2,0.5,,5880.0,,,,,154.86,,,,,,,,,,,,,,,,,
+2026-11-20,PERSISTENT,Persistent Systems Limited,Technology,WATCH,0.25,0.2,0.5,,6124.0,,,,,171.22,,,,,,,,,,,,,,,,,
+2026-11-23,PERSISTENT,Persistent Systems Limited,Technology,BUY,0.414,0.6,0.5,-0.18,6282.5,,,,swing;trend;breakout,174.39,,,,,,,,,,,,,,,,,
+2026-11-25,PERSISTENT,Persistent Systems Limited,Technology,BUY,0.443,0.6,0.5,-0.034,6120.0,,,,swing;trend;leaders;leaders-slope,183.39,0.0152,0.1471,True,uptrend: price > SMA50 > SMA200 | MACD histogram positive,ROE 22.9% (good) | Debt/Equity 0.07x (good) | Revenue growth 30.3% (good) | Earnings growth -26.3% (weak) | Net margin 10.7% | P/E 51.4,"56 headlines: 19 positive, 15 negative, 22 neutral | -0.87 2026-11-25 Suzlon, Persistent Report Cyber Incidents (varindia) | +0.90 2026-11-24 Persistent Systems Ltd gains for third consecutive session (Dailyhunt) | -0.93 2026-11-24 Staff data may have been exfiltrated on cyber incident at law firm, says Persistent Systems (The Times of India) | -0.92 2026-11-24 Two Indian IT Companies Flag Cybersecurity Incidents, Employee Data at Risk (The 420.in)",967805632512,51.43457,10.798958,0.22918,6.696,0.303,-0.263,0.107329994,2.024,0.61,

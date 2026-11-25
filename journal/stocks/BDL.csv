@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,BDL,Bharat Dynamics Limited,Industrials,WATCH,-0.025,-0.2,0.25,,1013.4,,,,,39.28
-2026-11-19,BDL,Bharat Dynamics Limited,Industrials,WATCH,-0.025,-0.2,0.25,,1032.45,,,,,38.61
-2026-11-20,BDL,Bharat Dynamics Limited,Industrials,WATCH,-0.025,-0.2,0.25,,1034.5,,,,,36.83
-2026-11-23,BDL,Bharat Dynamics Limited,Industrials,WATCH,-0.025,-0.2,0.25,,1020.0,,,,,35.9
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,BDL,Bharat Dynamics Limited,Industrials,WATCH,-0.025,-0.2,0.25,,1013.4,,,,,39.28,,,,,,,,,,,,,,,,,
+2026-11-19,BDL,Bharat Dynamics Limited,Industrials,WATCH,-0.025,-0.2,0.25,,1032.45,,,,,38.61,,,,,,,,,,,,,,,,,
+2026-11-20,BDL,Bharat Dynamics Limited,Industrials,WATCH,-0.025,-0.2,0.25,,1034.5,,,,,36.83,,,,,,,,,,,,,,,,,
+2026-11-23,BDL,Bharat Dynamics Limited,Industrials,WATCH,-0.025,-0.2,0.25,,1020.0,,,,,35.9,,,,,,,,,,,,,,,,,
+2026-11-25,BDL,Bharat Dynamics Limited,Industrials,WATCH,-0.025,-0.2,0.25,,1027.65,,,,,34.81,-0.3082,-0.3053,False,downtrend: price < SMA50 < SMA200 | MACD histogram positive,ROE 11.2% | Debt/Equity 0.00x (good) | Revenue growth 45.1% (good) | Earnings growth -14.9% (weak) | Net margin 14.9% (good) | P/E 77.5 (weak),not fetched (no strategy can reach BUY),378457423872,77.45311,8.352682,0.1117,0.205,0.451,-0.149,0.14875,2.337,0.48,

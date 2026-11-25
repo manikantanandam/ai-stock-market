@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,GALLANTT,Gallantt Ispat Limited,Basic Materials,AVOID,-0.225,-0.6,0.25,,533.2,,,,,26.52
-2026-11-19,GALLANTT,Gallantt Ispat Limited,Basic Materials,WATCH,-0.025,-0.2,0.25,,538.95,,,,,25.85
-2026-11-20,GALLANTT,Gallantt Ispat Limited,Basic Materials,WATCH,-0.025,-0.2,0.25,,538.1,,,,,25.01
-2026-11-23,GALLANTT,Gallantt Ispat Limited,Basic Materials,WATCH,-0.025,-0.2,0.25,,543.35,,,,,25.39
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,GALLANTT,Gallantt Ispat Limited,Basic Materials,AVOID,-0.225,-0.6,0.25,,533.2,,,,,26.52,,,,,,,,,,,,,,,,,
+2026-11-19,GALLANTT,Gallantt Ispat Limited,Basic Materials,WATCH,-0.025,-0.2,0.25,,538.95,,,,,25.85,,,,,,,,,,,,,,,,,
+2026-11-20,GALLANTT,Gallantt Ispat Limited,Basic Materials,WATCH,-0.025,-0.2,0.25,,538.1,,,,,25.01,,,,,,,,,,,,,,,,,
+2026-11-23,GALLANTT,Gallantt Ispat Limited,Basic Materials,WATCH,-0.025,-0.2,0.25,,543.35,,,,,25.39,,,,,,,,,,,,,,,,,
+2026-11-25,GALLANTT,Gallantt Ispat Limited,Basic Materials,WATCH,0.175,0.2,0.25,,550.55,,,,,24.92,-0.1191,-0.2877,False,MACD histogram positive,ROE 12.3% | Debt/Equity 0.17x (good) | Revenue growth 13.1% (good) | Earnings growth -30.7% (weak) | Net margin 8.9% | P/E 31.9,not fetched (no strategy can reach BUY),130038366208,31.92832,3.7297318,0.123100005,16.979,0.131,-0.307,0.08878,2.713,0.38,

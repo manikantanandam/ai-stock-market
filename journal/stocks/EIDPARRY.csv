@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,EIDPARRY,E.I.D.- Parry (India) Limited,Basic Materials,WATCH,-0.115,-0.2,-0.05,,647.0,,,,,18.73
-2026-11-19,EIDPARRY,E.I.D.- Parry (India) Limited,Basic Materials,WATCH,-0.115,-0.2,-0.05,,642.25,,,,,18.28
-2026-11-20,EIDPARRY,E.I.D.- Parry (India) Limited,Basic Materials,WATCH,-0.115,-0.2,-0.05,,647.85,,,,,18.1
-2026-11-23,EIDPARRY,E.I.D.- Parry (India) Limited,Basic Materials,WATCH,-0.115,-0.2,-0.05,,649.85,,,,,17.54
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,EIDPARRY,E.I.D.- Parry (India) Limited,Basic Materials,WATCH,-0.115,-0.2,-0.05,,647.0,,,,,18.73,,,,,,,,,,,,,,,,,
+2026-11-19,EIDPARRY,E.I.D.- Parry (India) Limited,Basic Materials,WATCH,-0.115,-0.2,-0.05,,642.25,,,,,18.28,,,,,,,,,,,,,,,,,
+2026-11-20,EIDPARRY,E.I.D.- Parry (India) Limited,Basic Materials,WATCH,-0.115,-0.2,-0.05,,647.85,,,,,18.1,,,,,,,,,,,,,,,,,
+2026-11-23,EIDPARRY,E.I.D.- Parry (India) Limited,Basic Materials,WATCH,-0.115,-0.2,-0.05,,649.85,,,,,17.54,,,,,,,,,,,,,,,,,
+2026-11-25,EIDPARRY,E.I.D.- Parry (India) Limited,Basic Materials,WATCH,-0.115,-0.2,-0.05,,649.6,,,,,16.97,-0.2499,-0.2546,True,downtrend: price < SMA50 < SMA200 | MACD histogram positive,ROE: n/a | Debt/Equity 0.24x (good) | Revenue growth 3.4% | Earnings growth -42.4% (weak) | Net margin 1.2% (weak) | P/E 39.0,not fetched (no strategy can reach BUY),114292047872,39.018837,1.2993779,,23.647,0.034,-0.424,0.01197,,0.0,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,BHARTIHEXA,Bharti Hexacom Limited,Communication Services,WATCH,0.31,0.2,0.7,,1666.3,,,,,58.28
-2026-11-19,BHARTIHEXA,Bharti Hexacom Limited,Communication Services,WATCH,0.31,0.2,0.7,,1639.3,,,,,57.95
-2026-11-20,BHARTIHEXA,Bharti Hexacom Limited,Communication Services,WATCH,0.31,0.2,0.7,,1631.4,,,,,56.85
-2026-11-23,BHARTIHEXA,Bharti Hexacom Limited,Communication Services,WATCH,0.31,0.2,0.7,,1599.1,,,,,56.53
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,BHARTIHEXA,Bharti Hexacom Limited,Communication Services,WATCH,0.31,0.2,0.7,,1666.3,,,,,58.28,,,,,,,,,,,,,,,,,
+2026-11-19,BHARTIHEXA,Bharti Hexacom Limited,Communication Services,WATCH,0.31,0.2,0.7,,1639.3,,,,,57.95,,,,,,,,,,,,,,,,,
+2026-11-20,BHARTIHEXA,Bharti Hexacom Limited,Communication Services,WATCH,0.31,0.2,0.7,,1631.4,,,,,56.85,,,,,,,,,,,,,,,,,
+2026-11-23,BHARTIHEXA,Bharti Hexacom Limited,Communication Services,WATCH,0.31,0.2,0.7,,1599.1,,,,,56.53,,,,,,,,,,,,,,,,,
+2026-11-25,BHARTIHEXA,Bharti Hexacom Limited,Communication Services,WATCH,0.31,0.2,0.7,,1578.0,,,,,56.26,-0.0729,-0.0541,False,uptrend: price > SMA50 > SMA200 | MACD histogram negative,ROE 29.0% (good) | Debt/Equity 0.82x | Revenue growth 11.4% (good) | Earnings growth 34.4% (good) | Net margin 20.0% (good) | P/E 41.6,not fetched (no strategy can reach BUY),819650035712,41.638306,11.209655,0.29044,82.411,0.114,0.344,0.19958,0.433,1.08,

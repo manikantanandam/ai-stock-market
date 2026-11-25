@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.14,-0.2,0.8,,673.15,,,,,49.06
-2026-11-19,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.14,-0.2,0.8,,654.55,,,,,47.96
-2026-11-20,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.14,-0.2,0.8,,621.85,,,,,46.87
-2026-11-23,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.24,0.0,0.8,,590.8,,,,,45.74
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.14,-0.2,0.8,,673.15,,,,,49.06,,,,,,,,,,,,,,,,,
+2026-11-19,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.14,-0.2,0.8,,654.55,,,,,47.96,,,,,,,,,,,,,,,,,
+2026-11-20,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.14,-0.2,0.8,,621.85,,,,,46.87,,,,,,,,,,,,,,,,,
+2026-11-23,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.24,0.0,0.8,,590.8,,,,,45.74,,,,,,,,,,,,,,,,,
+2026-11-25,STLTECH,Sterlite Technologies Limited,Technology,WATCH,0.24,0.0,0.8,,579.9,,,,,45.23,-0.14,0.226,False,RSI oversold (29) | MACD histogram negative | volume spike vs 20d average,ROE 22.9% (good) | Debt/Equity 0.22x (good) | Revenue growth 144.6% (good) | Earnings growth 11600.0% (good) | Net margin 10.6% | P/E 47.6,not fetched (no strategy can reach BUY),336576479232,47.603634,7.406506,0.2292,21.77,1.446,116.0,0.10593,1.55,0.0,

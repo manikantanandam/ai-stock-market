@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,WELCORP,Welspun Corp Limited,Basic Materials,WATCH,0.14,-0.2,0.8,,2224.9,,,,,128.94
-2026-11-19,WELCORP,Welspun Corp Limited,Basic Materials,WATCH,0.14,-0.2,0.8,,2224.5,,,,,124.25
-2026-11-20,WELCORP,Welspun Corp Limited,Basic Materials,WATCH,0.14,-0.2,0.8,,2185.0,,,,,120.37
-2026-11-23,WELCORP,Welspun Corp Limited,Basic Materials,WATCH,0.14,-0.2,0.8,,2152.8,,,,,117.72
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,WELCORP,Welspun Corp Limited,Basic Materials,WATCH,0.14,-0.2,0.8,,2224.9,,,,,128.94,,,,,,,,,,,,,,,,,
+2026-11-19,WELCORP,Welspun Corp Limited,Basic Materials,WATCH,0.14,-0.2,0.8,,2224.5,,,,,124.25,,,,,,,,,,,,,,,,,
+2026-11-20,WELCORP,Welspun Corp Limited,Basic Materials,WATCH,0.14,-0.2,0.8,,2185.0,,,,,120.37,,,,,,,,,,,,,,,,,
+2026-11-23,WELCORP,Welspun Corp Limited,Basic Materials,WATCH,0.14,-0.2,0.8,,2152.8,,,,,117.72,,,,,,,,,,,,,,,,,
+2026-11-25,WELCORP,Welspun Corp Limited,Basic Materials,WATCH,0.14,-0.2,0.8,,2117.5,,,,,119.27,-0.1487,0.5745,False,MACD histogram negative,ROE 24.5% (good) | Debt/Equity 0.10x (good) | Revenue growth 6.2% | Earnings growth 13.2% (good) | Net margin 13.5% (good) | P/E 24.8 (good),not fetched (no strategy can reach BUY),586609393664,24.788279,5.5231404,0.24476999,9.947,0.062,0.132,0.13477999,1.211,0.22,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,DATAPATTNS,Data Patterns (India) Limited,Industrials,WATCH,0.055,0.2,-0.15,,4111.0,,,,,179.55
-2026-11-19,DATAPATTNS,Data Patterns (India) Limited,Industrials,WATCH,0.055,0.2,-0.15,,4113.1,,,,,173.94
-2026-11-20,DATAPATTNS,Data Patterns (India) Limited,Industrials,WATCH,0.291,0.6,-0.15,0.179,4215.0,,,,,176.23
-2026-11-23,DATAPATTNS,Data Patterns (India) Limited,Industrials,WATCH,0.274,0.6,-0.15,0.096,4225.0,,,,,174.29
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,DATAPATTNS,Data Patterns (India) Limited,Industrials,WATCH,0.055,0.2,-0.15,,4111.0,,,,,179.55,,,,,,,,,,,,,,,,,
+2026-11-19,DATAPATTNS,Data Patterns (India) Limited,Industrials,WATCH,0.055,0.2,-0.15,,4113.1,,,,,173.94,,,,,,,,,,,,,,,,,
+2026-11-20,DATAPATTNS,Data Patterns (India) Limited,Industrials,WATCH,0.291,0.6,-0.15,0.179,4215.0,,,,,176.23,,,,,,,,,,,,,,,,,
+2026-11-23,DATAPATTNS,Data Patterns (India) Limited,Industrials,WATCH,0.274,0.6,-0.15,0.096,4225.0,,,,,174.29,,,,,,,,,,,,,,,,,
+2026-11-25,DATAPATTNS,Data Patterns (India) Limited,Industrials,WATCH,0.055,0.2,-0.15,,4135.0,,,,,171.02,-0.2085,-0.0446,False,MACD histogram positive,ROE 14.8% | Debt/Equity 0.00x (good) | Revenue growth -56.7% (weak) | Earnings growth -56.1% (weak) | Net margin 31.4% (good) | P/E 95.8 (weak),not fetched (no strategy can reach BUY),230267666432,95.809456,13.490351,0.14752,0.435,-0.567,-0.561,0.31353,7.627,0.24,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,PFOCUS,Prime Focus Limited,Communication Services,WATCH,-0.115,-0.2,-0.05,,275.75,,,,,16.95
-2026-11-19,PFOCUS,Prime Focus Limited,Communication Services,WATCH,-0.115,-0.2,-0.05,,267.15,,,,,16.94
-2026-11-20,PFOCUS,Prime Focus Limited,Communication Services,WATCH,-0.115,-0.2,-0.05,,252.7,,,,,17.25
-2026-11-23,PFOCUS,Prime Focus Limited,Communication Services,WATCH,-0.115,-0.2,-0.05,,236.65,,,,,17.44
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,PFOCUS,Prime Focus Limited,Communication Services,WATCH,-0.115,-0.2,-0.05,,275.75,,,,,16.95,,,,,,,,,,,,,,,,,
+2026-11-19,PFOCUS,Prime Focus Limited,Communication Services,WATCH,-0.115,-0.2,-0.05,,267.15,,,,,16.94,,,,,,,,,,,,,,,,,
+2026-11-20,PFOCUS,Prime Focus Limited,Communication Services,WATCH,-0.115,-0.2,-0.05,,252.7,,,,,17.25,,,,,,,,,,,,,,,,,
+2026-11-23,PFOCUS,Prime Focus Limited,Communication Services,WATCH,-0.115,-0.2,-0.05,,236.65,,,,,17.44,,,,,,,,,,,,,,,,,
+2026-11-25,PFOCUS,Prime Focus Limited,Communication Services,WATCH,-0.115,-0.2,-0.05,,239.35,,,,,17.12,-0.2586,-0.1021,True,MACD histogram negative,ROE 8.5% | Debt/Equity 2.31x (weak) | Revenue growth 34.7% (good) | Earnings growth 550.0% (good) | Net margin 3.0% (weak) | P/E 116.2 (weak),not fetched (no strategy can reach BUY),208049438720,116.152176,9.430599,0.08467,230.543,0.347,5.5,0.03034,1.259,0.0,

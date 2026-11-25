@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,JSWENERGY,JSW Energy Limited,Utilities,WATCH,0.07,0.2,-0.1,,511.85,,,,,13.2
-2026-11-19,JSWENERGY,JSW Energy Limited,Utilities,WATCH,0.07,0.2,-0.1,,515.0,,,,,12.92
-2026-11-20,JSWENERGY,JSW Energy Limited,Utilities,WATCH,0.07,0.2,-0.1,,513.4,,,,,13.13
-2026-11-23,JSWENERGY,JSW Energy Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,502.55,,,,,13.54
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,JSWENERGY,JSW Energy Limited,Utilities,WATCH,0.07,0.2,-0.1,,511.85,,,,,13.2,,,,,,,,,,,,,,,,,
+2026-11-19,JSWENERGY,JSW Energy Limited,Utilities,WATCH,0.07,0.2,-0.1,,515.0,,,,,12.92,,,,,,,,,,,,,,,,,
+2026-11-20,JSWENERGY,JSW Energy Limited,Utilities,WATCH,0.07,0.2,-0.1,,513.4,,,,,13.13,,,,,,,,,,,,,,,,,
+2026-11-23,JSWENERGY,JSW Energy Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,502.55,,,,,13.54,,,,,,,,,,,,,,,,,
+2026-11-25,JSWENERGY,JSW Energy Limited,Utilities,AVOID,-0.33,-0.6,-0.1,,485.8,,,,,14.16,-0.1732,-0.2043,False,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE 7.8% (weak) | Debt/Equity 2.07x (weak) | Revenue growth 23.0% (good) | Earnings growth 39.1% (good) | Net margin 11.5% | P/E 40.6,not fetched (no strategy can reach BUY),944001122304,40.55118,2.568412,0.07776,207.431,0.23,0.391,0.11505,1.02,0.39,

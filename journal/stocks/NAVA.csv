@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,NAVA,Nava Limited,Industrials,WATCH,-0.025,-0.2,0.25,,538.35,,,,,19.22
-2026-11-19,NAVA,Nava Limited,Industrials,WATCH,-0.025,-0.2,0.25,,530.55,,,,,18.71
-2026-11-20,NAVA,Nava Limited,Industrials,WATCH,0.175,0.2,0.25,,563.95,,,,,20.96
-2026-11-23,NAVA,Nava Limited,Industrials,WATCH,0.175,0.2,0.25,,550.15,,,,,21.09
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,NAVA,Nava Limited,Industrials,WATCH,-0.025,-0.2,0.25,,538.35,,,,,19.22,,,,,,,,,,,,,,,,,
+2026-11-19,NAVA,Nava Limited,Industrials,WATCH,-0.025,-0.2,0.25,,530.55,,,,,18.71,,,,,,,,,,,,,,,,,
+2026-11-20,NAVA,Nava Limited,Industrials,WATCH,0.175,0.2,0.25,,563.95,,,,,20.96,,,,,,,,,,,,,,,,,
+2026-11-23,NAVA,Nava Limited,Industrials,WATCH,0.175,0.2,0.25,,550.15,,,,,21.09,,,,,,,,,,,,,,,,,
+2026-11-25,NAVA,Nava Limited,Industrials,WATCH,0.175,0.2,0.25,,550.95,,,,,21.11,-0.0789,-0.1755,False,MACD histogram positive,ROE: n/a | Debt/Equity 0.21x (good) | Revenue growth 1.6% | Earnings growth -10.0% (weak) | Net margin 17.5% (good) | P/E 15.9 (good),not fetched (no strategy can reach BUY),150324002816,15.922869,1.7168791,,20.684,0.016,-0.1,0.17541,,1.56,

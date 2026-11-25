@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,JAINREC,Jain Resource Recycling Limited,Basic Materials,WATCH,0.16,0.2,0.2,,290.1,,,,,11.0
-2026-11-19,JAINREC,Jain Resource Recycling Limited,Basic Materials,WATCH,0.16,0.2,0.2,,293.0,,,,,11.11
-2026-11-20,JAINREC,Jain Resource Recycling Limited,Basic Materials,WATCH,0.16,0.2,0.2,,288.1,,,,,11.03
-2026-11-23,JAINREC,Jain Resource Recycling Limited,Basic Materials,WATCH,-0.04,-0.2,0.2,,278.7,,,,,11.38
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,JAINREC,Jain Resource Recycling Limited,Basic Materials,WATCH,0.16,0.2,0.2,,290.1,,,,,11.0,,,,,,,,,,,,,,,,,
+2026-11-19,JAINREC,Jain Resource Recycling Limited,Basic Materials,WATCH,0.16,0.2,0.2,,293.0,,,,,11.11,,,,,,,,,,,,,,,,,
+2026-11-20,JAINREC,Jain Resource Recycling Limited,Basic Materials,WATCH,0.16,0.2,0.2,,288.1,,,,,11.03,,,,,,,,,,,,,,,,,
+2026-11-23,JAINREC,Jain Resource Recycling Limited,Basic Materials,WATCH,-0.04,-0.2,0.2,,278.7,,,,,11.38,,,,,,,,,,,,,,,,,
+2026-11-25,JAINREC,Jain Resource Recycling Limited,Basic Materials,AVOID,-0.24,-0.6,0.2,,279.85,,,,,11.29,-0.1187,-0.3614,False,downtrend: price < SMA50 < SMA200 | MACD histogram negative,ROE 21.5% (good) | Debt/Equity 0.65x | Revenue growth 57.9% (good) | Earnings growth -14.1% (weak) | Net margin 2.7% (weak) | P/E 28.4,not fetched (no strategy can reach BUY),101110145024,28.391474,5.889921,0.21457,64.883,0.579,-0.141,0.027309999,1.767,0.0,

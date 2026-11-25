@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,TIINDIA,Tube Investments of India Limited,Industrials,WATCH,0.005,-0.2,0.35,,2207.5,,,,,81.91
-2026-11-19,TIINDIA,Tube Investments of India Limited,Industrials,WATCH,0.005,-0.2,0.35,,2248.0,,,,,80.97
-2026-11-20,TIINDIA,Tube Investments of India Limited,Industrials,WATCH,0.005,-0.2,0.35,,2228.3,,,,,78.49
-2026-11-23,TIINDIA,Tube Investments of India Limited,Industrials,WATCH,0.005,-0.2,0.35,,2210.0,,,,,77.64
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,TIINDIA,Tube Investments of India Limited,Industrials,WATCH,0.005,-0.2,0.35,,2207.5,,,,,81.91,,,,,,,,,,,,,,,,,
+2026-11-19,TIINDIA,Tube Investments of India Limited,Industrials,WATCH,0.005,-0.2,0.35,,2248.0,,,,,80.97,,,,,,,,,,,,,,,,,
+2026-11-20,TIINDIA,Tube Investments of India Limited,Industrials,WATCH,0.005,-0.2,0.35,,2228.3,,,,,78.49,,,,,,,,,,,,,,,,,
+2026-11-23,TIINDIA,Tube Investments of India Limited,Industrials,WATCH,0.005,-0.2,0.35,,2210.0,,,,,77.64,,,,,,,,,,,,,,,,,
+2026-11-25,TIINDIA,Tube Investments of India Limited,Industrials,WATCH,0.005,-0.2,0.35,,2217.7,,,,,75.05,-0.2961,-0.3517,True,downtrend: price < SMA50 < SMA200 | MACD histogram positive,ROE 9.3% | Debt/Equity 0.06x (good) | Revenue growth 32.6% (good) | Earnings growth 33.4% (good) | Net margin 2.7% (weak) | P/E 65.2 (weak),not fetched (no strategy can reach BUY),435150585856,65.17831,5.3642206,0.09335,6.477,0.326,0.334,0.026919998,1.692,0.16,

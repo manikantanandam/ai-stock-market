@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,LICI,Life Insurance Corporation of India,Financial Services,WATCH,0.25,0.2,0.5,,400.0,,,,,8.91
-2026-11-19,LICI,Life Insurance Corporation of India,Financial Services,WATCH,0.25,0.2,0.5,,404.1,,,,,8.82
-2026-11-20,LICI,Life Insurance Corporation of India,Financial Services,WATCH,0.25,0.2,0.5,,410.7,,,,,9.09
-2026-11-23,LICI,Life Insurance Corporation of India,Financial Services,WATCH,0.25,0.2,0.5,,407.3,,,,,9.02
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,LICI,Life Insurance Corporation of India,Financial Services,WATCH,0.25,0.2,0.5,,400.0,,,,,8.91,,,,,,,,,,,,,,,,,
+2026-11-19,LICI,Life Insurance Corporation of India,Financial Services,WATCH,0.25,0.2,0.5,,404.1,,,,,8.82,,,,,,,,,,,,,,,,,
+2026-11-20,LICI,Life Insurance Corporation of India,Financial Services,WATCH,0.25,0.2,0.5,,410.7,,,,,9.09,,,,,,,,,,,,,,,,,
+2026-11-23,LICI,Life Insurance Corporation of India,Financial Services,WATCH,0.25,0.2,0.5,,407.3,,,,,9.02,,,,,,,,,,,,,,,,,
+2026-11-25,LICI,Life Insurance Corporation of India,Financial Services,WATCH,0.25,0.2,0.5,,408.35,,,,,8.99,-0.0975,-0.0604,True,MACD histogram positive,ROE 40.6% (good) | Debt/Equity: n/a | Revenue growth 9.8% | Earnings growth 758.3% (good) | Net margin 6.6% | P/E 8.2 (good),not fetched (no strategy can reach BUY),5111863050240,8.231819,3.0295534,0.40567002,,0.098,7.583,0.06603,6.601,2.5,

@@ -1,5 +1,6 @@
-date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
-2026-11-18,SOBHA,Sobha Limited,Real Estate,WATCH,-0.08,0.2,-0.6,,1269.7,,,,,48.33
-2026-11-19,SOBHA,Sobha Limited,Real Estate,WATCH,-0.08,0.2,-0.6,,1269.4,,,,,46.23
-2026-11-20,SOBHA,Sobha Limited,Real Estate,WATCH,-0.08,0.2,-0.6,,1262.4,,,,,44.44
-2026-11-23,SOBHA,Sobha Limited,Real Estate,WATCH,-0.08,0.2,-0.6,,1251.1,,,,,43.35
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr,rs_3m,rs_6m,sector_up,technical_reasons,fundamental_reasons,sentiment_reasons,f_marketCap,f_trailingPE,f_priceToBook,f_returnOnEquity,f_debtToEquity,f_revenueGrowth,f_earningsGrowth,f_profitMargins,f_currentRatio,f_dividendYield,f_trailingPegRatio
+2026-11-18,SOBHA,Sobha Limited,Real Estate,WATCH,-0.08,0.2,-0.6,,1269.7,,,,,48.33,,,,,,,,,,,,,,,,,
+2026-11-19,SOBHA,Sobha Limited,Real Estate,WATCH,-0.08,0.2,-0.6,,1269.4,,,,,46.23,,,,,,,,,,,,,,,,,
+2026-11-20,SOBHA,Sobha Limited,Real Estate,WATCH,-0.08,0.2,-0.6,,1262.4,,,,,44.44,,,,,,,,,,,,,,,,,
+2026-11-23,SOBHA,Sobha Limited,Real Estate,WATCH,-0.08,0.2,-0.6,,1251.1,,,,,43.35,,,,,,,,,,,,,,,,,
+2026-11-25,SOBHA,Sobha Limited,Real Estate,WATCH,-0.08,0.2,-0.6,,1244.4,,,,,43.61,-0.1034,-0.1811,True,MACD histogram positive,ROE 4.1% (weak) | Debt/Equity 0.33x (good) | Revenue growth -31.3% (weak) | Earnings growth -54.6% (weak) | Net margin 3.7% (weak) | P/E 71.1 (weak),not fetched (no strategy can reach BUY),135780442112,71.07503,2.8684738,0.04089,32.991,-0.313,-0.546,0.03691,1.143,0.47,
