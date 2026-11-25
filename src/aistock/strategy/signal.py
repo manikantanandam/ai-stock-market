@@ -9,6 +9,7 @@ untested priors until the signal journal builds history.
 """
 from dataclasses import dataclass, field
 
+from aistock.data import sectors
 from aistock.data.fundamentals import get_fundamentals
 from aistock.data.news import get_news
 from aistock.data.prices import get_prices
@@ -42,7 +43,7 @@ class Config:
 class StrategySignal:
     strategy: str
     action: str           # BUY or WATCH
-    fired: bool           # entry rule (and market filter) true on the latest bar
+    fired: bool           # entry rule (and market, RS, sector filters) true on the latest bar
     stop: float
     target: float | None
     shares: int
@@ -64,6 +65,9 @@ class Signal:
     strategies: dict[str, StrategySignal] = field(default_factory=dict)
     reasons: dict[str, list[str]] = field(default_factory=dict)
     as_of: str = ""       # date of the price bar the signal is based on
+    rs_3m: float | None = None    # return minus NIFTY 50's over ~3 months
+    rs_6m: float | None = None    # same over ~6 months
+    sector_up: bool | None = None  # sector index above its SMA50; None when not checked or unknown
 
     @property
     def buys(self) -> list[str]:
@@ -74,12 +78,30 @@ class Signal:
         return {"symbol": self.symbol, "name": self.name, "sector": self.sector, "action": self.action,
                 "buys": ";".join(self.buys), "combined": self.combined, "technical": self.technical,
                 "fundamental": self.fundamental, "sentiment": self.sentiment, "close": self.close,
-                "atr": self.atr}
+                "atr": self.atr, "rs_3m": self.rs_3m, "rs_6m": self.rs_6m, "sector_up": self.sector_up}
 
 
 def market_ok() -> bool:
     """Market filter for today: NIFTY 50 above its 200-day SMA."""
     return bool(rules.market_regime(add_indicators(get_prices(INDEX))).iloc[-1])
+
+
+def sector_up(symbol: str) -> bool | None:
+    """Today's sector filter: the stock's sector index above its SMA50 (None if not in NIFTY 500)."""
+    industry = sectors.INDUSTRY.get(symbol)
+    return None if industry is None else bool(rules.sector_trend(sectors.index(industry)).iloc[-1])
+
+
+def _filters_off(st: Strategy, market: bool, rs_ok: bool, sector_ok: bool | None) -> list[str]:
+    """Entry filters of a strategy that block it today (empty = all pass)."""
+    off = []
+    if st.regime and not market:
+        off.append("market filter off (NIFTY below SMA200)")
+    if st.rs and not rs_ok:
+        off.append("RS filter off (lagging NIFTY over 3 or 6 months)")
+    if st.sector and not sector_ok:
+        off.append("sector filter off (" + ("sector unknown" if sector_ok is None else "sector below SMA50") + ")")
+    return off
 
 
 def _passes_gates(st: Strategy, f: float, combined: float) -> list[str]:
@@ -110,8 +132,13 @@ def evaluate(symbol: str, c: Config = Config(), news: str = "all",
     t_score, t_why = technical_score(df)
     f_score, f_why = fundamental_score(f)
 
-    fired = {st.name: bool(rules.build(st.rule)(ind).iloc[-1]) and (market or not st.regime)
-             for st in strategies}
+    index_close = get_prices(INDEX).Close
+    idx = index_close.reindex(ind.index).ffill()
+    rs = {n: float(ind.Close.iloc[-1] / ind.Close.iloc[-1 - n] - idx.iloc[-1] / idx.iloc[-1 - n]) for n in rules.RS_PERIODS}
+    rs_ok = bool(rules.outperforms(ind.Close, index_close).iloc[-1])
+    sector_ok = sector_up(symbol) if any(st.sector for st in strategies) else None
+    off = {st.name: _filters_off(st, market, rs_ok, sector_ok) for st in strategies}
+    fired = {st.name: bool(rules.build(st.rule)(ind).iloc[-1]) and not off[st.name] for st in strategies}
     best_case = c.combined(t_score, f_score, 1.0)
     candidate = any(fired[st.name] and not _passes_gates(st, f_score, best_case) for st in strategies)
     if news == "all" or (news == "candidates" and candidate):
@@ -124,7 +151,7 @@ def evaluate(symbol: str, c: Config = Config(), news: str = "all",
     results = {}
     for st in strategies:
         if not fired[st.name]:
-            why = ["market filter off (NIFTY below SMA200)"] if st.regime and not market else [f"{st.rule} not triggered"]
+            why = off[st.name] or [f"{st.rule} not triggered"]
         else:
             why = _passes_gates(st, f_score, combined)
             if s_score is not None and s_score <= c.veto_sentiment:
@@ -145,4 +172,5 @@ def evaluate(symbol: str, c: Config = Config(), news: str = "all",
         round(close, 2), round(atr, 2), results,
         {"technical": t_why, "fundamental": f_why, "sentiment": s_why},
         as_of=f"{last.name:%Y-%m-%d}",
+        rs_3m=round(rs[rules.RS_PERIODS[0]], 4), rs_6m=round(rs[rules.RS_PERIODS[1]], 4), sector_up=sector_ok,
     )

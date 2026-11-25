@@ -41,3 +41,19 @@ def test_build_resolves_names_and_thresholds():
     assert rules.build("pullback") is rules.pullback
     assert rules.build("ema_cross") is rules.ema_cross
     assert callable(rules.build("score:0.6"))
+
+
+def test_outperforms_needs_both_3_and_6_months():
+    idx = pd.Series(100.0, index=pd.bdate_range("2026-01-01", periods=200))
+    flat_then_up = pd.Series([100.0] * 150 + [110.0] * 50, index=idx.index)
+    fired = rules.outperforms(flat_then_up, idx)
+    assert not fired.iloc[:150].any()           # no outperformance, and NaN before 126 bars
+    assert fired.iloc[150:150 + 63].all()       # +10% within both windows
+    assert not rules.outperforms(flat_then_up, idx * 1.2 ** (idx.index >= idx.index[150])).any()
+
+
+def test_sector_trend_is_close_above_sma50():
+    close = pd.Series([100.0] * 60 + [90.0] * 5 + [120.0] * 5, index=pd.bdate_range("2026-01-01", periods=70))
+    trend = rules.sector_trend(close)
+    assert not trend.iloc[:65].any()            # flat (not above) or below the SMA
+    assert trend.iloc[65:].all()

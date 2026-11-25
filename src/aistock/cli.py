@@ -211,6 +211,8 @@ STRATEGY = typer.Option(strategies.DEFAULT, "--strategy", "-s", help=f"One of: {
 YEARS = typer.Option(10, help="Years of daily history")
 RULE = typer.Option(None, help=f"Override entry rule: score:<threshold>, {', '.join(rules.RULES)}")
 REGIME = typer.Option(None, "--regime/--no-regime", help="Override the NIFTY 50 > SMA200 market filter")
+RS = typer.Option(None, "--rs/--no-rs", help="Override the filter: stock beat NIFTY 50 over 3 and 6 months")
+SECTOR = typer.Option(None, "--sector/--no-sector", help="Override the filter: sector index above its SMA50")
 STOP_ATR = typer.Option(None, help="Override stop distance in ATR")
 TARGET_ATR = typer.Option(None, help="Override target in ATR; 0 = no fixed target")
 TRAIL_ATR = typer.Option(None, help="Override trailing stop in ATR; 0 = off")
@@ -225,13 +227,14 @@ POOLED_ROWS = [("stocks", str), ("trades", str), ("win_rate", pct), ("avg_trade"
                ("profitable_stocks", pct), ("beat_buy_hold", pct)]
 
 
-def _resolve(strategy, rule, regime, stop_atr, target_atr, trail_atr, max_hold) -> Strategy:
+def _resolve(strategy, rule, regime, rs, sector, stop_atr, target_atr, trail_atr, max_hold) -> Strategy:
     """The preset with any CLI overrides applied (renamed '<preset>*' if changed)."""
     try:
         st = strategies.get(strategy)
     except ValueError as e:
         raise typer.BadParameter(str(e))
-    overrides = {k: v for k, v in {"rule": rule, "regime": regime, "stop_atr": stop_atr, "max_hold": max_hold,
+    overrides = {k: v for k, v in {"rule": rule, "regime": regime, "rs": rs, "sector": sector,
+                                   "stop_atr": stop_atr, "max_hold": max_hold,
                                    "target_atr": target_atr, "trail_atr": trail_atr}.items() if v is not None}
     for k in ("target_atr", "trail_atr"):  # 0 means off
         if overrides.get(k) == 0:
@@ -251,16 +254,16 @@ def _metric_table(title: str, columns: dict[str, dict], rows: list[tuple]) -> Ta
 
 @app.command()
 def backtest(symbol: str, strategy: str = STRATEGY, years: int = YEARS, rule: str = RULE, regime: bool = REGIME,
-             stop_atr: float = STOP_ATR, target_atr: float = TARGET_ATR, trail_atr: float = TRAIL_ATR,
+             rs: bool = RS, sector: bool = SECTOR, stop_atr: float = STOP_ATR, target_atr: float = TARGET_ATR, trail_atr: float = TRAIL_ATR,
              max_hold: int = MAX_HOLD, oos: float = OOS):
     """Backtest a strategy on one stock with Indian delivery costs."""
-    st = _resolve(strategy, rule, regime, stop_atr, target_atr, trail_atr, max_hold)
+    st = _resolve(strategy, rule, regime, rs, sector, stop_atr, target_atr, trail_atr, max_hold)
     symbol = symbol.upper()
     data, skipped = universe.load([symbol], years)
     if not data:
         print(f"[red]{skipped[0]}[/red]")
         raise typer.Exit(1)
-    entries = universe.build_entries(data, st.rule, universe.regime(years) if st.regime else None)
+    entries = universe.strategy_entries(data, st, years)
     ind = data[symbol]
     runs = {seg: engine.run(i, e, st.params()).stats
             for seg, (i, e) in universe.segments(ind, entries[symbol], oos).items()}
@@ -273,12 +276,13 @@ def backtest(symbol: str, strategy: str = STRATEGY, years: int = YEARS, rule: st
 
 @app.command("backtest-all")
 def backtest_all(watchlist: str = WATCHLIST, strategy: str = STRATEGY, years: int = YEARS, rule: str = RULE,
-                 regime: bool = REGIME, stop_atr: float = STOP_ATR, target_atr: float = TARGET_ATR,
-                 trail_atr: float = TRAIL_ATR, max_hold: int = MAX_HOLD, oos: float = OOS):
+                 regime: bool = REGIME, rs: bool = RS, sector: bool = SECTOR, stop_atr: float = STOP_ATR,
+                 target_atr: float = TARGET_ATR, trail_atr: float = TRAIL_ATR, max_hold: int = MAX_HOLD,
+                 oos: float = OOS):
     """Backtest a strategy on every stock in a watchlist; per-stock results saved to reports/."""
-    st = _resolve(strategy, rule, regime, stop_atr, target_atr, trail_atr, max_hold)
+    st = _resolve(strategy, rule, regime, rs, sector, stop_atr, target_atr, trail_atr, max_hold)
     data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
-    entries = universe.build_entries(data, st.rule, universe.regime(years) if st.regime else None)
+    entries = universe.strategy_entries(data, st, years)
     stats, trades = universe.run_universe(data, entries, st.params(), oos)
     if trades.empty:
         print("[red]No trades generated[/red]")
@@ -295,9 +299,10 @@ def backtest_all(watchlist: str = WATCHLIST, strategy: str = STRATEGY, years: in
     _print_skipped(skipped)
 
 
-def _portfolio_runs(data, index, st: Strategy, positions: int, oos: float) -> tuple[dict, list[pd.Series]]:
+def _portfolio_runs(data, index, st: Strategy, positions: int, oos: float,
+                   years: int) -> tuple[dict, list[pd.Series]]:
     """Portfolio backtest per segment; returns ({segment label: stats}, equity curves)."""
-    entries = universe.build_entries(data, st.rule, rules.market_regime(index) if st.regime else None)
+    entries = universe.strategy_entries(data, st, years, rules.market_regime(index))
     dates = index.index[index.sma200.notna()]  # start once SMA200 is warm everywhere
     split = int(len(dates) * (1 - oos))
     columns, curves = {}, []
@@ -314,14 +319,14 @@ POSITIONS = typer.Option(10, help="Max concurrent positions; each gets 1/N of eq
 
 @app.command("portfolio")
 def portfolio_cmd(watchlist: str = WATCHLIST, strategy: str = STRATEGY, years: int = YEARS, rule: str = RULE,
-                  regime: bool = REGIME, stop_atr: float = STOP_ATR, target_atr: float = TARGET_ATR,
-                  trail_atr: float = TRAIL_ATR, max_hold: int = MAX_HOLD, oos: float = OOS,
-                  positions: int = POSITIONS):
+                  regime: bool = REGIME, rs: bool = RS, sector: bool = SECTOR, stop_atr: float = STOP_ATR,
+                  target_atr: float = TARGET_ATR, trail_atr: float = TRAIL_ATR, max_hold: int = MAX_HOLD,
+                  oos: float = OOS, positions: int = POSITIONS):
     """Shared-capital portfolio backtest of a strategy, vs NIFTY 50 and an equal-weight hold of the watchlist."""
-    st = _resolve(strategy, rule, regime, stop_atr, target_atr, trail_atr, max_hold)
+    st = _resolve(strategy, rule, regime, rs, sector, stop_atr, target_atr, trail_atr, max_hold)
     data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
     index = add_indicators(get_prices(universe.INDEX, years))
-    columns, curves = _portfolio_runs(data, index, st, positions, oos)
+    columns, curves = _portfolio_runs(data, index, st, positions, oos, years)
     rows = [("cagr", pct), ("nifty_cagr", pct), ("universe_cagr", pct), ("excess_cagr", pct),
             ("excess_vs_universe", pct), ("max_drawdown", pct), ("nifty_max_drawdown", pct),
             ("universe_max_drawdown", pct), ("sharpe", num), ("nifty_sharpe", num), ("exposure", pct),
@@ -345,7 +350,7 @@ def compare(watchlist: str = WATCHLIST, strategy: str = typer.Option("all", "--s
     index = add_indicators(get_prices(universe.INDEX, years))
     runs, curves = {}, []
     for st in track(chosen, description="Backtesting strategies"):
-        runs[st.name], c = _portfolio_runs(data, index, st, positions, oos)
+        runs[st.name], c = _portfolio_runs(data, index, st, positions, oos, years)
         curves += c
 
     is_label, oos_label = list(next(iter(runs.values())))
@@ -375,24 +380,29 @@ def compare(watchlist: str = WATCHLIST, strategy: str = typer.Option("all", "--s
 def sweep_cmd(watchlist: str = WATCHLIST, years: int = YEARS, oos: float = OOS,
               rank_by: str = typer.Option("profit_factor", help=f"One of: {', '.join(sweep.RANK_BY)}"),
               min_trades: int = typer.Option(300, help="Ignore combos with fewer in-sample trades"),
-              top: int = typer.Option(10, help="Combos to re-test out-of-sample")):
-    """Grid-search rules, market filter and exits; rank in-sample, then check the top picks out-of-sample."""
+              top: int = typer.Option(10, help="Combos to re-test out-of-sample"),
+              regime: bool = typer.Option(None, "--regime/--no-regime", help="Pin the market filter instead of sweeping it"),
+              rs: bool = typer.Option(None, "--rs/--no-rs", help="Pin the RS filter instead of sweeping it"),
+              sector: bool = typer.Option(None, "--sector/--no-sector", help="Pin the sector filter instead of sweeping it")):
+    """Grid-search rules, market/RS/sector filters and exits; rank in-sample, then check the top picks out-of-sample."""
     if rank_by not in sweep.RANK_BY:
         raise typer.BadParameter(f"rank-by must be one of {sweep.RANK_BY}")
     data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
-    results, final = sweep.run(data, universe.regime(years), oos, rank_by, min_trades, top,
+    grid = sweep.pinned(regime=regime, rs=rs, sector=sector)
+    results, final = sweep.run(data, universe.regime(years), oos, rank_by, min_trades, top, years, grid,
                                progress=lambda xs: track(xs, description=f"Sweeping {len(xs)} combos"))
     path = sweep.save(results, watchlist)
 
     table = Table(title=f"Top {top} by in-sample {rank_by} (min {min_trades} trades), then out-of-sample")
-    for col in ["#", "Rule", "Mkt", "Stop", "Tgt", "Trail", "Hold",
+    for col in ["#", "Rule", "Mkt", "RS", "Sec", "Stop", "Tgt", "Trail", "Hold",
                 "IS n", "IS PF", "IS avg", "OOS n", "OOS PF", "OOS avg", "OOS win", "OOS CAGR", "B&H CAGR"]:
-        table.add_column(col, justify="left" if col in ("Rule", "Mkt") else "right")
+        table.add_column(col, justify="left" if col in ("Rule", "Mkt", "RS", "Sec") else "right")
+    on_off = lambda v: "on" if v else "off"
     opt = lambda v: "-" if v is None or pd.isna(v) else f"{v:g}"
     for n, r in enumerate(final.to_dict("records"), 1):
         g = lambda k, f: f(r[k]) if r.get(k) is not None and not pd.isna(r[k]) else "-"
         table.add_row(
-            "base" if r["baseline"] else str(n), r["rule"], "on" if r["regime"] else "off",
+            "base" if r["baseline"] else str(n), r["rule"], on_off(r["regime"]), on_off(r["rs"]), on_off(r["sector"]),
             opt(r["stop_atr"]), opt(r["target_atr"]), opt(r["trail_atr"]), str(r["max_hold"]),
             g("is_trades", str), g("is_profit_factor", num), g("is_avg_trade", pct),
             g("oos_trades", str), g("oos_profit_factor", num), g("oos_avg_trade", pct),

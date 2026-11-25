@@ -46,6 +46,21 @@ def market_regime(index_ind: pd.DataFrame) -> pd.Series:
     return index_ind.Close > index_ind.sma200
 
 
+RS_PERIODS = (63, 126)  # about 3 and 6 months of sessions
+
+
+def outperforms(close: pd.Series, index_close: pd.Series) -> pd.Series:
+    """True when the stock's return beat the index's over both ~3 and ~6 months."""
+    idx = index_close.reindex(close.index).ffill()
+    beats = [close.pct_change(n, fill_method=None) > idx.pct_change(n, fill_method=None) for n in RS_PERIODS]
+    return beats[0] & beats[1]
+
+
+def sector_trend(sector_close: pd.Series) -> pd.Series:
+    """True when the sector index closes above its 50-day SMA."""
+    return sector_close > sector_close.rolling(50).mean()
+
+
 def with_regime(entries: pd.Series, regime: pd.Series | None) -> pd.Series:
     if regime is None:
         return entries

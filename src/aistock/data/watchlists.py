@@ -15,9 +15,18 @@ SOURCES = {
 }
 
 
-def load(name: str) -> list[str]:
+def _rows(name: str) -> list[dict]:
     with (DIR / f"{name}.csv").open() as fh:
-        return [row["Symbol"].strip() for row in csv.DictReader(fh)]
+        return list(csv.DictReader(fh))
+
+
+def load(name: str) -> list[str]:
+    return [row["Symbol"].strip() for row in _rows(name)]
+
+
+def industries(name: str) -> dict[str, str]:
+    """Symbol -> NSE industry (e.g. 'Information Technology')."""
+    return {row["Symbol"].strip(): row["Industry"].strip() for row in _rows(name)}
 
 
 def update() -> dict[str, int]:
