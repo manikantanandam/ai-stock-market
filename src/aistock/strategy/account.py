@@ -2,7 +2,7 @@
 
 One account per preset, stepped forward session by session with the same
 rules as portfolio.run: the previous session's BUYs are filled at today's open
-into the slots and cash free at that close (best technical score first), then
+into the slots and cash free at that close (best rank first, per the preset), then
 positions opened earlier are checked for gap-aware exits. buy(), check_exit()
 and sell() are shared with the backtest, so the two cannot drift apart.
 
@@ -33,7 +33,6 @@ from aistock.backtest.engine import Params
 from aistock.data.prices import prefetch
 from aistock.strategy import journal, paper
 from aistock.strategy.strategies import PRESETS
-from aistock.technical.indicators import score_series
 
 ROOT = journal.ROOT / "paper"
 TRADE_COLS = ["symbol", "entry_date", "exit_date", "entry", "exit", "bars", "reason", "pnl", "ret"]
@@ -58,13 +57,14 @@ class Account:
 
 
 def advance(acct: Account, dates: pd.DatetimeIndex, frames: dict[str, pd.DataFrame],
-            signals: dict[pd.Timestamp, list[str]], p: Params, start: pd.Timestamp | None = None) -> None:
+            signals: dict[pd.Timestamp, list[str]], p: Params, start: pd.Timestamp | None = None,
+            rank_by: str = "score") -> None:
     """Step the account through every session in `dates` after its last saved one
     (a new account starts at `start`, or the first date).
     frames: add_indicators() frames for every symbol it holds or may buy;
     signals: session date -> symbols with a BUY that session; p: today's preset."""
-    score = {s: score_series(f) for s, f in frames.items()}
-    mom = {s: f.Close.pct_change(126, fill_method=None) for s, f in frames.items()}
+    keys = {s: portfolio.rank_inputs(f, rank_by) for s, f in frames.items()}
+    score, mom = {s: k[0] for s, k in keys.items()}, {s: k[1] for s, k in keys.items()}
     bar = lambda s, d: frames[s].loc[d] if s in frames and d in frames[s].index else None
 
     def last_close(s: str, d: pd.Timestamp) -> float:
@@ -213,7 +213,8 @@ def update(only: list[str] | None = None, capital: float = 100_000.0, max_positi
         group = sig[sig.strategy == name]
         signals = {pd.Timestamp(d): list(g.symbol) for d, g in group.groupby("date")}
         readjust(acct, frames)
-        advance(acct, dates, frames, signals, PRESETS[name].params(), start=pd.Timestamp(group.date.min()))
+        st = PRESETS[name]
+        advance(acct, dates, frames, signals, st.params(), start=pd.Timestamp(group.date.min()), rank_by=st.rank)
         save(acct, dates)
     return list(accounts.values())
 

@@ -343,7 +343,7 @@ def _portfolio_runs(data, index, st: Strategy, positions: int, oos: float,
     split = int(len(dates) * (1 - oos))
     columns, curves = {}, []
     for seg, d in zip(universe.SEGMENTS, (dates[:split], dates[split:])):
-        eq, invested, trades = portfolio.run(data, entries, d, st.params(), positions)
+        eq, invested, trades = portfolio.run(data, entries, d, st.params(), positions, st.rank)
         columns[f"{seg} ({d[0]:%Y-%m} to {d[-1]:%Y-%m})"] = portfolio.stats(
             eq, invested, trades, index.Close, portfolio.equal_weight(data, d))
         curves.append(eq.rename(f"{st.name} {seg}"))
@@ -461,7 +461,7 @@ def yearly(watchlist: str = WATCHLIST, strategy: str = typer.Option("all", "--st
     cols = {}
     for st in track(chosen, description="Backtesting strategies"):
         entries = universe.strategy_entries(data, st, years, rules.market_regime(index))
-        eq, _, _ = portfolio.run(data, entries, dates, st.params(), positions)
+        eq, _, _ = portfolio.run(data, entries, dates, st.params(), positions, st.rank)
         cols[st.name] = walkforward.yearly_returns(eq)
     cols["EW hold"] = walkforward.yearly_returns(portfolio.equal_weight(data, dates))
     cols["NIFTY 50"] = walkforward.yearly_returns(index.Close.reindex(dates))

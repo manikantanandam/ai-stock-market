@@ -145,3 +145,15 @@ def test_readjust_rescales_open_positions(tmp_path, monkeypatch, factor, kind):
     again = account.load("t", dates)
     account.readjust(again, {"A": after})
     assert not again.notes                                  # already applied: not rescaled twice
+
+
+def test_matches_portfolio_backtest_with_slope_rank():
+    data, entries, signals, dates = setup()
+    p = Params(stop_atr=2.0, target_atr=None, max_hold=40)
+    _, _, trades = portfolio.run(data, entries, dates, p, max_positions=2, rank_by="slope")
+    acct = account.Account("t", p.capital, 2, p.capital)
+    account.advance(acct, dates, data, signals, p, rank_by="slope")
+    closed = trades[trades.reason != "end"]
+    got = pd.DataFrame(acct.trades)
+    assert list(got.symbol) == list(closed.symbol) and len(got) > 5
+    assert got.ret.to_numpy() == pytest.approx(closed.ret.to_numpy())
