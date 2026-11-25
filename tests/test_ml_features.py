@@ -47,7 +47,7 @@ def test_dataset_panel_and_rank_ic():
     index = add_indicators(random_walk(400, seed=9)[RAW])
     df = ml.dataset(data, index, {"A": index.Close})
     assert df.index.names == ["date", "symbol"]
-    assert list(df.columns) == ml.FEATURES + ["label"]
+    assert list(df.columns) == ml.FEATURES + ["label", "tech_score"]
     assert df.index.get_level_values("date").min() == data["A"].index[data["A"].sma200.notna()][0]
     assert df.loc[(slice(None), "B"), "sector_trend"].isna().all()   # unknown sector
     ic = ml.rank_ic(df.assign(perfect=df.label, noise=np.random.default_rng(0).random(len(df))),

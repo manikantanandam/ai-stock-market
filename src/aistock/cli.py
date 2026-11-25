@@ -13,6 +13,7 @@ from aistock.data import fundamentals, prices, sectors, watchlists
 from aistock.data.prices import get_prices, market_phase
 from aistock.data.watchlists import WATCHLISTS
 from aistock.ml import features as ml_features
+from aistock.ml import model as ml_model
 from aistock.strategy import account, journal, signal, strategies
 from aistock.strategy import paper as paper_trading
 from aistock.strategy.strategies import PRESETS, Strategy
@@ -485,10 +486,14 @@ def yearly(watchlist: str = WATCHLIST, strategy: str = typer.Option("all", "--st
 ML_CACHE = prices.CACHE.parent / "ml"
 
 
-@app.command("ml-dataset")
-def ml_dataset(watchlist: str = typer.Option("nifty500", help=f"One of: {', '.join(WATCHLISTS)}"),
-               years: int = YEARS):
-    """Build the ML ranker's feature/label panel, cache it, and show each feature's rank IC by year."""
+def _ml_panel(watchlist: str, years: int, rebuild: bool = False):
+    """(panel, cache path, skipped symbols); reuses today's cached panel unless
+    rebuild, or it lacks columns added since it was built."""
+    path = ML_CACHE / f"dataset_{watchlist}_{years}y_{date.today()}.parquet"
+    if path.exists() and not rebuild:
+        df = pd.read_parquet(path)
+        if {*ml_features.FEATURES, "label", "tech_score"} <= set(df.columns):
+            return df, path, []
     data, skipped = universe.load(WATCHLISTS[watchlist], years, lambda xs: track(xs, description="Loading"))
     index = add_indicators(get_prices(universe.INDEX, years))
     industries = {sectors.INDUSTRY.get(s) for s in data} - {None}
@@ -496,8 +501,54 @@ def ml_dataset(watchlist: str = typer.Option("nifty500", help=f"One of: {', '.jo
     sector_of = {s: sector_close.get(sectors.INDUSTRY.get(s)) for s in data}
     df = ml_features.dataset(data, index, sector_of, lambda xs: track(xs, description="Features"))
     ML_CACHE.mkdir(parents=True, exist_ok=True)
-    path = ML_CACHE / f"dataset_{watchlist}_{years}y_{date.today()}.parquet"
     df.to_parquet(path)
+    return df, path, skipped
+
+
+@app.command("ml-eval")
+def ml_eval(watchlist: str = typer.Option("nifty500", help=f"One of: {', '.join(WATCHLISTS)}"),
+            years: int = YEARS,
+            min_train_years: float = typer.Option(3.0, help="Years of history before the first test year"),
+            step: int = typer.Option(ml_model.STEP, help="Train on every Nth date (labels overlap)"),
+            raw: bool = typer.Option(False, "--raw", help="Use raw feature values instead of per-date ranks")):
+    """Walk-forward test of the ML ranker vs today's ranking: rank IC and decile returns per year."""
+    df, _, skipped = _ml_panel(watchlist, years)
+    dates = df.index.get_level_values("date").unique().sort_values()
+    wins = walkforward.windows(dates, min_train_years, gap=ml_features.HORIZON)
+    if not wins:
+        raise typer.BadParameter("not enough history for one test year")
+    rows, preds, last_model, last_test = ml_model.walk_forward(
+        df, wins, step, not raw, lambda xs: track(xs, description=f"Training {len(xs)} yearly models"))
+
+    h = ml_features.HORIZON
+    table = Table(title=f"{watchlist}: ML ranker walk-forward, {'raw' if raw else 'per-date ranked'} features "
+                        f"({h}-session excess return vs the average stock)")
+    for col in ["Year", "Train rows", "Test rows", "IC", "IC>0 days", "Base IC", "Top 10%", "Bottom 10%",
+                "Base top 10%"]:
+        table.add_column(col, justify="right")
+    for r in rows.to_dict("records"):
+        table.add_row(str(r["year"]), f"{r['train_rows']:,}", f"{r['rows']:,}", f"{r['ic']:+.3f}",
+                      pct(r["ic_pos"]), f"{r['ic_base']:+.3f}", pct(r["top"]), pct(r["bottom"]), pct(r["top_base"]))
+    table.add_row("Mean", "", "", f"{rows.ic.mean():+.3f}", pct(rows.ic_pos.mean()), f"{rows.ic_base.mean():+.3f}",
+                  pct(rows.top.mean()), pct(rows.bottom.mean()), pct(rows.top_base.mean()), style="bold")
+    print(table)
+
+    imp = ml_model.importance(last_model, last_test, not raw)
+    print(f"Feature importance ({wins[-1].year} model, IC drop when shuffled): "
+          + ", ".join(f"{f} {v:+.3f}" for f, v in imp.head(8).items()))
+    ok, why = ml_model.verdict(rows)
+    print(f"[{'green' if ok else 'red'}]{'GO' if ok else 'NO-GO'}[/]: {why}")
+    path = ML_CACHE / f"oos_predictions_{watchlist}_{years}y_{date.today()}.parquet"
+    preds.to_frame("pred").to_parquet(path)
+    print(f"Out-of-sample predictions saved to {path}")
+    _print_skipped(skipped)
+
+
+@app.command("ml-dataset")
+def ml_dataset(watchlist: str = typer.Option("nifty500", help=f"One of: {', '.join(WATCHLISTS)}"),
+               years: int = YEARS):
+    """Build the ML ranker's feature/label panel, cache it, and show each feature's rank IC by year."""
+    df, path, skipped = _ml_panel(watchlist, years, rebuild=True)
 
     labelled = df.label.notna()
     dates = df.index.get_level_values("date")
