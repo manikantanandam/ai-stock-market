@@ -90,6 +90,20 @@ Position size risks 1% of capital if the stop hits.
 
 Only the technical layer can be backtested: there is no free history of fundamentals snapshots or headlines. `aistock scan` writes daily signals to `journal/days/<date>.csv` and `journal/stocks/<SYMBOL>.csv` so the combined signal can be tested once enough history builds up.
 
+## Data sources
+
+All sources are free and need no API key or account.
+
+| Data | Source | Cache | Pros | Cons |
+|---|---|---|---|---|
+| Price data (daily OHLCV, NIFTY 50 `^NSEI`) | Yahoo Finance via `yfinance` (`data/prices.py`), batch-downloaded with `yf.download` | `.cache/prices/` per IST date and market phase | Free, no key; 10+ years of daily history; split/dividend-adjusted; covers all NSE stocks and the index; fast batch download | Unofficial scraping API that can break or rate-limit without notice; bars can lag after the close; occasional bad ticks or missing days; no delisted stocks (survivorship bias); no history for many NSE sector indices |
+| Technical indicators (SMA, EMA, RSI, MACD, ATR, volume) | Computed locally with `pandas-ta` from the price data (`technical/indicators.py`) | Not cached (cheap to recompute) | Deterministic and reproducible; works offline; full history, so every rule can be backtested | Only as good as the Yahoo prices it reads; standard textbook formulas, so no edge by itself |
+| Sector trends | Equal-weight indices built locally from NIFTY 500 members per industry (`data/sectors.py`) | Uses the price cache | Covers every industry the same way, including sectors Yahoo lacks | Today's constituents only (survivorship bias); equal weight differs from official cap-weighted NSE indices |
+| Fundamentals (P/E, P/B, ROE, debt/equity, growth, margins) | Yahoo Finance `Ticker.info` via `yfinance` (`data/fundamentals.py`) | `.cache/fundamentals/`, 7 days | Free; one call gives many ratios; good enough to screen out weak balance sheets | Current snapshot only, with no history, so it can't be backtested; fields are often missing or stale for smaller NSE stocks; ~500 slow per-stock calls (hence the weekly cache) |
+| News headlines | Google News RSS (India edition, last 14 days) plus Yahoo news filtered to the company name (`data/news.py`) | `.cache/news/` per day | Free, broad Indian coverage (ET, Moneycontrol, Business Standard…); no key | Headlines only, no article text; keyword search brings noise and misses; no free history, so it can't be backtested; Yahoo news is mostly US/ADR coverage |
+| News sentiment | FinBERT (`ProsusAI/finbert`, Hugging Face), run locally (`sentiment/finbert.py`) | Model in `~/.cache/huggingface` | Finance-tuned model; free; runs on an 8GB M1 and in CI on CPU | Trained on English financial text, not Indian market slang; scores headlines in isolation, so sarcasm and context are lost; ~400MB download |
+| Watchlists (NIFTY 50 / NIFTY 500 constituents) | niftyindices.com constituent CSVs (`data/watchlists.py`), committed in `data/watchlists/` | Committed snapshot | Official NSE index source; includes the industry used for sectors | Changes only at the twice-yearly rebalance, so it needs a manual `update-watchlists`; site occasionally blocks scripted downloads |
+
 ## Project layout
 
 ```
