@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,GRASIM,Grasim Industries Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,3062.0,,,,,68.93
+2026-11-19,GRASIM,Grasim Industries Limited,Basic Materials,WATCH,0.284,0.6,-0.15,0.147,3111.1,,,,,70.07
+2026-11-20,GRASIM,Grasim Industries Limited,Basic Materials,WATCH,0.276,0.6,-0.15,0.106,3103.7,,,,,69.09
+2026-11-23,GRASIM,Grasim Industries Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,3075.2,,,,,68.33

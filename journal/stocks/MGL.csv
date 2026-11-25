@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,MGL,Mahanagar Gas Limited,Utilities,WATCH,0.205,0.2,0.35,,1115.5,,,,,31.4
+2026-11-19,MGL,Mahanagar Gas Limited,Utilities,WATCH,0.205,0.2,0.35,,1103.3,,,,,31.24
+2026-11-20,MGL,Mahanagar Gas Limited,Utilities,WATCH,0.205,0.2,0.35,,1115.3,,,,,30.97
+2026-11-23,MGL,Mahanagar Gas Limited,Utilities,WATCH,0.005,-0.2,0.35,,1088.9,,,,,31.24

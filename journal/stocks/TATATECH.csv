@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,TATATECH,Tata Technologies Limited,Technology,WATCH,0.295,0.2,0.65,,656.7,,,,,21.23
+2026-11-19,TATATECH,Tata Technologies Limited,Technology,BUY,0.617,0.6,0.65,0.61,703.75,,,,swing;trend,24.69
+2026-11-20,TATATECH,Tata Technologies Limited,Technology,BUY,0.547,0.6,0.65,0.261,727.9,,,,swing;trend;breakout,26.08
+2026-11-23,TATATECH,Tata Technologies Limited,Technology,BUY,0.566,0.6,0.65,0.354,707.9,,,,swing;trend,26.13

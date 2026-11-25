@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,ECLERX,eClerx Services Limited,Technology,WATCH,0.255,0.0,0.85,,1500.1,,,,,68.67
+2026-11-19,ECLERX,eClerx Services Limited,Technology,WATCH,0.255,0.0,0.85,,1468.8,,,,,66.3
+2026-11-20,ECLERX,eClerx Services Limited,Technology,WATCH,0.255,0.0,0.85,,1454.1,,,,,65.66
+2026-11-23,ECLERX,eClerx Services Limited,Technology,WATCH,0.155,-0.2,0.85,,1511.4,,,,,68.53

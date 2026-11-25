@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,POLYMED,Poly Medicure Limited,Healthcare,BUY,0.428,0.6,0.5,-0.109,1654.5,,,,swing;trend,55.4
+2026-11-19,POLYMED,Poly Medicure Limited,Healthcare,BUY,0.527,0.6,0.5,0.386,1670.6,,,,swing;trend,53.44
+2026-11-20,POLYMED,Poly Medicure Limited,Healthcare,BUY,0.53,0.6,0.5,0.401,1635.7,,,,swing;trend,52.48
+2026-11-23,POLYMED,Poly Medicure Limited,Healthcare,BUY,0.514,0.6,0.5,0.322,1628.4,,,,swing;trend,51.15

@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,WELSPUNLIV,Welspun Living Limited,Consumer Cyclical,BUY,0.489,0.6,0.55,0.118,255.97,,,,swing;trend,12.69
+2026-11-19,WELSPUNLIV,Welspun Living Limited,Consumer Cyclical,BUY,0.579,0.6,0.55,0.568,253.14,,,,swing;trend,12.57
+2026-11-20,WELSPUNLIV,Welspun Living Limited,Consumer Cyclical,BUY,0.587,0.6,0.55,0.609,268.78,,,,swing;trend;breakout,13.42
+2026-11-23,WELSPUNLIV,Welspun Living Limited,Consumer Cyclical,BUY,0.582,0.6,0.55,0.585,270.76,,,,swing;trend,13.68

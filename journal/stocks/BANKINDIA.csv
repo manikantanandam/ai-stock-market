@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,BANKINDIA,Bank of India,Financial Services,WATCH,0.165,0.0,0.55,,158.0,,,,,4.49
+2026-11-19,BANKINDIA,Bank of India,Financial Services,WATCH,0.165,0.0,0.55,,161.9,,,,,4.54
+2026-11-20,BANKINDIA,Bank of India,Financial Services,WATCH,0.165,0.0,0.55,,164.7,,,,,4.66
+2026-11-23,BANKINDIA,Bank of India,Financial Services,WATCH,0.265,0.2,0.55,,159.01,,,,,4.94

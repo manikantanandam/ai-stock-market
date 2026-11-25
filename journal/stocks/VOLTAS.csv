@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,VOLTAS,Voltas Limited,Consumer Cyclical,WATCH,0.13,0.2,0.1,,1134.6,,,,,37.13
+2026-11-19,VOLTAS,Voltas Limited,Consumer Cyclical,WATCH,0.03,0.0,0.1,,1237.0,,,,,42.53
+2026-11-20,VOLTAS,Voltas Limited,Consumer Cyclical,WATCH,0.03,0.0,0.1,,1235.0,,,,,41.42
+2026-11-23,VOLTAS,Voltas Limited,Consumer Cyclical,WATCH,0.13,0.2,0.1,,1218.5,,,,,41.81

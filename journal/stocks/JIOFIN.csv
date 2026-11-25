@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,0.1,0.2,0.0,,224.5,,,,,5.31
+2026-11-19,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,0.1,0.2,0.0,,226.8,,,,,5.21
+2026-11-20,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,0.1,0.2,0.0,,224.97,,,,,5.05
+2026-11-23,JIOFIN,Jio Financial Services Limited,Financial Services,WATCH,-0.1,-0.2,0.0,,219.7,,,,,5.34

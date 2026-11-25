@@ -45,7 +45,7 @@ jobs:
           [ "$(TZ=Asia/Kolkata date +%H%M)" -lt 1545 ] && d=$(date -d "$d -1 day" +%Y-%m-%d)
           while [ "$(date -d "$d" +%u)" -gt 5 ]; do d=$(date -d "$d -1 day" +%Y-%m-%d); done
           echo "expected=$d" >> "$GITHUB_OUTPUT"
-          latest=$(tail -n +2 journal/signals.csv | cut -d, -f1 | sort | tail -1)
+          latest=$(ls journal/days | sort | tail -1 | cut -d. -f1)
           open=$(gh pr list --state open --search "head:daily-scan/" --json number -q length)
           run=true
           if [ "${{ github.event_name }}" = schedule ]; then
@@ -102,7 +102,7 @@ jobs:
         env:
           EXPECTED: ${{ needs.gate.outputs.expected }}
         run: |
-          session=$(tail -n +2 journal/signals.csv | cut -d, -f1 | sort | tail -1)
+          session=$(ls journal/days | sort | tail -1 | cut -d. -f1)
           if [ "$session" \< "$EXPECTED" ]; then
             echo "::warning::Scan is as of $session but the latest session should be $EXPECTED (stale Yahoo data or a market holiday)"
           fi
@@ -125,12 +125,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add journal/signals.csv
+          git add journal
           if git diff --cached --quiet; then
             echo "Journal unchanged"
             exit 0
           fi
-          day=$(tail -n +2 journal/signals.csv | cut -d, -f1 | sort | tail -1)  # session date
+          day=$(ls journal/days | sort | tail -1 | cut -d. -f1)  # session date
           branch="daily-scan/${day}-${{ github.run_id }}"
           git switch -c "$branch"
           git commit -m "Daily scan ${day}"

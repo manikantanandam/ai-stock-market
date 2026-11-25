@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,REDINGTON,Redington Limited,Technology,WATCH,0.28,0.2,0.6,,338.1,,,,,18.16
+2026-11-19,REDINGTON,Redington Limited,Technology,WATCH,0.28,0.2,0.6,,341.3,,,,,17.78
+2026-11-20,REDINGTON,Redington Limited,Technology,WATCH,0.28,0.2,0.6,,331.3,,,,,17.43
+2026-11-23,REDINGTON,Redington Limited,Technology,WATCH,0.08,-0.2,0.6,,331.3,,,,,16.89

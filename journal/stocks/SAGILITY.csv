@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,SAGILITY,Sagility Limited,Healthcare,BUY,0.64,0.6,0.75,0.575,45.15,,,,swing;trend,1.39
+2026-11-19,SAGILITY,Sagility Limited,Healthcare,BUY,0.577,0.6,0.75,0.258,44.86,,,,swing;trend;ema-cross,1.37
+2026-11-20,SAGILITY,Sagility Limited,Healthcare,BUY,0.549,0.6,0.75,0.118,45.25,,,,swing;trend;ema-cross,1.4
+2026-11-23,SAGILITY,Sagility Limited,Healthcare,BUY,0.549,0.6,0.75,0.118,46.09,,,,swing;trend,1.38

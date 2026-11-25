@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,EXIDEIND,Exide Industries Limited,Consumer Cyclical,BUY,0.421,0.6,0.3,0.157,389.05,,,,swing;trend,14.39
+2026-11-19,EXIDEIND,Exide Industries Limited,Consumer Cyclical,BUY,0.378,0.6,0.3,-0.059,400.25,,,,trend,14.35
+2026-11-20,EXIDEIND,Exide Industries Limited,Consumer Cyclical,BUY,0.339,0.6,0.3,-0.255,408.55,,,,trend,14.6
+2026-11-23,EXIDEIND,Exide Industries Limited,Consumer Cyclical,BUY,0.377,0.6,0.3,-0.063,401.85,,,,trend,14.76

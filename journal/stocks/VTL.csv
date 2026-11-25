@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,VTL,Vardhman Textiles Limited,Consumer Cyclical,WATCH,0.095,-0.2,0.65,,527.6,,,,,18.27
+2026-11-19,VTL,Vardhman Textiles Limited,Consumer Cyclical,WATCH,0.095,-0.2,0.65,,534.0,,,,,18.01
+2026-11-20,VTL,Vardhman Textiles Limited,Consumer Cyclical,WATCH,0.095,-0.2,0.65,,528.35,,,,,17.42
+2026-11-23,VTL,Vardhman Textiles Limited,Consumer Cyclical,WATCH,0.095,-0.2,0.65,,523.9,,,,,17.03

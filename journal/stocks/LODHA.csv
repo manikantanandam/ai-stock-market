@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,LODHA,Lodha Developers Limited,Real Estate,BUY,0.615,0.6,0.9,0.223,1197.1,,,,swing;trend,44.89
+2026-11-19,LODHA,Lodha Developers Limited,Real Estate,BUY,0.617,0.6,0.9,0.233,1202.7,,,,swing;trend,43.36
+2026-11-20,LODHA,Lodha Developers Limited,Real Estate,BUY,0.581,0.6,0.9,0.055,1218.7,,,,swing;trend,43.78
+2026-11-23,LODHA,Lodha Developers Limited,Real Estate,BUY,0.59,0.6,0.9,0.099,1219.0,,,,swing;trend,42.72

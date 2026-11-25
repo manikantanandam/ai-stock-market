@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,BSE,BSE Limited,Financial Services,WATCH,0.37,0.2,0.9,,3755.7,,,,,118.85
+2026-11-19,BSE,BSE Limited,Financial Services,WATCH,0.37,0.2,0.9,,3765.0,,,,,117.07
+2026-11-20,BSE,BSE Limited,Financial Services,WATCH,0.17,-0.2,0.9,,3781.0,,,,,116.21
+2026-11-23,BSE,BSE Limited,Financial Services,WATCH,0.17,-0.2,0.9,,3757.0,,,,,114.56

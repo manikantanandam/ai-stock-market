@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,MOTILALOFS,Motilal Oswal Financial Services Limited,Financial Services,BUY,0.429,0.4,0.5,0.395,1228.95,,,,swing;trend,49.13
+2026-11-19,MOTILALOFS,Motilal Oswal Financial Services Limited,Financial Services,BUY,0.547,0.6,0.5,0.483,1210.4,,,,swing;trend,48.53
+2026-11-20,MOTILALOFS,Motilal Oswal Financial Services Limited,Financial Services,BUY,0.496,0.6,0.5,0.232,1205.65,,,,swing;trend,47.09
+2026-11-23,MOTILALOFS,Motilal Oswal Financial Services Limited,Financial Services,BUY,0.393,0.4,0.5,0.214,1235.0,,,,trend,47.21

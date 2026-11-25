@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,NHPC,NHPC Limited,Utilities,WATCH,-0.135,-0.6,0.55,,74.46,,,,,1.93
+2026-11-19,NHPC,NHPC Limited,Utilities,WATCH,0.065,-0.2,0.55,,76.3,,,,,1.98
+2026-11-20,NHPC,NHPC Limited,Utilities,WATCH,0.065,-0.2,0.55,,76.61,,,,,1.92
+2026-11-23,NHPC,NHPC Limited,Utilities,WATCH,0.065,-0.2,0.55,,75.36,,,,,1.95

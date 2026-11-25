@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,LTM,LTM Limited,Technology,WATCH,-0.12,-0.6,0.6,,4075.0,,,,,137.81
+2026-11-19,LTM,LTM Limited,Technology,WATCH,-0.12,-0.6,0.6,,4079.9,,,,,135.58
+2026-11-20,LTM,LTM Limited,Technology,WATCH,0.08,-0.2,0.6,,4166.4,,,,,142.46
+2026-11-23,LTM,LTM Limited,Technology,WATCH,0.08,-0.2,0.6,,4215.0,,,,,140.93

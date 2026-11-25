@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,1891.3,,,,,49.59
+2026-11-19,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,1873.1,,,,,49.1
+2026-11-20,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,1943.7,,,,,52.17
+2026-11-23,NH,Narayana Hrudayalaya Limited,Healthcare,WATCH,0.28,0.2,0.6,,1974.2,,,,,51.89

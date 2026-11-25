@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,PAGEIND,Page Industries Limited,Consumer Cyclical,WATCH,0.025,-0.4,0.75,,30810.0,,,,,1124.59
+2026-11-19,PAGEIND,Page Industries Limited,Consumer Cyclical,WATCH,-0.075,-0.6,0.75,,31065.0,,,,,1090.33
+2026-11-20,PAGEIND,Page Industries Limited,Consumer Cyclical,WATCH,-0.075,-0.6,0.75,,31020.0,,,,,1057.45
+2026-11-23,PAGEIND,Page Industries Limited,Consumer Cyclical,WATCH,0.025,-0.4,0.75,,30100.0,,,,,1078.71

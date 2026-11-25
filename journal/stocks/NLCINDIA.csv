@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,NLCINDIA,NLC India Limited,Utilities,WATCH,0.14,-0.2,0.8,,226.89,,,,,8.7
+2026-11-19,NLCINDIA,NLC India Limited,Utilities,WATCH,0.14,-0.2,0.8,,234.92,,,,,8.71
+2026-11-20,NLCINDIA,NLC India Limited,Utilities,WATCH,0.14,-0.2,0.8,,233.79,,,,,8.52
+2026-11-23,NLCINDIA,NLC India Limited,Utilities,WATCH,-0.06,-0.6,0.8,,227.16,,,,,8.56

@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,RKFORGE,Ramkrishna Forgings Limited,Industrials,WATCH,0.248,0.6,-0.25,0.117,758.65,,,,,31.62
+2026-11-19,RKFORGE,Ramkrishna Forgings Limited,Industrials,WATCH,0.315,0.6,-0.25,0.449,767.5,,,,,30.71
+2026-11-20,RKFORGE,Ramkrishna Forgings Limited,Industrials,WATCH,0.301,0.6,-0.25,0.381,745.75,,,,,30.48
+2026-11-23,RKFORGE,Ramkrishna Forgings Limited,Industrials,WATCH,0.289,0.6,-0.25,0.318,749.35,,,,,29.47

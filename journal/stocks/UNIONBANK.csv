@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,UNIONBANK,Union Bank of India,Financial Services,BUY,0.521,0.4,0.8,0.405,207.88,,,,swing;trend,4.76
+2026-11-19,UNIONBANK,Union Bank of India,Financial Services,BUY,0.537,0.4,0.8,0.484,210.0,,,,swing;trend,4.74
+2026-11-20,UNIONBANK,Union Bank of India,Financial Services,BUY,0.458,0.4,0.8,0.088,218.85,,,,swing;trend;breakout,5.28
+2026-11-23,UNIONBANK,Union Bank of India,Financial Services,BUY,0.546,0.6,0.8,0.032,208.2,,,,swing;trend,5.76

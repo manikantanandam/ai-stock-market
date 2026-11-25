@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,BBOX,Black Box Limited,Technology,BUY,0.52,0.6,0.4,0.502,880.0,,,,swing;trend,44.11
+2026-11-19,BBOX,Black Box Limited,Technology,BUY,0.508,0.6,0.4,0.439,907.4,,,,swing;trend,44.77
+2026-11-20,BBOX,Black Box Limited,Technology,BUY,0.435,0.6,0.4,0.074,896.4,,,,swing;trend,43.1
+2026-11-23,BBOX,Black Box Limited,Technology,BUY,0.43,0.6,0.4,0.048,854.05,,,,swing;trend,44.26

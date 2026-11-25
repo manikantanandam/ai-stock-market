@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,LALPATHLAB,Dr. Lal PathLabs Limited,Healthcare,BUY,0.548,0.6,0.9,-0.108,1965.4,,,,swing;trend,65.76
+2026-11-19,LALPATHLAB,Dr. Lal PathLabs Limited,Healthcare,BUY,0.566,0.6,0.9,-0.02,1963.2,,,,swing;trend,63.24
+2026-11-20,LALPATHLAB,Dr. Lal PathLabs Limited,Healthcare,BUY,0.569,0.6,0.9,-0.004,2006.0,,,,swing;trend,65.02
+2026-11-23,LALPATHLAB,Dr. Lal PathLabs Limited,Healthcare,BUY,0.568,0.6,0.9,-0.009,2040.5,,,,swing;trend,65.24

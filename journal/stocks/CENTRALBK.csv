@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,CENTRALBK,Central Bank of India,Financial Services,WATCH,0.265,0.2,0.55,,32.43,,,,,0.74
+2026-11-19,CENTRALBK,Central Bank of India,Financial Services,WATCH,0.165,0.0,0.55,,33.61,,,,,0.8
+2026-11-20,CENTRALBK,Central Bank of India,Financial Services,WATCH,0.165,0.0,0.55,,34.37,,,,,0.87
+2026-11-23,CENTRALBK,Central Bank of India,Financial Services,WATCH,0.265,0.2,0.55,,33.4,,,,,0.93

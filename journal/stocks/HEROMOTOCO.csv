@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,HEROMOTOCO,Hero MotoCorp Limited,Consumer Cyclical,WATCH,0.37,0.2,0.9,,5253.0,,,,,137.02
+2026-11-19,HEROMOTOCO,Hero MotoCorp Limited,Consumer Cyclical,BUY,0.639,0.6,0.9,0.343,5556.0,,,,swing;trend;breakout,149.19
+2026-11-20,HEROMOTOCO,Hero MotoCorp Limited,Consumer Cyclical,BUY,0.658,0.6,0.9,0.439,5536.0,,,,swing;trend,145.36
+2026-11-23,HEROMOTOCO,Hero MotoCorp Limited,Consumer Cyclical,BUY,0.619,0.6,0.9,0.246,5535.0,,,,swing;trend,143.37

@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,JINDALSAW,Jindal Saw Limited,Basic Materials,WATCH,0.01,0.2,-0.3,,252.23,,,,,10.99
+2026-11-19,JINDALSAW,Jindal Saw Limited,Basic Materials,WATCH,0.01,0.2,-0.3,,249.93,,,,,10.88
+2026-11-20,JINDALSAW,Jindal Saw Limited,Basic Materials,WATCH,0.01,0.2,-0.3,,246.42,,,,,10.56
+2026-11-23,JINDALSAW,Jindal Saw Limited,Basic Materials,WATCH,0.01,0.2,-0.3,,240.52,,,,,10.43

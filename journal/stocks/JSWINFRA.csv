@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,JSWINFRA,JSW Infrastructure Limited,Industrials,WATCH,0.205,0.2,0.35,,338.75,,,,,10.87
+2026-11-19,JSWINFRA,JSW Infrastructure Limited,Industrials,WATCH,0.205,0.2,0.35,,337.15,,,,,10.46
+2026-11-20,JSWINFRA,JSW Infrastructure Limited,Industrials,BUY,0.437,0.6,0.35,0.162,341.25,,,,swing;trend,10.54
+2026-11-23,JSWINFRA,JSW Infrastructure Limited,Industrials,BUY,0.484,0.6,0.35,0.393,353.55,,,,swing;trend;breakout,11.1

@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,BAJAJ-AUTO,Bajaj Auto Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,10570.0,,,,,236.02
+2026-11-19,BAJAJ-AUTO,Bajaj Auto Limited,Consumer Cyclical,BUY,0.612,0.6,0.8,0.36,10817.0,,,,swing;trend,248.16
+2026-11-20,BAJAJ-AUTO,Bajaj Auto Limited,Consumer Cyclical,BUY,0.582,0.6,0.8,0.209,10765.0,,,,swing;trend,245.08
+2026-11-23,BAJAJ-AUTO,Bajaj Auto Limited,Consumer Cyclical,WATCH,0.34,0.2,0.8,,10643.0,,,,,241.0

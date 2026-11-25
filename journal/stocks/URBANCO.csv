@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,URBANCO,Urban Company Limited,Technology,BUY,0.328,0.6,0.05,0.067,172.73,,,,trend,7.68
+2026-11-19,URBANCO,Urban Company Limited,Technology,BUY,0.353,0.6,0.05,0.192,176.05,,,,trend;breakout,7.69
+2026-11-20,URBANCO,Urban Company Limited,Technology,BUY,0.346,0.6,0.05,0.153,168.95,,,,trend,7.78
+2026-11-23,URBANCO,Urban Company Limited,Technology,BUY,0.34,0.6,0.05,0.125,168.68,,,,trend,7.7

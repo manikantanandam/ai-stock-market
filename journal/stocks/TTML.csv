@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,TTML,Tata Teleservices (Maharashtra) Limited,Communication Services,WATCH,-0.1,-0.2,0.0,,37.06,,,,,2.28
+2026-11-19,TTML,Tata Teleservices (Maharashtra) Limited,Communication Services,WATCH,-0.1,-0.2,0.0,,36.81,,,,,2.17
+2026-11-20,TTML,Tata Teleservices (Maharashtra) Limited,Communication Services,WATCH,-0.1,-0.2,0.0,,36.02,,,,,2.09
+2026-11-23,TTML,Tata Teleservices (Maharashtra) Limited,Communication Services,AVOID,-0.3,-0.6,0.0,,34.7,,,,,2.08

@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,COFORGE,Coforge Limited,Technology,WATCH,0.265,0.2,0.55,,2049.0,,,,,65.97
+2026-11-19,COFORGE,Coforge Limited,Technology,WATCH,0.265,0.2,0.55,,2041.0,,,,,64.32
+2026-11-20,COFORGE,Coforge Limited,Technology,WATCH,0.265,0.2,0.55,,2086.7,,,,,70.5
+2026-11-23,COFORGE,Coforge Limited,Technology,BUY,0.495,0.6,0.55,0.148,2142.3,,,,swing;trend,70.34

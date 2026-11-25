@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,STARHEALTH,Star Health and Allied Insurance Company Limited,Financial Services,BUY,0.56,0.6,0.55,0.474,559.8,,,,swing;trend,19.39
+2026-11-19,STARHEALTH,Star Health and Allied Insurance Company Limited,Financial Services,BUY,0.487,0.6,0.55,0.111,568.65,,,,swing;trend,19.22
+2026-11-20,STARHEALTH,Star Health and Allied Insurance Company Limited,Financial Services,BUY,0.439,0.6,0.55,-0.129,556.05,,,,swing;trend,18.94
+2026-11-23,STARHEALTH,Star Health and Allied Insurance Company Limited,Financial Services,BUY,0.481,0.6,0.55,0.082,564.1,,,,swing;trend,18.65

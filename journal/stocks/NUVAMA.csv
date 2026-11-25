@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,NUVAMA,Nuvama Wealth Management Limited,Financial Services,BUY,0.476,0.6,0.5,0.129,1871.2,,,,swing;trend,80.8
+2026-11-19,NUVAMA,Nuvama Wealth Management Limited,Financial Services,BUY,0.48,0.6,0.5,0.149,1834.6,,,,swing;trend,78.55
+2026-11-20,NUVAMA,Nuvama Wealth Management Limited,Financial Services,WATCH,0.25,0.2,0.5,,1820.8,,,,,76.06
+2026-11-23,NUVAMA,Nuvama Wealth Management Limited,Financial Services,WATCH,0.05,-0.2,0.5,,1758.3,,,,,77.07

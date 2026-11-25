@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,PAYTM,One97 Communications Limited,Technology,BUY,0.366,0.6,0.2,0.032,1890.0,,,,trend,63.72
+2026-11-19,PAYTM,One97 Communications Limited,Technology,WATCH,0.16,0.2,0.2,,1725.9,,,,,75.29
+2026-11-20,PAYTM,One97 Communications Limited,Technology,WATCH,0.16,0.2,0.2,,1740.0,,,,,74.15
+2026-11-23,PAYTM,One97 Communications Limited,Technology,WATCH,-0.04,-0.2,0.2,,1730.6,,,,,72.16

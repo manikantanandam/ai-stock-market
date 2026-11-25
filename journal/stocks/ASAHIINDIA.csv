@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.39,0.4,0.35,0.427,1157.3,,,,trend,35.4
+2026-11-19,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.366,0.4,0.35,0.305,1192.05,,,,trend,35.85
+2026-11-20,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.373,0.4,0.35,0.342,1163.6,,,,trend,35.78
+2026-11-23,ASAHIINDIA,Asahi India Glass Limited,Consumer Cyclical,BUY,0.321,0.4,0.35,0.08,1178.45,,,,trend,34.89

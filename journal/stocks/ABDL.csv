@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,ABDL,Allied Blenders and Distillers Limited,Consumer Defensive,BUY,0.227,0.4,0.25,-0.239,798.05,,,,trend,31.72
+2026-11-19,ABDL,Allied Blenders and Distillers Limited,Consumer Defensive,WATCH,0.202,0.4,0.25,-0.363,808.2,,,,,31.95
+2026-11-20,ABDL,Allied Blenders and Distillers Limited,Consumer Defensive,WATCH,0.294,0.6,0.25,-0.406,794.3,,,,,31.47
+2026-11-23,ABDL,Allied Blenders and Distillers Limited,Consumer Defensive,BUY,0.242,0.4,0.25,-0.167,802.85,,,,trend,30.92

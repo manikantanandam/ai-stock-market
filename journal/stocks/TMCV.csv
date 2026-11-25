@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,443.8,,,,,15.9
+2026-11-19,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,445.85,,,,,15.45
+2026-11-20,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,456.75,,,,,15.67
+2026-11-23,TMCV,Tata Motors Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,453.8,,,,,15.42

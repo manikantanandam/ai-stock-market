@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,EIHOTEL,EIH Limited,Consumer Cyclical,WATCH,0.295,0.2,0.65,,313.45,,,,,9.58
+2026-11-19,EIHOTEL,EIH Limited,Consumer Cyclical,WATCH,0.295,0.2,0.65,,310.0,,,,,9.66
+2026-11-20,EIHOTEL,EIH Limited,Consumer Cyclical,WATCH,0.195,0.0,0.65,,334.15,,,,,10.99
+2026-11-23,EIHOTEL,EIH Limited,Consumer Cyclical,WATCH,0.295,0.2,0.65,,333.4,,,,,10.99

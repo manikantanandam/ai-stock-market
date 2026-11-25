@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,FSL,Firstsource Solutions Limited,Technology,WATCH,0.08,-0.2,0.6,,273.0,,,,,11.13
+2026-11-19,FSL,Firstsource Solutions Limited,Technology,WATCH,0.08,-0.2,0.6,,273.9,,,,,11.04
+2026-11-20,FSL,Firstsource Solutions Limited,Technology,WATCH,0.28,0.2,0.6,,281.45,,,,,11.32
+2026-11-23,FSL,Firstsource Solutions Limited,Technology,WATCH,0.28,0.2,0.6,,283.6,,,,,11.35

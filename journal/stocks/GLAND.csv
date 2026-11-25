@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,GLAND,Gland Pharma Limited,Healthcare,BUY,0.533,0.6,0.65,0.191,3230.5,,,,swing;trend,104.53
+2026-11-19,GLAND,Gland Pharma Limited,Healthcare,BUY,0.525,0.6,0.65,0.149,3292.9,,,,swing;trend,102.45
+2026-11-20,GLAND,Gland Pharma Limited,Healthcare,BUY,0.53,0.6,0.65,0.174,3331.9,,,,swing;trend,99.38
+2026-11-23,GLAND,Gland Pharma Limited,Healthcare,BUY,0.579,0.6,0.65,0.421,3297.4,,,,swing;trend,98.91

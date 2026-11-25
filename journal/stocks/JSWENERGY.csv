@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,JSWENERGY,JSW Energy Limited,Utilities,WATCH,0.07,0.2,-0.1,,511.85,,,,,13.2
+2026-11-19,JSWENERGY,JSW Energy Limited,Utilities,WATCH,0.07,0.2,-0.1,,515.0,,,,,12.92
+2026-11-20,JSWENERGY,JSW Energy Limited,Utilities,WATCH,0.07,0.2,-0.1,,513.4,,,,,13.13
+2026-11-23,JSWENERGY,JSW Energy Limited,Utilities,WATCH,-0.13,-0.2,-0.1,,502.55,,,,,13.54

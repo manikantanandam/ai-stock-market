@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,APLAPOLLO,APL Apollo Tubes Limited,Basic Materials,WATCH,0.34,0.2,0.8,,2161.2,,,,,58.62
+2026-11-19,APLAPOLLO,APL Apollo Tubes Limited,Basic Materials,WATCH,0.14,-0.2,0.8,,2147.9,,,,,57.57
+2026-11-20,APLAPOLLO,APL Apollo Tubes Limited,Basic Materials,WATCH,0.14,-0.2,0.8,,2121.6,,,,,61.33
+2026-11-23,APLAPOLLO,APL Apollo Tubes Limited,Basic Materials,WATCH,0.24,0.0,0.8,,1670.0,,,,,90.64

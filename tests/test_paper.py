@@ -13,10 +13,12 @@ DATES = UP.index
 def replay(tmp_path, monkeypatch):
     """Run paper.run on an in-memory journal with synthetic prices."""
     def go(rows: list[dict], prices: dict[str, pd.DataFrame] | None = None, **kw):
-        path = tmp_path / "signals.csv"
-        pd.DataFrame(rows).to_csv(path, index=False)
+        days = tmp_path / "days"
+        days.mkdir()
+        for date, g in pd.DataFrame(rows).groupby("date"):
+            g.to_csv(days / f"{date}.csv", index=False)
         frames = {"^NSEI": UP.assign(Close=100.0), **(prices or {"A": UP})}
-        monkeypatch.setattr(paper, "JOURNAL", path)
+        monkeypatch.setattr(paper.journal, "DAYS", days)
         monkeypatch.setattr(paper, "prefetch", lambda *a, **k: None)
         monkeypatch.setattr(paper, "_prices", lambda s: frames[s])
         return paper.run(**kw)

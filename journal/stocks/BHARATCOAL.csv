@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,BHARATCOAL,Bharat Coking Coal Limited,Basic Materials,WATCH,-0.115,-0.2,-0.05,,30.66,,,,,0.76
+2026-11-19,BHARATCOAL,Bharat Coking Coal Limited,Basic Materials,WATCH,-0.115,-0.2,-0.05,,30.67,,,,,0.73
+2026-11-20,BHARATCOAL,Bharat Coking Coal Limited,Basic Materials,AVOID,-0.315,-0.6,-0.05,,30.46,,,,,0.71
+2026-11-23,BHARATCOAL,Bharat Coking Coal Limited,Basic Materials,AVOID,-0.315,-0.6,-0.05,,30.02,,,,,0.71

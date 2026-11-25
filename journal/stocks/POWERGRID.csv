@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,259.1,,,,,6.05
+2026-11-19,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,264.5,,,,,6.15
+2026-11-20,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,269.0,,,,,6.35
+2026-11-23,POWERGRID,Power Grid Corporation of India Limited,Utilities,WATCH,0.235,0.2,0.45,,264.85,,,,,6.53

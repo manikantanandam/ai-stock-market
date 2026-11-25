@@ -26,7 +26,7 @@ The first command that uses news downloads FinBERT (~440MB) to the Hugging Face 
 uv run aistock analyze INFY
 uv run aistock analyze RELIANCE --capital 500000 --no-news
 
-# Rank a watchlist (nifty50 default, nifty500, or --symbols TCS,INFY) and log signals to journal/signals.csv
+# Rank a watchlist (nifty50 default, nifty500, or --symbols TCS,INFY) and log signals to journal/days/ and journal/stocks/
 uv run aistock scan
 uv run aistock scan --watchlist nifty500 --news candidates --top 20
 
@@ -60,7 +60,7 @@ uv run aistock paper --strategy trend --since 2026-12-01
 
 Backtest commands take `--watchlist nifty50|nifty500`. For large lists, `scan` fetches news only for stocks that could still reach BUY (`--news candidates`, the default above 60 stocks). Recent listings with under 200 sessions of history are skipped.
 
-**Daily scan on GitHub Actions:** `.github/workflows/daily-scan.yml` runs `aistock scan --watchlist nifty500` at 16:30 IST on weekdays and merges `journal/signals.csv` into `main` through an automated PR. `main` is protected: every change, including the daily journal update, goes through a pull request. Run `git pull` before running `scan` locally, and don't commit local journal changes. You can also trigger it from the Actions tab (`workflow_dispatch`).
+**Daily scan on GitHub Actions:** `.github/workflows/daily-scan.yml` runs `aistock scan --watchlist nifty500` at 16:47 IST on weekdays (with a 20:17 IST backup if that session is missing) and merges `journal/` into `main` through an automated PR. `main` is protected: every change, including the daily journal update, goes through a pull request. Run `git pull` before running `scan` locally, and don't commit local journal changes. You can also trigger it from the Actions tab (`workflow_dispatch`).
 
 Symbols are bare NSE tickers (`INFY`, `M&M`); `.NS` is added internally. Run `uv run aistock <command> --help` for all options.
 
@@ -87,7 +87,7 @@ Position size risks 1% of capital if the stop hits.
 
 **Backtester:** long-only, daily bars, next-day-open entries, gap-aware stop/target fills, optional trailing stop, and Indian delivery costs (STT, stamp duty, exchange fees, GST, DP charge, slippage). Every run is split into in-sample (first 70%) and out-of-sample (last 30%). The sweep ranks on in-sample only and then re-tests the top picks out-of-sample.
 
-Only the technical layer can be backtested: there is no free history of fundamentals snapshots or headlines. `aistock scan` writes daily signals to `journal/signals.csv` so the combined signal can be tested once enough history builds up.
+Only the technical layer can be backtested: there is no free history of fundamentals snapshots or headlines. `aistock scan` writes daily signals to `journal/days/<date>.csv` and `journal/stocks/<SYMBOL>.csv` so the combined signal can be tested once enough history builds up.
 
 ## Project layout
 

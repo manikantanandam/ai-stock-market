@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,IDEA,Vodafone Idea Limited,Communication Services,WATCH,0.16,0.2,0.2,,12.1,,,,,0.42
+2026-11-19,IDEA,Vodafone Idea Limited,Communication Services,WATCH,0.16,0.2,0.2,,12.11,,,,,0.4
+2026-11-20,IDEA,Vodafone Idea Limited,Communication Services,WATCH,0.16,0.2,0.2,,12.15,,,,,0.39
+2026-11-23,IDEA,Vodafone Idea Limited,Communication Services,WATCH,-0.04,-0.2,0.2,,11.91,,,,,0.39

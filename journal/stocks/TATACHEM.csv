@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,634.6,,,,,21.85
+2026-11-19,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,650.05,,,,,22.08
+2026-11-20,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,639.3,,,,,23.48
+2026-11-23,TATACHEM,Tata Chemicals Limited,Basic Materials,WATCH,0.055,0.2,-0.15,,652.05,,,,,23.85

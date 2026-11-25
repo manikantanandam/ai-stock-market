@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,GAIL,GAIL (India) Limited,Utilities,BUY,0.453,0.4,0.65,0.292,190.0,,,,swing;trend,3.98
+2026-11-19,GAIL,GAIL (India) Limited,Utilities,BUY,0.498,0.4,0.65,0.514,192.1,,,,swing;trend,3.86
+2026-11-20,GAIL,GAIL (India) Limited,Utilities,BUY,0.461,0.4,0.65,0.329,191.44,,,,swing;trend,3.82
+2026-11-23,GAIL,GAIL (India) Limited,Utilities,BUY,0.566,0.6,0.65,0.353,185.6,,,,swing;trend,3.98

@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,LINDEINDIA,Linde India Limited,Basic Materials,WATCH,0.175,0.2,0.25,,6865.0,,,,,228.52
+2026-11-19,LINDEINDIA,Linde India Limited,Basic Materials,WATCH,0.175,0.2,0.25,,6742.0,,,,,223.56
+2026-11-20,LINDEINDIA,Linde India Limited,Basic Materials,WATCH,0.175,0.2,0.25,,6572.0,,,,,222.02
+2026-11-23,LINDEINDIA,Linde India Limited,Basic Materials,WATCH,0.175,0.2,0.25,,6961.5,,,,,244.16

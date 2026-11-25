@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,NYKAA,FSN E-Commerce Ventures Limited,Consumer Cyclical,BUY,0.554,0.6,0.4,0.671,352.0,,,,swing;trend,10.16
+2026-11-19,NYKAA,FSN E-Commerce Ventures Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,357.8,,,,,9.93
+2026-11-20,NYKAA,FSN E-Commerce Ventures Limited,Consumer Cyclical,BUY,0.489,0.6,0.4,0.343,364.0,,,,swing;trend,9.97
+2026-11-23,NYKAA,FSN E-Commerce Ventures Limited,Consumer Cyclical,WATCH,0.22,0.2,0.4,,357.0,,,,,9.97

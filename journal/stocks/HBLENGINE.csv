@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,0.16,0.2,0.2,,788.05,,,,,29.77
+2026-11-19,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,-0.04,-0.2,0.2,,772.55,,,,,28.86
+2026-11-20,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,-0.04,-0.2,0.2,,760.8,,,,,28.01
+2026-11-23,HBLENGINE,HBL Engineering Limited,Industrials,WATCH,-0.04,-0.2,0.2,,770.0,,,,,28.33

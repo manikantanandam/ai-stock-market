@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.445,0.6,0.45,0.051,4820.4,,,,swing;trend,169.85
+2026-11-19,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.474,0.6,0.45,0.193,4978.6,,,,swing;trend;breakout,173.35
+2026-11-20,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.5,0.6,0.45,0.324,4932.7,,,,swing;trend,171.1
+2026-11-23,FLUOROCHEM,Gujarat Fluorochemicals Limited,Basic Materials,BUY,0.46,0.6,0.45,0.123,4895.0,,,,swing;trend,169.82

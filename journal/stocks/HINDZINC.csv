@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,HINDZINC,Hindustan Zinc Limited,Basic Materials,WATCH,0.2,-0.2,1.0,,527.0,,,,,16.98
+2026-11-19,HINDZINC,Hindustan Zinc Limited,Basic Materials,WATCH,-0.0,-0.6,1.0,,529.0,,,,,17.22
+2026-11-20,HINDZINC,Hindustan Zinc Limited,Basic Materials,WATCH,-0.0,-0.6,1.0,,521.6,,,,,17.85
+2026-11-23,HINDZINC,Hindustan Zinc Limited,Basic Materials,WATCH,-0.0,-0.6,1.0,,528.95,,,,,17.54

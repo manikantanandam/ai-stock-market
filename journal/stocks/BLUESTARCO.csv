@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,BLUESTARCO,Blue Star Limited,Industrials,WATCH,0.31,0.2,0.7,,1621.8,,,,,56.44
+2026-11-19,BLUESTARCO,Blue Star Limited,Industrials,WATCH,0.21,0.0,0.7,,1764.0,,,,,63.36
+2026-11-20,BLUESTARCO,Blue Star Limited,Industrials,WATCH,0.21,0.0,0.7,,1791.0,,,,,63.81
+2026-11-23,BLUESTARCO,Blue Star Limited,Industrials,WATCH,0.21,0.0,0.7,,1785.1,,,,,61.81

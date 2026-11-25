@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,IGIL,International Gemological Institute Limited,Basic Materials,BUY,0.422,0.4,0.65,0.134,444.1,,,,swing;trend,18.01
+2026-11-19,IGIL,International Gemological Institute Limited,Basic Materials,BUY,0.415,0.4,0.65,0.098,437.3,,,,swing;trend,17.41
+2026-11-20,IGIL,International Gemological Institute Limited,Basic Materials,WATCH,0.295,0.2,0.65,,422.2,,,,,17.54
+2026-11-23,IGIL,International Gemological Institute Limited,Basic Materials,WATCH,0.295,0.2,0.65,,431.1,,,,,17.06

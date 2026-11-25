@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,NAVINFLUOR,Navin Fluorine International Limited,Basic Materials,BUY,0.577,0.4,0.9,0.537,10278.0,,,,swing;trend,321.46
+2026-11-19,NAVINFLUOR,Navin Fluorine International Limited,Basic Materials,BUY,0.532,0.4,0.9,0.312,10203.0,,,,swing;trend,316.17
+2026-11-20,NAVINFLUOR,Navin Fluorine International Limited,Basic Materials,BUY,0.627,0.6,0.9,0.285,10077.0,,,,swing;trend,314.95
+2026-11-23,NAVINFLUOR,Navin Fluorine International Limited,Basic Materials,BUY,0.567,0.4,0.9,0.485,10154.0,,,,swing;trend,312.81

@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,BHARTIARTL,Bharti Airtel Limited,Communication Services,BUY,0.53,0.6,0.7,0.099,2132.0,,,,swing;trend,44.96
+2026-11-19,BHARTIARTL,Bharti Airtel Limited,Communication Services,BUY,0.441,0.4,0.7,0.154,2144.0,,,,swing;trend,43.71
+2026-11-20,BHARTIARTL,Bharti Airtel Limited,Communication Services,BUY,0.476,0.4,0.7,0.331,2161.7,,,,swing;trend,43.0
+2026-11-23,BHARTIARTL,Bharti Airtel Limited,Communication Services,BUY,0.51,0.6,0.7,0.001,2128.5,,,,swing;trend,43.38

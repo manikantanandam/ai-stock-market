@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,HONAUT,Honeywell Automation India Limited,Industrials,WATCH,0.005,-0.2,0.35,,29835.0,,,,,836.84
+2026-11-19,HONAUT,Honeywell Automation India Limited,Industrials,WATCH,0.005,-0.2,0.35,,30005.0,,,,,822.07
+2026-11-20,HONAUT,Honeywell Automation India Limited,Industrials,WATCH,0.005,-0.2,0.35,,30345.0,,,,,800.14
+2026-11-23,HONAUT,Honeywell Automation India Limited,Industrials,WATCH,0.005,-0.2,0.35,,29715.0,,,,,806.56

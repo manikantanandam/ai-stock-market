@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,INDHOTEL,The Indian Hotels Company Limited,Consumer Cyclical,BUY,0.61,0.6,0.9,0.199,875.05,,,,swing;trend,22.05
+2026-11-19,INDHOTEL,The Indian Hotels Company Limited,Consumer Cyclical,BUY,0.609,0.6,0.9,0.193,889.65,,,,swing;trend,22.01
+2026-11-20,INDHOTEL,The Indian Hotels Company Limited,Consumer Cyclical,BUY,0.499,0.4,0.9,0.144,912.0,,,,swing;trend,22.59
+2026-11-23,INDHOTEL,The Indian Hotels Company Limited,Consumer Cyclical,BUY,0.589,0.6,0.9,0.093,906.0,,,,swing;trend,22.05

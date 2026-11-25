@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,TORNTPOWER,Torrent Power Limited,Utilities,WATCH,0.005,-0.2,0.35,,1211.8,,,,,33.01
+2026-11-19,TORNTPOWER,Torrent Power Limited,Utilities,WATCH,0.205,0.2,0.35,,1234.1,,,,,32.85
+2026-11-20,TORNTPOWER,Torrent Power Limited,Utilities,WATCH,0.005,-0.2,0.35,,1225.4,,,,,31.88
+2026-11-23,TORNTPOWER,Torrent Power Limited,Utilities,WATCH,-0.195,-0.6,0.35,,1198.4,,,,,32.64

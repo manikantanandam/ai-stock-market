@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,TATACOMM,Tata Communications Limited,Communication Services,BUY,0.321,0.6,0.2,-0.196,1767.3,,,,trend,57.53
+2026-11-19,TATACOMM,Tata Communications Limited,Communication Services,BUY,0.345,0.6,0.2,-0.077,1751.7,,,,trend,56.39
+2026-11-20,TATACOMM,Tata Communications Limited,Communication Services,BUY,0.369,0.6,0.2,0.044,1751.0,,,,trend,54.43
+2026-11-23,TATACOMM,Tata Communications Limited,Communication Services,WATCH,0.16,0.2,0.2,,1723.6,,,,,54.32

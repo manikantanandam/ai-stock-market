@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,HYUNDAI,Hyundai Motor India Limited,Consumer Cyclical,BUY,0.481,0.6,0.5,0.156,2097.5,,,,swing;trend,57.08
+2026-11-19,HYUNDAI,Hyundai Motor India Limited,Consumer Cyclical,BUY,0.467,0.6,0.5,0.086,2219.2,,,,swing;trend;breakout,63.93
+2026-11-20,HYUNDAI,Hyundai Motor India Limited,Consumer Cyclical,BUY,0.468,0.6,0.5,0.09,2215.0,,,,swing;trend,62.64
+2026-11-23,HYUNDAI,Hyundai Motor India Limited,Consumer Cyclical,BUY,0.511,0.6,0.5,0.306,2155.0,,,,swing;trend,65.16

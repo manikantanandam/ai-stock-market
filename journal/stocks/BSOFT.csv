@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,301.75,,,,,13.46
+2026-11-19,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,298.85,,,,,13.48
+2026-11-20,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,303.15,,,,,13.8
+2026-11-23,BSOFT,Birlasoft Limited,Technology,WATCH,0.11,-0.2,0.7,,304.7,,,,,14.04

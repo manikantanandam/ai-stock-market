@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,ABB,ABB India Limited,Industrials,WATCH,0.22,0.2,0.4,,6851.0,,,,,231.27
+2026-11-19,ABB,ABB India Limited,Industrials,BUY,0.493,0.6,0.4,0.367,6951.0,,,,swing;trend,226.0
+2026-11-20,ABB,ABB India Limited,Industrials,BUY,0.486,0.6,0.4,0.332,6934.5,,,,swing;trend,218.75
+2026-11-23,ABB,ABB India Limited,Industrials,WATCH,0.22,0.2,0.4,,6868.5,,,,,213.06

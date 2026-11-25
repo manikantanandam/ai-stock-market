@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,LEMONTREE,Lemon Tree Hotels Limited,Consumer Cyclical,WATCH,0.31,0.2,0.7,,123.59,,,,,3.66
+2026-11-19,LEMONTREE,Lemon Tree Hotels Limited,Consumer Cyclical,WATCH,0.21,0.0,0.7,,124.83,,,,,3.52
+2026-11-20,LEMONTREE,Lemon Tree Hotels Limited,Consumer Cyclical,WATCH,0.21,0.0,0.7,,127.54,,,,,3.62
+2026-11-23,LEMONTREE,Lemon Tree Hotels Limited,Consumer Cyclical,WATCH,0.21,0.0,0.7,,127.63,,,,,3.56

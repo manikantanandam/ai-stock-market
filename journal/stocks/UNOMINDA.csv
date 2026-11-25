@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,UNOMINDA,Uno Minda Limited,Consumer Cyclical,BUY,0.646,0.6,0.7,0.678,1370.0,,,,swing;trend,44.86
+2026-11-19,UNOMINDA,Uno Minda Limited,Consumer Cyclical,BUY,0.524,0.4,0.7,0.571,1385.0,,,,swing;trend,44.49
+2026-11-20,UNOMINDA,Uno Minda Limited,Consumer Cyclical,BUY,0.551,0.6,0.7,0.206,1380.0,,,,swing;trend,43.48
+2026-11-23,UNOMINDA,Uno Minda Limited,Consumer Cyclical,BUY,0.553,0.6,0.7,0.213,1356.9,,,,swing;trend,43.18

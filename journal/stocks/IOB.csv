@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,IOB,Indian Overseas Bank,Financial Services,WATCH,0.14,-0.2,0.8,,30.93,,,,,0.93
+2026-11-19,IOB,Indian Overseas Bank,Financial Services,WATCH,0.34,0.2,0.8,,31.49,,,,,0.95
+2026-11-20,IOB,Indian Overseas Bank,Financial Services,WATCH,0.34,0.2,0.8,,31.99,,,,,1.01
+2026-11-23,IOB,Indian Overseas Bank,Financial Services,WATCH,0.34,0.2,0.8,,31.22,,,,,1.05

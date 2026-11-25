@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,TATAPOWER,The Tata Power Company Limited,Utilities,AVOID,-0.255,-0.6,0.15,,338.0,,,,,8.82
+2026-11-19,TATAPOWER,The Tata Power Company Limited,Utilities,AVOID,-0.255,-0.6,0.15,,340.0,,,,,8.74
+2026-11-20,TATAPOWER,The Tata Power Company Limited,Utilities,AVOID,-0.255,-0.6,0.15,,339.7,,,,,8.62
+2026-11-23,TATAPOWER,The Tata Power Company Limited,Utilities,AVOID,-0.255,-0.6,0.15,,328.0,,,,,9.02

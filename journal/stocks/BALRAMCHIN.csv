@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,BALRAMCHIN,Balrampur Chini Mills Limited,Consumer Defensive,WATCH,0.265,0.2,0.55,,637.45,,,,,24.82
+2026-11-19,BALRAMCHIN,Balrampur Chini Mills Limited,Consumer Defensive,WATCH,0.265,0.2,0.55,,639.5,,,,,23.9
+2026-11-20,BALRAMCHIN,Balrampur Chini Mills Limited,Consumer Defensive,WATCH,0.065,-0.2,0.55,,618.6,,,,,23.8
+2026-11-23,BALRAMCHIN,Balrampur Chini Mills Limited,Consumer Defensive,WATCH,0.065,-0.2,0.55,,619.25,,,,,23.1

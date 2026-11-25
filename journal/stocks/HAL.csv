@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.17,-0.2,0.9,,4675.0,,,,,129.66
+2026-11-19,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.17,-0.2,0.9,,4760.0,,,,,126.47
+2026-11-20,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.17,-0.2,0.9,,4809.0,,,,,122.91
+2026-11-23,HAL,Hindustan Aeronautics Limited,Industrials,WATCH,0.17,-0.2,0.9,,4780.0,,,,,119.8

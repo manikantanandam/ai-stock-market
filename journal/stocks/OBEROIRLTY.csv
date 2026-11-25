@@ -1,0 +1,5 @@
+date,symbol,name,sector,action,combined,technical,fundamental,sentiment,close,stop,target,shares,buys,atr
+2026-11-18,OBEROIRLTY,Oberoi Realty Limited,Real Estate,BUY,0.408,0.6,0.1,0.389,1800.0,,,,swing;trend,50.28
+2026-11-19,OBEROIRLTY,Oberoi Realty Limited,Real Estate,BUY,0.41,0.6,0.1,0.398,1810.0,,,,swing;trend,49.77
+2026-11-20,OBEROIRLTY,Oberoi Realty Limited,Real Estate,BUY,0.378,0.6,0.1,0.239,1843.0,,,,trend,51.31
+2026-11-23,OBEROIRLTY,Oberoi Realty Limited,Real Estate,BUY,0.378,0.6,0.1,0.241,1860.0,,,,trend,49.69
