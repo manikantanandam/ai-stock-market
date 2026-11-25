@@ -123,12 +123,12 @@ jobs:
           NO_COLOR: "1"
           COLUMNS: "120"
         run: |
-          uv run aistock scan --watchlist nifty500 --top 50 --notes --notes-max 50 | tee scan.txt
+          uv run aistock scan --watchlist nifty500 --top 50 --notes --notes-max 25 | tee scan.txt
           { echo '```'; cat scan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       # Notes for journaled sessions that have none (from before notes were
       # saved, or a day Ollama failed). A backfilled note takes ~30s on CI, so
-      # one session of 50 BUYs per run; the step limit keeps a slow run from
+      # two sessions of 25 BUYs per run; the step limit keeps a slow run from
       # starving the journal merge below. Normally this is a no-op.
       - name: Backfill notes
         continue-on-error: true
@@ -136,7 +136,7 @@ jobs:
         env:
           NO_COLOR: "1"
           COLUMNS: "120"
-        run: uv run aistock backfill-notes --sessions 1 --notes-max 50
+        run: uv run aistock backfill-notes --sessions 2 --notes-max 25
 
       # Manual runs can rewrite notes for chosen sessions, e.g. after the
       # backfill learns new reasons. Each date replaces that session's notes.
@@ -154,7 +154,7 @@ jobs:
               echo "::warning::Skipping '$d': not a journaled session (YYYY-MM-DD)"
               continue
             fi
-            uv run aistock backfill-notes --date "$d" --notes-max 50
+            uv run aistock backfill-notes --date "$d" --notes-max 25
           done
 
       # Yahoo can lag after the close; flag a scan whose latest bar is older
