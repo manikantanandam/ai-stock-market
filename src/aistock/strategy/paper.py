@@ -44,7 +44,7 @@ def load_signals(since: str | None = None, only: list[str] | None = None) -> pd.
     return sig.sort_values(["strategy", "symbol", "date"]).reset_index(drop=True)
 
 
-def _prices(symbol: str) -> pd.DataFrame:
+def session_prices(symbol: str) -> pd.DataFrame:
     ind = add_indicators(get_prices(symbol, years=2))
     # A bar from today's open session is still forming; don't trade on it
     today = pd.Timestamp(datetime.now(IST).date())
@@ -61,12 +61,12 @@ def run(since: str | None = None, only: list[str] | None = None,
     if sig.empty:
         return pd.DataFrame(), pd.DataFrame()
     prefetch(sorted(set(sig.symbol)) + [INDEX], years=2)
-    nifty = _prices(INDEX).Close
+    nifty = session_prices(INDEX).Close
     trades, pending, cache = [], [], {}
 
     for (strategy, symbol), group in sig.groupby(["strategy", "symbol"]):
         try:
-            ind = cache.setdefault(symbol, _prices(symbol))
+            ind = cache.setdefault(symbol, session_prices(symbol))
         except Exception:
             continue  # delisted / no data: nothing to replay
         p = PRESETS[strategy].params()

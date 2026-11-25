@@ -20,7 +20,7 @@ def replay(tmp_path, monkeypatch):
         frames = {"^NSEI": UP.assign(Close=100.0), **(prices or {"A": UP})}
         monkeypatch.setattr(paper.journal, "DAYS", days)
         monkeypatch.setattr(paper, "prefetch", lambda *a, **k: None)
-        monkeypatch.setattr(paper, "_prices", lambda s: frames[s])
+        monkeypatch.setattr(paper, "session_prices", lambda s: frames[s])
         return paper.run(**kw)
     return go
 

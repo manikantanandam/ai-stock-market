@@ -115,6 +115,16 @@ jobs:
           uv run aistock paper --show 20 | tee paper.txt
           { echo '## Paper trading'; echo '```'; cat paper.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
+      # Saved accounts (shared capital, 10 slots each) in journal/paper/, which
+      # the journal PR below commits; each run catches up on missed sessions.
+      - name: Paper accounts
+        env:
+          NO_COLOR: "1"
+          COLUMNS: "140"
+        run: |
+          uv run aistock paper-account --show | tee accounts.txt
+          { echo '## Paper accounts'; echo '```'; cat accounts.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       # main is protected (PR + passing "pytest" check), so the journal update
       # goes through a PR. PRs opened with GITHUB_TOKEN don't trigger other
       # workflows, so Tests is dispatched on the branch explicitly, and
