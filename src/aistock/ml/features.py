@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 
 from aistock.technical import rules
+from aistock.technical.indicators import score_series
 
 HORIZON = 20  # sessions held for the label
 FEATURES = [
@@ -60,12 +61,14 @@ def label(ind: pd.DataFrame, index: pd.DataFrame, horizon: int = HORIZON) -> pd.
 
 def dataset(data: dict[str, pd.DataFrame], index: pd.DataFrame,
             sector_of: dict[str, pd.Series | None], progress=iter) -> pd.DataFrame:
-    """Long panel indexed by (date, symbol) with FEATURES and `label`, from the
-    SMA200 warm-up on. sector_of: symbol -> its sector index close (or None)."""
+    """Long panel indexed by (date, symbol) with FEATURES, `label`, and
+    `tech_score` (today's portfolio ranking, kept as the baseline to beat, not a
+    feature), from the SMA200 warm-up on. sector_of: symbol -> sector index close (or None)."""
     parts = []
     for sym in progress(list(data)):
         ind = data[sym]
-        f = features(ind, index, sector_of.get(sym)).assign(label=label(ind, index), symbol=sym)
+        f = features(ind, index, sector_of.get(sym)).assign(
+            label=label(ind, index), tech_score=score_series(ind).astype("float32"), symbol=sym)
         parts.append(f[ind.sma200.notna()])
     df = pd.concat(parts)
     df.index.name = "date"
@@ -75,10 +78,15 @@ def dataset(data: dict[str, pd.DataFrame], index: pd.DataFrame,
 def rank_ic(df: pd.DataFrame, cols: list[str] = FEATURES) -> pd.DataFrame:
     """Mean per-date Spearman correlation of each column with the label, by year:
     a quick read of which features carry signal before any model is trained."""
+    ic = daily_ic(df, cols)
+    return ic.groupby(ic.index.year).mean()
+
+
+def daily_ic(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+    """Per-date Spearman correlation of each column with the label (date x column)."""
     d = df.dropna(subset=["label"])
     ranks = d[cols + ["label"]].groupby(level="date").rank(pct=True)
     ranks = ranks.sub(ranks.groupby(level="date").transform("mean"))
     num = ranks[cols].mul(ranks.label, axis=0).groupby(level="date").sum()
     sq = (ranks ** 2).groupby(level="date").sum()
-    ic = num.div(np.sqrt(sq[cols].mul(sq.label, axis=0)))
-    return ic.groupby(ic.index.year).mean()
+    return num.div(np.sqrt(sq[cols].mul(sq.label, axis=0)))
