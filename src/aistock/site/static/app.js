@@ -510,7 +510,8 @@ const DAILY_LABELS = { Date: 'Date', Volume: 'Volume', sma20: 'SMA20', sma50: 'S
   ema200: 'EMA200', rsi14: 'RSI14', macd_hist: 'MACD hist', atr14: 'ATR14', vol_avg20: 'Avg vol 20', Technical: 'Tech score',
   trailingPE: 'P/E (est.)', priceToBook: 'P/B (est.)', marketCap: 'Mkt cap (est.)', Fundamental: 'Fund score (est.)' };
 const DAILY_EXTRA = ['Open', 'High', 'Low', 'ema100', 'ema200', 'vol_avg20', 'priceToBook', 'marketCap'];
-const YEAR_LABELS = { date: 'Fiscal year end', start: 'In effect from', currency: 'Currency', revenue: 'Revenue', net_income: 'Net income',
+const YEAR_LABELS = { date: 'Fiscal year end', start: 'In effect from', currency: 'Currency', converted_from: 'Converted from',
+  revenue: 'Revenue', net_income: 'Net income',
   eps: 'EPS', equity: 'Equity', debt: 'Debt', current_assets: 'Current assets', current_liabilities: 'Current liabilities',
   shares: 'Shares', returnOnEquity: 'ROE', debtToEquity: 'Debt/Equity (%)', revenueGrowth: 'Revenue growth',
   earningsGrowth: 'Earnings growth', profitMargins: 'Net margin', currentRatio: 'Current ratio' };
@@ -521,7 +522,7 @@ const YEAR_LABELS = { date: 'Fiscal year end', start: 'In effect from', currency
 const POINT_CHANGE = { rsi14: [1, ' pt'], macd_hist: [1, ' pt'], Technical: [1, ' pt'], Fundamental: [1, ' pt'],
   returnOnEquity: [100, ' pp'], revenueGrowth: [100, ' pp'], earningsGrowth: [100, ' pp'], profitMargins: [100, ' pp'],
   debtToEquity: [1, ' pp'], currentRatio: [1, ''] };
-const NO_CHANGE = ['Date', 'date', 'start', 'currency'];
+const NO_CHANGE = ['Date', 'date', 'start', 'currency', 'converted_from'];
 
 function changeCells(rows, columns) {
   const prev = new Map(rows.map((p, i) => [p, rows[i - 1]]));
@@ -545,7 +546,7 @@ function historyTables(history, years) {
       table(history.slice().reverse(), columns,
         { labels: DAILY_LABELS, extra: DAILY_EXTRA, pageSize: 25, cells: changeCells(history, columns) })),
     years.length ? card('Fundamentals by fiscal year',
-      h('p', { class: 'muted' }, "Amounts are in the company's reporting currency (some report in USD). Ratios take effect about 60 days after the year end. Under each value, its change from the previous year (percentage points for ratios)."),
+      h('p', { class: 'muted' }, "Amounts are in ₹; companies reporting in USD are converted at the fiscal year's average USD/INR rate (income) or its year-end rate (balance sheet). Ratios take effect about 60 days after the year end. Under each value, its change from the previous year (percentage points for ratios)."),
       table(years.slice().reverse(), Object.keys(years[0]), { labels: YEAR_LABELS, cells: changeCells(years, Object.keys(years[0])) })) : null,
   ];
 }

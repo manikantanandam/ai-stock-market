@@ -23,6 +23,27 @@ def _div(a: float | None, b: float | None) -> float | None:
     return a / b if a is not None and b else None
 
 
+FLOWS = ["revenue", "net_income", "eps"]  # over the fiscal year; the rest are balances at its end
+BALANCES = ["equity", "debt", "current_assets", "current_liabilities"]
+
+
+def to_inr(years: list[dict], fx: pd.Series) -> list[dict]:
+    """Convert get_statements years reported in another currency to INR, as Indian filers do:
+    flows at the fiscal year's average rate, balances at the year-end rate. `fx` is daily
+    INR per unit of that currency (e.g. USDINR=X closes); `converted_from` records the original."""
+    out = []
+    for y in years:
+        end = pd.Timestamp(y["date"])
+        year_fx = fx[(fx.index > end - pd.DateOffset(years=1)) & (fx.index <= end)]
+        if y.get("currency") in (None, "INR") or year_fx.empty:
+            out.append(y)
+            continue
+        rates = {**dict.fromkeys(FLOWS, year_fx.mean()), **dict.fromkeys(BALANCES, year_fx.iloc[-1])}
+        out.append({**y, **{k: None if y.get(k) is None else y[k] * rate for k, rate in rates.items()},
+                    "currency": "INR", "converted_from": y["currency"]})
+    return out
+
+
 def yearly(years: list[dict]) -> pd.DataFrame:
     """One row per fiscal year: `date` (year end), `start` (when it takes effect), the statement
     figures, and RATIOS in get_fundamentals' units (debtToEquity in percent, like Yahoo)."""
