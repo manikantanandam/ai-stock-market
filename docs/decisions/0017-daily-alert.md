@@ -9,11 +9,12 @@ push summary and chose both channels.
 
 ## Decision
 `aistock alert` (`src/aistock/alerts.py`) builds a short summary from the session's journal day file only
-(no LLM, 0001): BUY count, each new BUY on its own line (symbol, company, sector, combined score, strategies),
-the top 5 BUYs by score, the dropped BUYs on one line, and the dashboard link. Paper accounts were in the first
-version and dropped at the user's request (too much text for a phone alert; they're on the dashboard); a
-comma-separated list of tickers was also rejected as unreadable. Each channel gets its own rendering: Telegram
-HTML, markdown tables for the issue, plain text for email. `--date` rebuilds it for any journaled session. The Daily scan workflow runs it as its last step with `continue-on-error`; the
+(no LLM, 0001). Telegram gets a card: verdict counts with a breadth bar (share of scanned stocks saying BUY),
+the three sectors with most BUYs, each new BUY (sector icon, symbol, score, company, strategies), the five
+strongest BUYs with medals, the dropped BUYs folded in an expandable quote, and the dashboard link. The issue
+gets the same as markdown tables, email as plain text. Rejected along the way at the user's request: paper
+accounts in the alert (too much text; they're on the dashboard), a comma-separated wall of tickers, and
+per-stock score bars (BUY scores sit in a narrow band, so every bar looked the same). `--date` rebuilds it for any journaled session. The Daily scan workflow runs it as its last step with `continue-on-error`; the
 Send alert workflow (`alert.yml`) runs it by hand for a chosen date (default: the latest session). Channels:
 - Telegram, when the `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` repo secrets exist;
 - email over SMTP (stdlib, SSL), when `SMTP_USERNAME` and `SMTP_PASSWORD` exist (Gmail app password by

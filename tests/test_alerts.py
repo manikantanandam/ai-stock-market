@@ -28,7 +28,7 @@ def test_summary_of_the_latest_session(tmp_path):
 def test_summary_of_the_first_session_has_nothing_to_compare(tmp_path):
     s = alerts.summary(journal(tmp_path), date="2026-11-25")
     assert (s.prev, [b.symbol for b in s.buys], s.new, s.dropped) == (None, ["A", "B"], [], [])
-    assert alerts.plain(s).splitlines()[1] == "2 BUY signals"
+    assert alerts.plain(s).splitlines()[1] == "2 BUY · 1 WATCH · 0 AVOID (67% of 3 stocks say BUY)"
 
 
 def test_summary_rejects_a_date_without_session(tmp_path):
@@ -40,8 +40,9 @@ def test_summary_rejects_a_date_without_session(tmp_path):
 def test_plain_text(tmp_path):
     assert alerts.plain(alerts.summary(journal(tmp_path)), url="https://example.org/").splitlines() == [
         "AI Stock · Thu 26 Nov 2026",
-        "2 BUY signals · 1 new · 1 dropped", "",
-        "New BUYs",
+        "2 BUY · 1 WATCH · 0 AVOID (67% of 3 stocks say BUY)",
+        "Hot sectors: Tech 2", "",
+        "New BUYs (1, 1 dropped since Wed 25 Nov)",
         "  C · Gamma · Tech · score +0.60 · 3 strategies", "",
         "Top 2 by score",
         "  C  +0.60  Tech",
@@ -51,18 +52,28 @@ def test_plain_text(tmp_path):
     ]
 
 
-def test_telegram_html_escapes_and_formats_each_new_buy(tmp_path):
+def test_telegram_card(tmp_path):
     s = alerts.summary(journal(tmp_path))
     s.new[0].name = "M&M"
-    text = alerts.telegram_html(s, url="https://example.org/?a=1&b=2")
-    assert text.startswith("📈 <b>AI Stock</b> · Thu 26 Nov 2026")
-    assert "<b>C</b> · M&amp;M\n    Tech · <code>+0.60</code> · <i>3 strategies</i>" in text
-    assert "<code>A +0.50</code>  Tech" in text
-    assert '👉 <a href="https://example.org/?a=1&amp;b=2">Open dashboard</a>' in text
+    lines = alerts.telegram_html(s, url="https://example.org/?a=1&b=2").splitlines()
+    assert lines[:6] == ["📈 <b>AI STOCK DAILY</b>", "<i>Thu 26 Nov 2026 · NSE close</i>", alerts.RULE,
+                         "🟢 <b>2</b> BUY   🟡 <b>1</b> WATCH   🔴 <b>0</b> AVOID",
+                         "<code>▰▰▰▰▰▰▰▱▱▱</code> 67% of 3 stocks say BUY",
+                         "🔥 ▫️ Tech <b>2</b>"]  # unknown sector: plain marker
+    text = "\n".join(lines)
+    assert "🆕 <b>NEW BUYS</b> · 1  <i>(➖ 1 dropped)</i>\n▫️ <b>C</b>  <code>+0.60</code>\n      <i>M&amp;M · 3 strategies</i>" in text
+    assert "🥇 <b>C</b> <code>+0.60</code> ▫️ <i>M&amp;M</i>\n🥈 <b>A</b>" in text
+    assert "<blockquote expandable>➖ <b>No longer BUY</b> (1)\nB</blockquote>" in text
+    assert lines[-1] == '👉 <a href="https://example.org/?a=1&amp;b=2"><b>Open dashboard</b></a>'
+
+
+def test_bar():
+    assert (alerts._bar(0.21, 10), alerts._bar(1.5, 4), alerts._bar(-1, 3)) == ("▰▰▱▱▱▱▱▱▱▱", "▰▰▰▰", "▱▱▱")
 
 
 def test_markdown_tables(tmp_path):
     text = alerts.markdown(alerts.summary(journal(tmp_path)), url="https://example.org/")
+    assert text.splitlines()[1:3] == ["🟢 **2** BUY · 🟡 1 WATCH · 🔴 0 AVOID", "🔥 Tech 2"]
     assert "| **C** | Gamma | Tech | +0.60 | 3 strategies |" in text
     assert "| **A** | +0.50 | Tech |" in text
     assert text.endswith("[Open dashboard →](https://example.org/)")

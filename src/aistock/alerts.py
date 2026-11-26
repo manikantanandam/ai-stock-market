@@ -45,6 +45,8 @@ class Summary:
     buys: list[Stock]  # best combined score first
     new: list[Stock]   # BUYs that weren't BUYs in the previous session, best first
     dropped: list[str]
+    actions: dict[str, int]              # stocks per verdict (BUY / WATCH / AVOID)
+    sectors: list[tuple[str, int]]       # sectors with the most BUYs, most first
 
 
 def _names(symbols: list[str], limit: int) -> str:
@@ -87,7 +89,9 @@ def summary(root: Path = ROOT, date: str | None = None) -> Summary | None:
         was = set(before.symbol[before.action == "BUY"])
         new = [b for b in buys if b.symbol not in was]
         dropped = sorted(was - {b.symbol for b in buys})
-    return Summary(date, prev, buys, new, dropped)
+    actions = today.action.value_counts().to_dict()
+    sectors = [(k, int(v)) for k, v in rows.sector.value_counts().items()] if "sector" in rows else []
+    return Summary(date, prev, buys, new, dropped, actions, sectors)
 
 
 # ---------- rendering: one summary, three formats ----------
@@ -100,10 +104,14 @@ def _score(x: float) -> str:
     return f"{x:+.2f}".replace("-", "−")
 
 
-def _counts(s: Summary) -> str:
-    if s.prev is None:
-        return f"{len(s.buys)} BUY signals"
-    return f"{len(s.buys)} BUY signals · {len(s.new)} new · {len(s.dropped)} dropped"
+def _verdicts(s: Summary) -> str:
+    total = sum(s.actions.values()) or 1
+    return (f"{s.actions.get('BUY', 0)} BUY · {s.actions.get('WATCH', 0)} WATCH · {s.actions.get('AVOID', 0)} AVOID "
+            f"({s.actions.get('BUY', 0) / total:.0%} of {total} stocks say BUY)")
+
+
+def _hot(s: Summary) -> str:
+    return " · ".join(f"{k} {n}" for k, n in s.sectors[:3])
 
 
 def _strategies(b: Stock) -> str:
@@ -117,9 +125,9 @@ def _more(items: list, limit: int) -> int:
 
 def plain(s: Summary, url: str | None = None) -> str:
     """Plain text: email and the terminal."""
-    lines = [f"AI Stock · {_day(s.date)}", _counts(s)]
+    lines = [f"AI Stock · {_day(s.date)}", _verdicts(s)] + ([f"Hot sectors: {_hot(s)}"] if s.sectors else [])
     if s.new:
-        lines += ["", "New BUYs"]
+        lines += ["", f"New BUYs ({len(s.new)}, {len(s.dropped)} dropped since {_day(s.prev)[:-5]})"]
         for b in s.new[:MAX_NEW]:
             lines.append(f"  {b.symbol} · {b.name} · {b.sector} · score {_score(b.combined)} · {_strategies(b)}")
         if _more(s.new, MAX_NEW):
@@ -135,34 +143,61 @@ def plain(s: Summary, url: str | None = None) -> str:
     return "\n".join(lines)
 
 
+SECTOR_ICON = {"Technology": "💻", "Financial Services": "🏦", "Healthcare": "💊", "Industrials": "🏭",
+               "Consumer Cyclical": "🚗", "Consumer Defensive": "🛒", "Basic Materials": "🧪", "Real Estate": "🏠",
+               "Communication Services": "📡", "Utilities": "⚡", "Energy": "🛢"}
+MEDALS = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
+RULE = "━━━━━━━━━━━━━━━━━━"
+
+
+def _icon(sector: str) -> str:
+    return SECTOR_ICON.get(sector, "▫️")
+
+
+def _bar(fraction: float, cells: int) -> str:
+    """A block bar: _bar(0.3, 10) -> '▰▰▰▱▱▱▱▱▱▱'."""
+    full = round(max(0.0, min(1.0, fraction)) * cells)
+    return "▰" * full + "▱" * (cells - full)
+
+
 def telegram_html(s: Summary, url: str | None = None) -> str:
-    """Telegram HTML: one block per new BUY (bold symbol, name, then sector, score and strategies), the top
-    BUYs as an aligned monospace list, dropped BUYs on one short line."""
+    """Telegram HTML, laid out as a card: a header with the verdict counts and a breadth bar (share of scanned
+    stocks that are BUYs), the hot sectors, each new BUY with a sector icon and its score, the
+    strongest BUYs with medals, and the dropped BUYs folded into an expandable quote."""
     e = html.escape
-    lines = [f"📈 <b>AI Stock</b> · {_day(s.date)}", f"<i>{e(_counts(s))}</i>"]
-    if s.new:
-        lines += ["", "🆕 <b>New BUYs</b>"]
+    total = sum(s.actions.values()) or 1
+    buy, watch, avoid = (s.actions.get(a, 0) for a in ("BUY", "WATCH", "AVOID"))
+    lines = [f"📈 <b>AI STOCK DAILY</b>", f"<i>{_day(s.date)} · NSE close</i>", RULE,
+             f"🟢 <b>{buy}</b> BUY   🟡 <b>{watch}</b> WATCH   🔴 <b>{avoid}</b> AVOID",
+             f"<code>{_bar(buy / total, 10)}</code> {buy / total:.0%} of {total} stocks say BUY"]
+    if s.sectors:
+        lines.append("🔥 " + " · ".join(f"{_icon(k)} {e(k)} <b>{n}</b>" for k, n in s.sectors[:3]))
+    if s.prev is not None:
+        lines += ["", f"🆕 <b>NEW BUYS</b> · {len(s.new)}" + (f"  <i>(➖ {len(s.dropped)} dropped)</i>" if s.dropped else "")]
+        if not s.new:
+            lines.append("<i>No new BUYs since " + _day(s.prev)[:-5] + "</i>")
         for b in s.new[:MAX_NEW]:
-            lines += [f"<b>{e(b.symbol)}</b> · {e(b.name)}",
-                      f"    {e(b.sector)} · <code>{_score(b.combined)}</code> · <i>{e(_strategies(b))}</i>"]
+            lines += [f"{_icon(b.sector)} <b>{e(b.symbol)}</b>  <code>{_score(b.combined)}</code>",
+                      f"      <i>{e(b.name)} · {e(_strategies(b))}</i>"]
         if _more(s.new, MAX_NEW):
             lines.append(f"<i>+{_more(s.new, MAX_NEW)} more on the dashboard</i>")
     if s.buys:
-        width = max(len(b.symbol) for b in s.buys[:TOP])
-        lines += ["", f"🏆 <b>Top {min(TOP, len(s.buys))} by score</b>"]
-        lines += [f"<code>{e(b.symbol):<{width}} {_score(b.combined)}</code>  {e(b.sector)}" for b in s.buys[:TOP]]
+        lines += ["", "🏆 <b>STRONGEST BUYS</b>"]
+        lines += [f"{MEDALS[k]} <b>{e(b.symbol)}</b> <code>{_score(b.combined)}</code> {_icon(b.sector)} <i>{e(b.name)}</i>"
+                  for k, b in enumerate(s.buys[:TOP])]
     if s.dropped:
-        lines += ["", f"➖ <b>Dropped</b>  <i>{e(_names(s.dropped, MAX_DROPPED))}</i>"]
+        lines += ["", f"<blockquote expandable>➖ <b>No longer BUY</b> ({len(s.dropped)})\n{e(', '.join(s.dropped))}</blockquote>"]
     if url:
-        lines += ["", f'👉 <a href="{e(url)}">Open dashboard</a>']
+        lines += [RULE, f'👉 <a href="{e(url)}"><b>Open dashboard</b></a>']
     return "\n".join(lines)
 
 
 def markdown(s: Summary, url: str | None = None) -> str:
     """GitHub markdown: the issue comment, new and top BUYs as tables."""
-    lines = [f"### 📈 AI Stock · {_day(s.date)}", f"_{_counts(s)}_"]
+    lines = [f"### 📈 AI Stock · {_day(s.date)}", f"🟢 **{s.actions.get('BUY', 0)}** BUY · 🟡 {s.actions.get('WATCH', 0)} WATCH · "
+             f"🔴 {s.actions.get('AVOID', 0)} AVOID"] + ([f"🔥 {_hot(s)}"] if s.sectors else [])
     if s.new:
-        lines += ["", "**🆕 New BUYs**", "", "| Stock | Name | Sector | Score | Strategies |", "|---|---|---|---:|---|"]
+        lines += ["", f"**🆕 New BUYs** ({len(s.new)}, ➖ {len(s.dropped)} dropped)", "", "| Stock | Name | Sector | Score | Strategies |", "|---|---|---|---:|---|"]
         lines += [f"| **{b.symbol}** | {b.name} | {b.sector} | {_score(b.combined)} | {_strategies(b)} |"
                   for b in s.new[:MAX_NEW]]
         if _more(s.new, MAX_NEW):
