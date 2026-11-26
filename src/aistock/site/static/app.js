@@ -428,17 +428,48 @@ function lineConfig(labels, datasets, opts = {}) {
   };
 }
 
-function renderStock(file, rows) {
+// Full close history (data/prices/, written at build time) with logged BUYs marked; range buttons trim the window.
+const RANGES = [['1Y', 1], ['5Y', 5], ['Max', 0]];
+
+function historyCard(history, rows) {
+  const buys = new Map(rows.filter(r => r.action === 'BUY').map(r => [r.date, r.close]));
+  const box = h('div', { class: 'chart-box tall' });
+  const draw = years => {
+    charts.filter(c => c.canvas.parentNode === box).forEach(c => c.destroy());
+    charts = charts.filter(c => c.canvas.parentNode !== box);
+    box.replaceChildren();
+    const end = new Date(history[history.length - 1].Date);
+    const from = years ? new Date(end.getFullYear() - years, end.getMonth(), end.getDate()).toISOString().slice(0, 10) : '';
+    const pts = history.filter(p => String(p.Date) >= from);
+    const datasets = [{ label: 'Close', data: pts.map(p => p.Close), borderColor: series(0) }];
+    if (buys.size) datasets.push({ label: 'BUY', data: pts.map(p => buys.get(p.Date) ?? null), showLine: false,
+      pointRadius: 4, borderColor: series(1), backgroundColor: series(1) });
+    chart(box, lineConfig(pts.map(p => p.Date), datasets));
+  };
+  const btns = RANGES.map(([label, years]) => {
+    const b = h('button', { class: 'link' }, label);
+    b.addEventListener('click', () => { btns.forEach(x => x.disabled = x === b); draw(years); });
+    return b;
+  });
+  btns[btns.length - 1].disabled = true;
+  requestAnimationFrame(() => draw(0));
+  return card(`Price history (${history[0].Date} to ${history[history.length - 1].Date})`, h('div', { class: 'controls' }, btns), box);
+}
+
+async function renderStock(file, rows) {
   const last = rows[rows.length - 1] || {};
   const labels = rows.map(r => r.date);
+  const history = file.kind === 'stock' && (manifest.prices || []).includes(file.title)
+    ? (await load('prices/' + file.title + '.csv')).filter(p => num(p.Close)) : [];
   const scores = ['combined', 'technical', 'fundamental', 'sentiment'].filter(c => file.columns.includes(c));
   return [
     h('p', { class: 'sub' }, [last.name, last.sector || last.group, last.unit && 'INR per ' + last.unit].filter(Boolean).join(' · ')),
     tiles([['Last action', last.action || '–', last.action === 'BUY' ? 'pos' : last.action === 'SELL' ? 'neg' : ''],
       ['Close', fmt(last.close)], ...scores.map(c => [c[0].toUpperCase() + c.slice(1), fmt(last[c])]),
       ['Sessions logged', rows.length]]),
+    history.length ? historyCard(history, rows) : null,
     h('div', { class: 'charts' },
-      chartCard('Close', lineConfig(labels, [{ label: 'Close', data: rows.map(r => r.close), borderColor: series(0) }])),
+      history.length ? null : chartCard('Close', lineConfig(labels, [{ label: 'Close', data: rows.map(r => r.close), borderColor: series(0) }])),
       chartCard('Scores (−1 to 1)', lineConfig(labels, scores.map((c, i) =>
         ({ label: c, data: rows.map(r => r[c]), borderColor: series(i), backgroundColor: series(i), pointRadius: 3 })), { min: -1, max: 1 }))),
     table(rows.slice().reverse(), file.columns),

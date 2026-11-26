@@ -12,6 +12,10 @@ same for commodity futures, under journal/commodities/; a session's cnotes
 are drawn on its cday page), "trades" (entry/exit rows), "series"
 (Date column + numeric columns, e.g. equity curves), "yearly" (returns per
 calendar year), "table" (anything else).
+
+With prices=True, `build` also writes each journaled stock's full Yahoo
+history (Date,Close) to data/prices/<SYMBOL>.csv and lists those symbols
+in the manifest, so a stock page charts more than the logged sessions.
 """
 import csv
 import json
@@ -83,7 +87,25 @@ def _describe(path: Path, rel: str) -> dict:
             "title": title_of(rel), "columns": columns, "rows": rows}
 
 
-def build(out: Path, root: Path = ROOT) -> dict:
+def write_prices(out: Path, symbols: list[str]) -> list[str]:
+    """Full daily close history per symbol into <out>/data/prices/; returns the symbols written."""
+    from aistock.data import prices
+
+    (out / "data" / "prices").mkdir(parents=True, exist_ok=True)
+    prices.prefetch(symbols, None)
+    written = []
+    for sym in symbols:
+        try:
+            df = prices.get_prices(sym, None)
+        except Exception as e:  # delisted or renamed symbols: the page falls back to journal closes
+            print(f"prices: skipped {sym}: {e}")
+            continue
+        df[["Close"]].round(2).to_csv(out / "data" / "prices" / f"{sym}.csv", index_label="Date", date_format="%Y-%m-%d")
+        written.append(sym)
+    return written
+
+
+def build(out: Path, root: Path = ROOT, prices: bool = False) -> dict:
     """Write the site to `out`; returns the manifest."""
     shutil.rmtree(out / "data", ignore_errors=True)  # drop CSVs that no longer exist
     shutil.copytree(STATIC, out, dirs_exist_ok=True)
@@ -98,8 +120,10 @@ def build(out: Path, root: Path = ROOT) -> dict:
     accounts = {}
     for cfg in sorted((root / "journal" / "paper").glob("*/account.json")):
         accounts[cfg.parent.name] = json.loads(cfg.read_text())
+    stocks = [f["title"] for f in files if f["kind"] == "stock"]
     manifest = {"built": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                "groups": GROUPS, "files": files, "accounts": accounts}
+                "groups": GROUPS, "files": files, "accounts": accounts,
+                "prices": write_prices(out, stocks) if prices else []}
     (out / "data").mkdir(exist_ok=True)
     (out / "data" / "manifest.json").write_text(json.dumps(manifest))
     return manifest
