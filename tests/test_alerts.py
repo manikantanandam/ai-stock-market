@@ -20,55 +20,78 @@ def journal(tmp_path):
     return tmp_path
 
 
-def test_message_lists_new_and_dropped_buys_and_each_account(tmp_path):
-    text = alerts.message(journal(tmp_path), url="https://example.org/")
+def test_summary_of_the_latest_session(tmp_path):
+    s = alerts.summary(journal(tmp_path))
 
-    assert text.splitlines() == [
-        "AI stock · 2026-11-26",
-        "- BUY 2: 1 new, 1 dropped since 2026-11-25",
-        "- New: C",
-        "- Dropped: B",
-        "Paper accounts (return · equal-weight hold since start):",
-        # hold: A +10%, B 0%, C -10% -> 0.0%
-        "- trend: +2.0% · hold +0.0% · 2 open · in: A · out: B stop -10.0%",
-        "https://example.org/",
-    ]
+    assert (s.date, s.prev, s.buys, s.new, s.dropped) == ("2026-11-26", "2026-11-25", ["C", "A"], ["C"], ["B"])
+    (a,) = s.accounts
+    # hold: A +10%, B 0%, C -10% -> 0.0%
+    assert (a.name, a.ret, a.hold, a.open, a.entered, a.exits) == ("trend", pytest.approx(0.02), pytest.approx(0.0),
+                                                                   2, ["A"], [("B", "stop", -0.1)])
 
 
-def test_message_is_empty_without_sessions(tmp_path):
-    assert alerts.message(tmp_path) == ""
+def test_summary_of_an_earlier_session_uses_that_days_state(tmp_path):
+    s = alerts.summary(journal(tmp_path), date="2026-11-25")
+
+    assert (s.prev, s.buys, s.new) == (None, ["A", "B"], [])
+    (a,) = s.accounts
+    # C entered 11-25 and is still open; B (traded 11-20 to 11-26) was open too; A came later
+    assert (a.ret, a.open, a.entered, a.exits) == (0.0, 2, ["C"], [])
 
 
-def test_names_cap_long_lists():
-    assert alerts._names([str(i) for i in range(18)]).endswith("14 +3 more")
-
-
-def test_message_for_an_earlier_session_uses_that_days_state(tmp_path):
-    text = alerts.message(journal(tmp_path), date="2026-11-25")
-
-    assert text.splitlines() == [
-        "AI stock · 2026-11-25",
-        "- BUY 2: A, B",
-        "Paper accounts (return · equal-weight hold since start):",
-        # C entered 11-25 and is still open; B (traded 11-20 to 11-26) was open too; A came later
-        "- trend: +0.0% · hold +0.0% · 2 open · in: C",
-    ]
-
-
-def test_message_rejects_a_date_without_session(tmp_path):
+def test_summary_rejects_a_date_without_session(tmp_path):
     with pytest.raises(ValueError, match="latest before it is 2026-11-26"):
-        alerts.message(journal(tmp_path), date="2026-11-27")
+        alerts.summary(journal(tmp_path), date="2026-11-27")
+    assert alerts.summary(tmp_path / "empty") is None
 
 
-def test_send_skips_channels_without_secrets(monkeypatch):
+def test_plain_text(tmp_path):
+    text = alerts.plain(alerts.summary(journal(tmp_path)), url="https://example.org/")
+    assert text.splitlines() == [
+        "AI Stock · Thu 26 Nov 2026", "",
+        "BUY signals: 2 (1 new · 1 dropped since Wed 25 Nov)",
+        "New: C",
+        "Dropped: B", "",
+        "Paper accounts (return vs equal-weight hold since start)",
+        "      Return   Hold Open",
+        "trend  +2.0%  +0.0%    2", "",
+        "Today's trades",
+        "Bought: trend A",
+        "Sold: B (trend, stop −10.0%)", "",
+        "Dashboard: https://example.org/",
+    ]
+
+
+def test_telegram_html_escapes_and_keeps_the_table_monospace(tmp_path):
+    s = alerts.summary(journal(tmp_path))
+    s.new = ["M&M"]
+    text = alerts.telegram_html(s, url="https://example.org/?a=1&b=2")
+    assert "🆕 M&amp;M" in text
+    assert "<pre>      Return   Hold Open\ntrend  +2.0%  +0.0%    2</pre>" in text
+    assert '<a href="https://example.org/?a=1&amp;b=2">Open dashboard →</a>' in text
+
+
+def test_markdown_table(tmp_path):
+    text = alerts.markdown(alerts.summary(journal(tmp_path)))
+    assert "| trend | +2.0% | +0.0% | 2 |" in text
+    assert "- 🔴 **Sold** B (trend, stop −10.0%)" in text
+
+
+def test_many_entries_are_counted_not_named(tmp_path):
+    s = alerts.summary(journal(tmp_path))
+    s.accounts[0].entered = ["A", "B", "C"]
+    assert alerts._trades(s)[0] == "trend 3 stocks"
+
+
+def test_send_skips_channels_without_secrets(tmp_path, monkeypatch):
     for k in ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "SMTP_USERNAME", "SMTP_PASSWORD"):
         monkeypatch.delenv(k, raising=False)
-    assert alerts.send("hi", to_telegram=True, to_issue=False, to_email=True) == [
+    assert alerts.send(alerts.summary(journal(tmp_path)), to_issue=False) == [
         "Telegram: skipped (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not set)",
         "Email: skipped (SMTP_USERNAME / SMTP_PASSWORD not set)"]
 
 
-def test_a_failing_channel_does_not_stop_the_others(monkeypatch):
+def test_a_failing_channel_does_not_stop_the_others(tmp_path, monkeypatch):
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "t")
     monkeypatch.setenv("TELEGRAM_CHAT_ID", "c")
     monkeypatch.setenv("SMTP_USERNAME", "me@example.org")
@@ -80,7 +103,7 @@ def test_a_failing_channel_does_not_stop_the_others(monkeypatch):
 
     sent = []
     monkeypatch.setattr(alerts, "telegram", refuse)
-    monkeypatch.setattr(alerts, "email", lambda text, user, pw, to, server, port: sent.append((to, server, port)))
-    assert alerts.send("hi", to_issue=False) == [
+    monkeypatch.setattr(alerts, "email", lambda text, user, pw, to, server, port: sent.append((text.splitlines()[0], to)))
+    assert alerts.send(alerts.summary(journal(tmp_path)), to_issue=False) == [
         "Telegram: failed (RuntimeError: Telegram refused the message)", "Email: sent to me@example.org"]
-    assert sent == [("me@example.org", "smtp.gmail.com", 465)]
+    assert sent == [("AI Stock · Thu 26 Nov 2026", "me@example.org")]

@@ -11,7 +11,8 @@ push summary and chose both channels.
 `aistock alert` (`src/aistock/alerts.py`) builds a short plain-text summary from the journal only (no LLM, 0001):
 BUY count with new and dropped BUYs since the previous session, then per paper account its return, the
 equal-weight hold since its start, open positions, and that session's entries and exits; ends with the
-dashboard link. `--date` rebuilds it for any journaled session (open positions as of that date come from
+dashboard link. Each channel gets its own rendering of the same summary: Telegram HTML (bold titles,
+accounts as a ~32-character monospace table that fits a phone), markdown for the issue, plain text for email. `--date` rebuilds it for any journaled session (open positions as of that date come from
 positions plus closed trades). The Daily scan workflow runs it as its last step with `continue-on-error`; the
 Send alert workflow (`alert.yml`) runs it by hand for a chosen date (default: the latest session). Channels:
 - Telegram, when the `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` repo secrets exist;

@@ -334,16 +334,16 @@ def alert(
     from aistock import alerts
 
     try:
-        text = alerts.message(url=url or None, date=date or None)
+        s = alerts.summary(date=date or None)
     except ValueError as e:
         raise typer.BadParameter(str(e), param_hint="--date")
-    if not text:
+    if s is None:
         print("No journaled session yet")
         return
-    typer.echo(text)
+    typer.echo(alerts.plain(s, url or None))
     if dry_run:
         return
-    results = alerts.send(text, telegram, issue, email)
+    results = alerts.send(s, url or None, telegram, issue, email)
     for line in results:
         typer.echo(line)
     if any(": failed (" in line for line in results):
