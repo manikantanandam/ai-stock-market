@@ -159,6 +159,9 @@ def scan(
         news = "all" if len(names) <= 60 else "candidates"
     if news not in signal.NEWS_MODES:
         raise typer.BadParameter(f"news must be auto or one of {signal.NEWS_MODES}")
+    # The phase when prices are downloaded decides logging: a scan started before the
+    # 15:45 IST cutoff holds partial bars even if it finishes after it
+    phase = market_phase()
     print(f"Downloading prices and fundamentals for {len(names)} stocks...")
     prices.prefetch(names, years=2)
     fundamentals.prefetch(names)
@@ -174,7 +177,7 @@ def scan(
         print("[red]No symbols could be evaluated[/red]")
         raise typer.Exit(1)
     # Mid-session bars are partial, so only completed sessions go in the journal
-    logged = f"logged to {journal.record(results)}" if market_phase() != "live" else "not logged (market open)"
+    logged = f"logged to {journal.record(results)}" if phase != "live" else "not logged (started while the market was open)"
     results.sort(key=lambda s: (len(s.buys), s.combined), reverse=True)
 
     table = Table(title=f"Scan: {len(results)} stocks, as of {results[0].as_of}")
@@ -196,7 +199,7 @@ def scan(
           f"news for {with_news}/{len(results)} · {logged}")
     if notes:
         written = _print_notes([(s, s.buys[0]) for s in results[:top] if s.buys][:notes_max])
-        if written and market_phase() != "live":
+        if written and phase != "live":
             journal.record_notes(written)
             print(f"Notes logged to {journal.NOTES}")
     _print_skipped(failed)
