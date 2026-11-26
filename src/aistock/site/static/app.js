@@ -127,7 +127,7 @@ function withFigures(text, bar) {
     return `${trend[1]}: close ${fmt(Close)}${op}SMA50 ${fmt(sma50)}${op}SMA200 ${fmt(sma200)}`;
   }
   if (text.startsWith('MACD histogram') && num(macd_hist)) return `${text} (${macd_hist > 0 ? '+' : ''}${macd_hist.toFixed(2)})`;
-  if (text.startsWith('volume spike') && num(Volume) && vol_avg20 > 0) return `volume ${(Volume / vol_avg20).toFixed(1)}× 20d average`;
+  if (text.startsWith('volume spike') && num(Volume) && vol_avg20 > 0) return `${text} (${(Volume / vol_avg20).toFixed(1)}×)`;
   return text;
 }
 
