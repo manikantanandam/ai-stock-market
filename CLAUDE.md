@@ -54,3 +54,9 @@ Only rules, market filter and exits are backtestable; fundamentals and news have
 
 - Deterministic code makes the trading decisions. The LLM only explains or summarizes and must never decide trades.
 - Every signal rule should be backtested out-of-sample with costs before it is trusted.
+
+## Decisions and docs
+
+- `docs/decisions/README.md` indexes short decision records (what was decided, why, when to revisit). Read it before proposing a strategy rule, filter, data source or dashboard change: "Rejected" ideas were tested and dropped, so don't re-propose them unless their "Revisit when" condition holds.
+- When a decision is made or an experiment is dropped, add a record from `docs/decisions/template.md` and a row in the index, in the same PR.
+- `docs/dashboard.md` maps the dashboard: build output and manifest fields, pages and what each loads, `app.js` conventions, and how to take PR screenshots with headless Chrome.
