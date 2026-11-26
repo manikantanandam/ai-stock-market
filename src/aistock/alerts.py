@@ -2,6 +2,9 @@
 "Daily alerts" GitHub issue (`aistock alert`; run at the end of the Daily scan workflow, and by hand for any
 date through the Send alert workflow).
 
+Telegram gets the summary as an image card (`card_html`, rendered by headless Chrome, sent with `caption_html`
+holding the links), falling back to `telegram_html` text when no image can be made.
+
 `summary` reads the session's journal day file only (no LLM, decision 0001): the BUY signals with each
 stock's company name, sector, combined score and strategies, which of them are new since the previous session, and
 which BUYs were dropped. Paper accounts are left to the dashboard. Each channel gets its own rendering of the
@@ -15,6 +18,7 @@ import smtplib
 import subprocess
 import urllib.parse
 import urllib.request
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from email.message import EmailMessage
@@ -254,6 +258,148 @@ def telegram_html(s: Summary, url: str | None = None) -> str:
     return "\n".join(lines)
 
 
+# ---------- image card (Telegram photo) ----------
+
+# Strategy colours, shared by every card so a pill means the same thing each day.
+STRATEGY_COLOURS = {"swing": "#3b82f6", "trend": "#10b981", "breakout": "#f59e0b", "leaders": "#a855f7",
+                    "leaders-slope": "#ec4899", "ema-cross": "#06b6d4", "pullback": "#84cc16"}
+
+CARD_CSS = """
+:root { --bg: #0f1115; --panel: #171a21; --line: #262a33; --ink: #f2f3f5; --ink-2: #a3a8b3; --ink-3: #6b7280;
+  --buy: #22c55e; --watch: #f59e0b; --avoid: #ef4444; --up: #22c55e; --down: #ef4444; --flat: #9ca3af; }
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--bg); color: var(--ink); width: 540px; padding: 22px;
+  font: 15px/1.4 Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-variant-numeric: tabular-nums; }
+.head { display: flex; justify-content: space-between; align-items: baseline; }
+.brand { font-weight: 800; letter-spacing: .08em; font-size: 13px; color: var(--ink-2); }
+.date { font-size: 13px; color: var(--ink-2); }
+.hero { display: flex; align-items: baseline; gap: 10px; margin-top: 10px; }
+.big { font-size: 44px; font-weight: 800; letter-spacing: -.02em; }
+.big small { font-size: 22px; }
+.sub { color: var(--ink-2); font-size: 14px; }
+.chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.chip.up { color: var(--up); background: rgba(34,197,94,.14); }
+.chip.down { color: var(--down); background: rgba(239,68,68,.14); }
+.chip.flat { color: var(--flat); background: rgba(156,163,175,.14); }
+.chip.new { color: #60a5fa; background: rgba(96,165,250,.16); }
+.split { display: flex; height: 10px; border-radius: 999px; overflow: hidden; margin: 12px 0 8px; background: var(--line); }
+.split i { display: block; }
+.legend { display: flex; gap: 16px; font-size: 13px; color: var(--ink-2); }
+.legend b { color: var(--ink); }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+section { margin-top: 18px; }
+h2 { font-size: 12px; letter-spacing: .1em; color: var(--ink-3); font-weight: 700; margin-bottom: 8px;
+  display: flex; justify-content: space-between; }
+.sectors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.sector { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.sector .n { font-size: 22px; font-weight: 800; }
+.sector .name { font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.group { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; }
+.pills { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-bottom: 6px; }
+.pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; color: #fff; }
+.count { margin-left: auto; font-size: 12px; color: var(--ink-3); font-weight: 700; }
+.row { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); }
+.row:first-of-type { border-top: none; }
+.sym { font-weight: 800; font-size: 15px; letter-spacing: .01em; }
+.meta { font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px; }
+.score { font-weight: 800; font-size: 14px; color: var(--buy); background: rgba(34,197,94,.12); padding: 3px 9px; border-radius: 8px; }
+.rank { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 8px; padding: 6px 0;
+  border-top: 1px solid var(--line); }
+.rank:first-of-type { border-top: none; }
+.medal { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800;
+  background: var(--line); color: var(--ink-2); }
+.medal.m1 { background: #facc15; color: #1f1a00; } .medal.m2 { background: #d1d5db; color: #1f2937; }
+.medal.m3 { background: #d97706; color: #1f1200; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px 12px; }
+.dropped { margin-top: 16px; font-size: 12px; color: var(--ink-3); }
+.dropped b { color: var(--ink-2); }
+.foot { margin-top: 14px; font-size: 11px; color: var(--ink-3); text-align: right; }
+"""
+
+
+def _chip(now: float, before: float | None, pct: bool = False) -> str:
+    """A change as a coloured chip: ▲3 green, ▼1% red, 0 grey, NEW blue."""
+    if before is None:
+        return '<span class="chip new">NEW</span>'
+    d = round((now - before) * 100) if pct else now - before
+    unit = "%" if pct else ""
+    if d == 0:
+        return f'<span class="chip flat">0{unit}</span>'
+    return f'<span class="chip {"up" if d > 0 else "down"}">{"▲" if d > 0 else "▼"}{abs(d)}{unit}</span>'
+
+
+def card_html(s: Summary) -> str:
+    """The alert as a self-contained HTML card (rendered to an image for Telegram, see card_png): breadth with
+    its change and a BUY/WATCH/AVOID split bar, hot sectors as tiles, new BUYs grouped under colour-coded
+    strategy pills, the strongest BUYs ranked, dropped BUYs in a muted line."""
+    e = html.escape
+    total = sum(s.actions.values()) or 1
+    buy, watch, avoid = (s.actions.get(a, 0) for a in ("BUY", "WATCH", "AVOID"))
+    share = buy / total
+    split = "".join(f'<i style="width:{n / total * 100:.2f}%;background:var(--{k})"></i>'
+                    for k, n in (("buy", buy), ("watch", watch), ("avoid", avoid)))
+    out = [f'<div class="head"><span class="brand">AI STOCK DAILY</span><span class="date">{e(_day(s.date))} · NSE close</span></div>',
+           f'<div class="hero"><span class="big">{share * 100:.0f}<small>%</small></span>'
+           f'<span class="sub">of {total} stocks say BUY</span>'
+           + (_chip(share, s.prev_share, pct=True) if s.prev_share is not None else "") + "</div>",
+           f'<div class="split">{split}</div>',
+           '<div class="legend">' + "".join(f'<span><span class="dot" style="background:var(--{k})"></span><b>{n}</b> {k.upper()}</span>'
+                                            for k, n in (("buy", buy), ("watch", watch), ("avoid", avoid))) + "</div>"]
+    if s.sectors:
+        tiles = "".join(f'<div class="sector"><div class="n">{n} '
+                        + (_chip(n, s.prev_sectors.get(k)) if s.prev is not None else "")
+                        + f'</div><div class="name">{e(k)}</div></div>' for k, n in s.sectors[:3])
+        out.append(f'<section><h2><span>HOT SECTORS</span><span>BUYs</span></h2><div class="sectors">{tiles}</div></section>')
+    if s.prev is not None:
+        groups = []
+        for strategies, group in _groups(s.new[:MAX_NEW]):
+            pills = "".join(f'<span class="pill" style="background:{STRATEGY_COLOURS.get(x, "#4b5563")}">{e(x)}</span>'
+                            for x in strategies)
+            rows = "".join(f'<div class="row"><div><div class="sym">{e(b.symbol)}</div>'
+                           f'<div class="meta">{e(b.name)} · {e(b.sector)}</div></div>'
+                           f'<span class="score">{_score(b.combined)}</span></div>' for b in group)
+            groups.append(f'<div class="group"><div class="pills">{pills}<span class="count">×{len(group)}</span></div>{rows}</div>')
+        more = f'<div class="sub">+{_more(s.new, MAX_NEW)} more on the dashboard</div>' if _more(s.new, MAX_NEW) else ""
+        body = "".join(groups) or f'<div class="sub">No new BUYs since {e(_day(s.prev)[:-5])}</div>'
+        out.append(f'<section><h2><span>NEW BUYS</span><span>{len(s.new)}</span></h2>{body}{more}</section>')
+    if s.buys:
+        fresh = {b.symbol for b in s.new}
+        ranks = "".join(f'<div class="rank"><span class="medal m{k + 1}">{k + 1}</span>'
+                        f'<div><span class="sym">{e(b.symbol)}</span> '
+                        + ('<span class="chip new">NEW</span>' if b.symbol in fresh else "")
+                        + f'<div class="meta">{e(b.name)} · {e(b.sector)}</div></div>'
+                        f'<span class="score">{_score(b.combined)}</span></div>' for k, b in enumerate(s.buys[:TOP]))
+        out.append(f'<section><h2><span>STRONGEST BUYS</span><span>score</span></h2><div class="panel">{ranks}</div></section>')
+    if s.dropped:
+        out.append(f'<div class="dropped"><b>No longer BUY ({len(s.dropped)}):</b> {e(", ".join(s.dropped))}</div>')
+    out.append('<div class="foot">aistock · rules decide, scores rank</div>')
+    return ('<!doctype html><html><head><meta charset="utf-8">'
+            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap">'
+            f"<style>{CARD_CSS}</style></head><body>" + "".join(out)
+            + "<script>document.fonts.ready.then(() => { document.body.dataset.shown = 'card'; });</script></body></html>")
+
+
+def card_png(s: Summary) -> bytes | None:
+    """The card as a PNG via headless Chrome; None when Chrome isn't available (callers fall back to text)."""
+    from aistock.site import screenshots
+
+    try:
+        return screenshots.render(card_html(s))
+    except Exception as err:  # no Chrome, or it failed: the text alert still goes out
+        print(f"card image skipped: {type(err).__name__}: {err}")
+        return None
+
+
+def caption_html(s: Summary, url: str | None = None) -> str:
+    """The photo's caption: what the image shows in one line, plus the links an image can't hold."""
+    e = html.escape
+    line = f"📈 <b>AI Stock · {e(_day(s.date))}</b> · {len(s.buys)} BUYs" + (f", {len(s.new)} new" if s.prev else "")
+    if url:
+        line += (f'\n👉 <a href="{e(url)}#journal/days/{s.date}.csv">Open this session</a>'
+                 f'  ·  <a href="{e(url)}">Dashboard</a>')
+    return line
+
+
 def markdown(s: Summary, url: str | None = None) -> str:
     """GitHub markdown: the issue comment, new and top BUYs as tables."""
     lines = [f"### 📈 AI Stock · {_day(s.date)}", f"🟢 **{s.actions.get('BUY', 0)}** BUY · 🟡 {s.actions.get('WATCH', 0)} WATCH · "
@@ -281,6 +427,30 @@ def telegram(text: str, token: str, chat_id: str) -> None:
     with urllib.request.urlopen(f"https://api.telegram.org/bot{token}/sendMessage", data, timeout=30) as r:
         if not json.load(r).get("ok"):
             raise RuntimeError("Telegram refused the message")
+
+
+def telegram_photo(png: bytes, caption: str, token: str, chat_id: str) -> None:
+    """Send `png` with an HTML `caption` from the bot to the chat (Bot API sendPhoto, multipart upload)."""
+    boundary = uuid.uuid4().hex
+    part = lambda name, value, extra="": (f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"{extra}\r\n'
+                                          + ("Content-Type: image/png\r\n" if extra else "") + "\r\n").encode() + value + b"\r\n"
+    body = (part("chat_id", chat_id.encode()) + part("caption", caption.encode()) + part("parse_mode", b"HTML")
+            + part("photo", png, '; filename="alert.png"') + f"--{boundary}--\r\n".encode())
+    request = urllib.request.Request(f"https://api.telegram.org/bot{token}/sendPhoto", body,
+                                     {"Content-Type": f"multipart/form-data; boundary={boundary}"})
+    with urllib.request.urlopen(request, timeout=60) as r:
+        if not json.load(r).get("ok"):
+            raise RuntimeError("Telegram refused the photo")
+
+
+def _telegram(s: Summary, url: str | None, token: str, chat_id: str) -> str:
+    """The card image with a caption holding the links; the text card when no image could be made."""
+    png = card_png(s)
+    if png:
+        telegram_photo(png, caption_html(s, url), token, chat_id)
+        return "sent (card image)"
+    telegram(telegram_html(s, url), token, chat_id)
+    return "sent (text)"
 
 
 def email(text: str, user: str, password: str, to: str, server: str = "smtp.gmail.com", port: int = 465) -> None:
@@ -318,7 +488,7 @@ def send(s: Summary, url: str | None = None, to_telegram: bool = True, to_issue:
     channels = []
     if to_telegram:
         channels.append(("Telegram", ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"),
-                         lambda: telegram(telegram_html(s, url), env("TELEGRAM_BOT_TOKEN"), env("TELEGRAM_CHAT_ID")) or "sent"))
+                         lambda: _telegram(s, url, env("TELEGRAM_BOT_TOKEN"), env("TELEGRAM_CHAT_ID"))))
     if to_email:
         channels.append(("Email", ("SMTP_USERNAME", "SMTP_PASSWORD"),
                          lambda: email(plain(s, url), env("SMTP_USERNAME"), env("SMTP_PASSWORD"),

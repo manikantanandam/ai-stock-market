@@ -9,7 +9,11 @@ push summary and chose both channels.
 
 ## Decision
 `aistock alert` (`src/aistock/alerts.py`) builds a short summary from the session's journal day file only
-(no LLM, 0001). Telegram can't colour text, so colour comes from what it tints: emoji (green-square breadth
+(no LLM, 0001). Telegram gets it as an image card (`card_html`, dark theme, Inter font, rendered by the
+same headless Chrome as the PR screenshots via `site.screenshots.render`, sent with sendPhoto); its caption
+holds the tappable links. Text-card iterations in Telegram HTML never satisfied the user (no text colour,
+fixed fonts, little control over spacing), so the image is the design. If no image can be made, the text
+card below goes out instead. The text card: Telegram can't colour text, so colour comes from what it tints: emoji (green-square breadth
 bar, 🟢/🔴 change markers), links (symbols) and quote blocks (each strategy group of new BUYs is its own
 tinted card). Telegram gets a card: verdict counts with a breadth bar (share of scanned stocks saying BUY,
 with its change on the previous session), the three sectors with most BUYs (with their change), the new BUYs grouped under a header per strategy set with its count (broadest agreement

@@ -139,11 +139,43 @@ def test_a_failing_channel_does_not_stop_the_others(tmp_path, monkeypatch):
     monkeypatch.delenv("ALERT_EMAIL_TO", raising=False)
 
     def refuse(*a, **k):
-        raise RuntimeError("Telegram refused the message")
+        raise RuntimeError("Telegram refused the photo")
 
     sent = []
-    monkeypatch.setattr(alerts, "telegram", refuse)
+    monkeypatch.setattr(alerts, "card_png", lambda s: b"png")
+    monkeypatch.setattr(alerts, "telegram_photo", refuse)
     monkeypatch.setattr(alerts, "email", lambda text, user, pw, to, server, port: sent.append((text.splitlines()[0], to)))
     assert alerts.send(alerts.summary(journal(tmp_path)), to_issue=False) == [
-        "Telegram: failed (RuntimeError: Telegram refused the message)", "Email: sent to me@example.org"]
+        "Telegram: failed (RuntimeError: Telegram refused the photo)", "Email: sent to me@example.org"]
     assert sent == [("AI Stock · Thu 26 Nov 2026", "me@example.org")]
+
+
+def test_telegram_sends_the_card_image_with_the_links_in_its_caption(tmp_path, monkeypatch):
+    got = {}
+    monkeypatch.setattr(alerts, "card_png", lambda s: b"png")
+    monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: got.update(png=png, caption=caption))
+    assert alerts._telegram(alerts.summary(journal(tmp_path)), "https://example.org/", "t", "c") == "sent (card image)"
+    assert got["png"] == b"png"
+    assert got["caption"] == ("📈 <b>AI Stock · Thu 26 Nov 2026</b> · 2 BUYs, 1 new\n"
+                              '👉 <a href="https://example.org/#journal/days/2026-11-26.csv">Open this session</a>'
+                              '  ·  <a href="https://example.org/">Dashboard</a>')
+
+
+def test_telegram_falls_back_to_text_without_an_image(tmp_path, monkeypatch):
+    got = []
+    monkeypatch.setattr(alerts, "card_png", lambda s: None)
+    monkeypatch.setattr(alerts, "telegram", lambda text, token, chat: got.append(text))
+    assert alerts._telegram(alerts.summary(journal(tmp_path)), None, "t", "c") == "sent (text)"
+    assert got[0].startswith("📈 <b>AI STOCK DAILY</b>")
+
+
+def test_card_html_holds_every_section(tmp_path):
+    s = alerts.summary(journal(tmp_path))
+    s.new[0].name = "M&M"
+    page = alerts.card_html(s)
+    assert 'of 3 stocks say BUY</span><span class="chip flat">0%</span>' in page
+    assert 'style="background:#3b82f6">swing</span>' in page and '<span class="count">×1</span>' in page
+    assert '<div class="meta">M&amp;M · Tech</div>' in page  # escaped
+    assert '<span class="medal m1">1</span>' in page and '<span class="chip new">NEW</span>' in page
+    assert "No longer BUY (1):</b> B" in page
+    assert "document.body.dataset.shown" in page  # the renderer waits for it
