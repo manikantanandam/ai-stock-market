@@ -1170,11 +1170,13 @@ const RENDER = { day: renderDay, notes: renderNotes, stock: renderStock, trades:
 const PAGES = { today: ['Today', renderToday], accounts: ['Paper accounts', renderAccounts] };
 
 let showSeq = 0;  // a slower earlier render must not replace a newer page
+// body[data-shown] is set once a page is drawn: the PR screenshot script (site/screenshots.py) waits for it.
 
 async function show() {
   const [hashPath, query] = route();
   const path = hashPath || 'today', seq = ++showSeq;
   params = query; tableSeq = 0;
+  delete document.body.dataset.shown;
   charts.forEach(c => c.destroy()); charts = [];
   document.querySelectorAll('nav a').forEach(a => {
     const on = a.getAttribute('href') === '#' + path;
@@ -1185,14 +1187,27 @@ async function show() {
   const main = $('#main');
   window.scrollTo(0, 0);
   const file = manifest.files.find(f => f.path === path);
-  if (!PAGES[path] && !file) { main.replaceChildren(h('p', { class: 'muted' }, 'File not found: ' + path)); return; }
+  if (!PAGES[path] && !file) {
+    main.replaceChildren(h('p', { class: 'muted' }, 'File not found: ' + path));
+    document.body.dataset.shown = path;
+    return;
+  }
   main.replaceChildren(h('p', { class: 'muted' }, 'Loading…'));
-  const parts = PAGES[path] ? await PAGES[path][1]() : await RENDER[file.kind](file, await load(path));
+  let parts;
+  try {
+    parts = PAGES[path] ? await PAGES[path][1]() : await RENDER[file.kind](file, await load(path));
+  } catch (e) {  // e.g. a failed fetch: say so instead of 'Loading…' forever
+    if (seq !== showSeq) return;
+    main.replaceChildren(h('p', { class: 'warning' }, `Could not load this page (${e.message}). Reload to try again.`));
+    document.body.dataset.shown = path;
+    return;
+  }
   if (seq !== showSeq) return;
   const head = PAGES[path] ? [h('h2', {}, PAGES[path][0])] : [
     h('h2', {}, file.title, ['stock', 'contract'].includes(file.kind) ? starButton(file.title) : null),
     h('p', { class: 'sub' }, `${file.path} · ${file.rows.toLocaleString()} rows · `, h('a', { href: 'data/' + file.path, download: '' }, 'download CSV'))];
   main.replaceChildren(...head, ...parts.flat().filter(Boolean));
+  document.body.dataset.shown = path;
 }
 
 // ---------- navigation ----------

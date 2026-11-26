@@ -1,0 +1,75 @@
+# Screenshots of the dashboard in the description of every PR that changes it.
+# `aistock pr-screenshots` (src/aistock/site/screenshots.py) builds nothing itself: this job builds the
+# site from the PR's code and journal, then captures the pages (the PR body's `<!-- screenshots: ... -->`
+# line, else Today, Paper accounts, the latest session and a held stock), pushes the images to the
+# orphan `pr-screenshots` branch and rewrites the description's screenshots section.
+# Run by hand for any PR: gh workflow run pr-screenshots.yml -f pr=<number>
+name: PR screenshots
+
+on:
+  pull_request:
+    paths:
+      - "src/aistock/site/**"
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "PR number"
+        required: true
+
+permissions:
+  contents: write        # push to the pr-screenshots branch
+  pull-requests: write   # edit the PR description
+
+concurrency:
+  group: pr-screenshots-${{ github.event.pull_request.number || inputs.pr }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    # PRs from forks get a read-only token
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR: ${{ github.event.pull_request.number || inputs.pr }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out the PR head
+        if: github.event_name == 'workflow_dispatch'
+        run: gh pr checkout "$PR"
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      # Same cache prefix as the Pages build (annual statements, 7-day TTL)
+      - name: Cache fundamentals
+        uses: actions/cache@v4
+        with:
+          path: .cache/fundamentals
+          key: fundamentals-screenshots-${{ github.run_id }}
+          restore-keys: fundamentals-
+
+      - name: Install
+        run: uv sync --locked
+
+      # As in pages.yml: reports/ isn't committed, so take the latest weekly run's (Live vs backtest needs them)
+      - name: Fetch latest backtest reports
+        continue-on-error: true
+        run: |
+          id=$(gh run list -w weekly-backtest.yml -s completed -L 1 --json databaseId -q '.[0].databaseId')
+          if [ -z "$id" ]; then exit 0; fi
+          gh run download "$id" -p '*-reports' -D artifacts
+          mkdir -p reports
+          find artifacts -name '*.csv' -exec mv {} reports/ \;
+
+      - name: Build site
+        run: uv run aistock site --out _site
+
+      - name: Screenshots into the PR description
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          uv run aistock pr-screenshots "$PR" --site _site
