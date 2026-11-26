@@ -186,7 +186,7 @@ class _Chrome:
                          returnByValue=True).get("result", {}).get("value")
 
 
-def render(page_html: str, width: int = 540, scale: int = 2, theme: str = "dark") -> bytes:
+def render(page_html: str, width: int = 600, scale: int = 2, theme: str = "dark") -> bytes:
     """PNG of a self-contained HTML page (e.g. the alert card), as tall as its content. The page must set
     body[data-shown] when it is ready."""
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:

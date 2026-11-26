@@ -268,13 +268,13 @@ CARD_CSS = """
 :root { --bg: #0f1115; --panel: #171a21; --line: #262a33; --ink: #f2f3f5; --ink-2: #a3a8b3; --ink-3: #6b7280;
   --buy: #22c55e; --watch: #f59e0b; --avoid: #ef4444; --up: #22c55e; --down: #ef4444; --flat: #9ca3af; }
 * { box-sizing: border-box; margin: 0; }
-body { background: var(--bg); color: var(--ink); width: 540px; padding: 22px;
+body { background: var(--bg); color: var(--ink); padding: 18px 20px;
   font: 15px/1.4 Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-variant-numeric: tabular-nums; }
 .head { display: flex; justify-content: space-between; align-items: baseline; }
 .brand { font-weight: 800; letter-spacing: .08em; font-size: 13px; color: var(--ink-2); }
 .date { font-size: 13px; color: var(--ink-2); }
-.hero { display: flex; align-items: baseline; gap: 10px; margin-top: 10px; }
-.big { font-size: 44px; font-weight: 800; letter-spacing: -.02em; }
+.hero { display: flex; align-items: baseline; gap: 10px; margin-top: 4px; }
+.big { font-size: 38px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
 .big small { font-size: 22px; }
 .sub { color: var(--ink-2); font-size: 14px; }
 .chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }
@@ -282,45 +282,54 @@ body { background: var(--bg); color: var(--ink); width: 540px; padding: 22px;
 .chip.down { color: var(--down); background: rgba(239,68,68,.14); }
 .chip.flat { color: var(--flat); background: rgba(156,163,175,.14); }
 .chip.new { color: #60a5fa; background: rgba(96,165,250,.16); }
-.split { display: flex; height: 10px; border-radius: 999px; overflow: hidden; margin: 12px 0 8px; background: var(--line); }
+.split { display: flex; height: 10px; border-radius: 999px; overflow: hidden; margin: 8px 0 6px; background: var(--line); }
 .split i { display: block; }
 .legend { display: flex; gap: 16px; font-size: 13px; color: var(--ink-2); }
 .legend b { color: var(--ink); }
 .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
-section { margin-top: 18px; }
-h2 { font-size: 12px; letter-spacing: .1em; color: var(--ink-3); font-weight: 700; margin-bottom: 8px;
+section { margin-top: 10px; }
+h2 { font-size: 12px; letter-spacing: .1em; color: var(--ink-3); font-weight: 700; margin-bottom: 6px;
   display: flex; justify-content: space-between; }
 .sectors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.sector { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
-.sector .n { font-size: 22px; font-weight: 800; }
-.sector .name { font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.group { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; }
-.pills { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-bottom: 6px; }
+.sector { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px 10px; }
+.sector { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.sector .n { font-size: 17px; font-weight: 800; }
+.sector .name { font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.group { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 7px 12px; margin-bottom: 6px; }
+.pills { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-bottom: 4px; }
 .pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; color: #fff; }
 .count { margin-left: auto; font-size: 12px; color: var(--ink-3); font-weight: 700; }
-.row { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); }
+.row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 3px 0;
+  border-top: 1px solid var(--line); }
+.line { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
 .row:first-of-type { border-top: none; }
 .sym { font-weight: 800; font-size: 15px; letter-spacing: .01em; }
-.meta { font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px; }
-.score { font-weight: 800; font-size: 14px; color: var(--buy); background: rgba(34,197,94,.12); padding: 3px 9px; border-radius: 8px; }
-.rank { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 8px; padding: 6px 0;
+.meta { font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.score { font-weight: 800; font-size: 13px; color: var(--buy); background: rgba(34,197,94,.12); padding: 2px 8px; border-radius: 7px; }
+.rank { display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 8px; padding: 3px 0;
   border-top: 1px solid var(--line); }
 .rank:first-of-type { border-top: none; }
-.medal { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800;
+.medal { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800;
   background: var(--line); color: var(--ink-2); }
 .medal.m1 { background: #facc15; color: #1f1a00; } .medal.m2 { background: #d1d5db; color: #1f2937; }
 .medal.m3 { background: #d97706; color: #1f1200; }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px 12px; }
-.dropped { margin-top: 16px; font-size: 12px; color: var(--ink-3); }
+.dropped { margin-top: 10px; font-size: 12px; color: var(--ink-3); }
 .dropped b { color: var(--ink-2); }
-.note { margin-top: 14px; padding: 10px 12px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line);
+.note { margin-top: 10px; padding: 8px 12px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line);
   font-size: 12px; line-height: 1.5; color: var(--ink-2); }
 .note b { color: var(--ink); }
 .scale { display: flex; height: 6px; border-radius: 999px; margin: 8px 0 4px;
   background: linear-gradient(90deg, var(--avoid), var(--watch) 50%, var(--buy)); }
 .ticks { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); }
-.foot { margin-top: 14px; font-size: 11px; color: var(--ink-3); text-align: right; }
+.foot { margin-top: 8px; font-size: 11px; color: var(--ink-3); text-align: right; }
 """
+
+
+# Short sector names for the narrow sector tiles (full names elsewhere)
+SHORT_SECTOR = {"Financial Services": "Financials", "Consumer Cyclical": "Cons. Cyclical",
+                "Consumer Defensive": "Cons. Defensive", "Communication Services": "Comm. Services",
+                "Basic Materials": "Materials"}
 
 
 def _chip(now: float, before: float | None, pct: bool = False) -> str:
@@ -342,17 +351,16 @@ def score_note() -> str:
     c = Config()
     parts = [(c.w_technical, "technical"), (c.w_fundamental, "fundamentals"), (c.w_sentiment, "news sentiment")]
     mins = [f"{name} +{st.min_combined:.2f}" for name, st in PRESETS.items() if st.min_combined is not None]
-    return ("<b>Score</b> is the combined score, from −1 to +1: "
-            + " + ".join(f"{w:.0%} {label}" for w, label in parts)
-            + ", each also from −1 to +1 (news counts 0 when it wasn't fetched). Higher means more of the evidence "
-            "agrees. A BUY comes from a strategy's entry rules; the score only ranks BUYs"
-            + (f", though some strategies also need a minimum ({', '.join(mins)})" if mins else "") + ".")
+    return ("<b>Score</b> −1 to +1 = " + " + ".join(f"{w:.0%} {label}" for w, label in parts)
+            + " (each −1 to +1; news 0 if not fetched). Strategies' rules decide BUYs; the score ranks them"
+            + (f" ({', '.join(m.replace(' +', ' needs ≥ +') for m in mins)})" if mins else "") + ".")
 
 
 def card_html(s: Summary) -> str:
     """The alert as a self-contained HTML card (rendered to an image for Telegram, see card_png): breadth with
     its change and a BUY/WATCH/AVOID split bar, hot sectors as tiles, new BUYs grouped under colour-coded
-    strategy pills, the strongest BUYs ranked, dropped BUYs in a muted line, and a note on what the score means."""
+    strategy pills, the strongest BUYs ranked, and a note on what the score means. Kept to about 1 : 1.5 so it
+    fills Telegram's preview (taller images get shrunk with bars at the sides); dropped BUYs go in the caption."""
     e = html.escape
     total = sum(s.actions.values()) or 1
     buy, watch, avoid = (s.actions.get(a, 0) for a in ("BUY", "WATCH", "AVOID"))
@@ -367,17 +375,17 @@ def card_html(s: Summary) -> str:
            '<div class="legend">' + "".join(f'<span><span class="dot" style="background:var(--{k})"></span><b>{n}</b> {k.upper()}</span>'
                                             for k, n in (("buy", buy), ("watch", watch), ("avoid", avoid))) + "</div>"]
     if s.sectors:
-        tiles = "".join(f'<div class="sector"><div class="n">{n} '
+        tiles = "".join(f'<div class="sector"><span class="n">{n}</span>'
                         + (_chip(n, s.prev_sectors.get(k)) if s.prev is not None else "")
-                        + f'</div><div class="name">{e(k)}</div></div>' for k, n in s.sectors[:3])
+                        + f'<span class="name">{e(SHORT_SECTOR.get(k, k))}</span></div>' for k, n in s.sectors[:3])
         out.append(f'<section><h2><span>HOT SECTORS</span><span>BUYs</span></h2><div class="sectors">{tiles}</div></section>')
     if s.prev is not None:
         groups = []
         for strategies, group in _groups(s.new[:MAX_NEW]):
             pills = "".join(f'<span class="pill" style="background:{STRATEGY_COLOURS.get(x, "#4b5563")}">{e(x)}</span>'
                             for x in strategies)
-            rows = "".join(f'<div class="row"><div><div class="sym">{e(b.symbol)}</div>'
-                           f'<div class="meta">{e(b.name)} · {e(b.sector)}</div></div>'
+            rows = "".join(f'<div class="row"><div class="line"><span class="sym">{e(b.symbol)}</span>'
+                           f'<span class="meta">{e(b.name)} · {e(b.sector)}</span></div>'
                            f'<span class="score">{_score(b.combined)}</span></div>' for b in group)
             groups.append(f'<div class="group"><div class="pills">{pills}<span class="count">×{len(group)}</span></div>{rows}</div>')
         more = f'<div class="sub">+{_more(s.new, MAX_NEW)} more on the dashboard</div>' if _more(s.new, MAX_NEW) else ""
@@ -386,16 +394,13 @@ def card_html(s: Summary) -> str:
     if s.buys:
         fresh = {b.symbol for b in s.new}
         ranks = "".join(f'<div class="rank"><span class="medal m{k + 1}">{k + 1}</span>'
-                        f'<div><span class="sym">{e(b.symbol)}</span> '
+                        f'<div class="line"><span class="sym">{e(b.symbol)}</span>'
                         + ('<span class="chip new">NEW</span>' if b.symbol in fresh else "")
-                        + f'<div class="meta">{e(b.name)} · {e(b.sector)}</div></div>'
+                        + f'<span class="meta">{e(b.name)} · {e(b.sector)}</span></div>'
                         f'<span class="score">{_score(b.combined)}</span></div>' for k, b in enumerate(s.buys[:TOP]))
         out.append(f'<section><h2><span>STRONGEST BUYS</span><span>score</span></h2><div class="panel">{ranks}</div></section>')
-    if s.dropped:
-        out.append(f'<div class="dropped"><b>No longer BUY ({len(s.dropped)}):</b> {e(", ".join(s.dropped))}</div>')
     out.append(f'<div class="note">{score_note()}<div class="scale"></div>'
                '<div class="ticks"><span>−1 bearish</span><span>0 neutral</span><span>+1 bullish</span></div></div>')
-    out.append('<div class="foot">aistock · rules decide, scores rank</div>')
     return ('<!doctype html><html><head><meta charset="utf-8">'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap">'
             f"<style>{CARD_CSS}</style></head><body>" + "".join(out)
@@ -414,9 +419,12 @@ def card_png(s: Summary) -> bytes | None:
 
 
 def caption_html(s: Summary, url: str | None = None) -> str:
-    """The photo's caption: what the image shows in one line, plus the links an image can't hold."""
+    """The photo's caption: what the image shows in one line, the dropped BUYs, and the links an image can't
+    hold."""
     e = html.escape
     line = f"📈 <b>AI Stock · {e(_day(s.date))}</b> · {len(s.buys)} BUYs" + (f", {len(s.new)} new" if s.prev else "")
+    if s.dropped:  # kept off the image so it stays short enough to fill Telegram's preview
+        line += f"\n➖ <i>No longer BUY ({len(s.dropped)}): {e(', '.join(s.dropped))}</i>"
     if url:
         line += (f'\n👉 <a href="{e(url)}#journal/days/{s.date}.csv">Open this session</a>'
                  f'  ·  <a href="{e(url)}">Dashboard</a>')

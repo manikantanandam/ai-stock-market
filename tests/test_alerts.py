@@ -157,6 +157,7 @@ def test_telegram_sends_the_card_image_with_the_links_in_its_caption(tmp_path, m
     assert alerts._telegram(alerts.summary(journal(tmp_path)), "https://example.org/", "t", "c") == "sent (card image)"
     assert got["png"] == b"png"
     assert got["caption"] == ("📈 <b>AI Stock · Thu 26 Nov 2026</b> · 2 BUYs, 1 new\n"
+                              "➖ <i>No longer BUY (1): B</i>\n"
                               '👉 <a href="https://example.org/#journal/days/2026-11-26.csv">Open this session</a>'
                               '  ·  <a href="https://example.org/">Dashboard</a>')
 
@@ -175,9 +176,9 @@ def test_card_html_holds_every_section(tmp_path):
     page = alerts.card_html(s)
     assert 'of 3 stocks say BUY</span><span class="chip flat">0%</span>' in page
     assert 'style="background:#3b82f6">swing</span>' in page and '<span class="count">×1</span>' in page
-    assert '<div class="meta">M&amp;M · Tech</div>' in page  # escaped
+    assert '<span class="meta">M&amp;M · Tech</span>' in page  # escaped
     assert '<span class="medal m1">1</span>' in page and '<span class="chip new">NEW</span>' in page
-    assert "No longer BUY (1):</b> B" in page
+    assert "No longer BUY" not in page  # in the caption, so the image stays short
     assert "document.body.dataset.shown" in page  # the renderer waits for it
 
 
@@ -189,6 +190,6 @@ def test_score_note_follows_the_live_weights(monkeypatch):
     # dataclass defaults are fixed in __init__, so swap in a Config with other ones
     monkeypatch.setattr(signal, "Config", partial(signal.Config, w_technical=0.6, w_fundamental=0.2))
     note = alerts.score_note()
-    assert "from −1 to +1: 60% technical + 20% fundamentals + 20% news sentiment" in note
-    assert "need a minimum (swing +0.40)" in note
+    assert "−1 to +1 = 60% technical + 20% fundamentals + 20% news sentiment" in note
+    assert "(swing needs ≥ +0.40)" in note
     assert '<div class="note">' in alerts.card_html(alerts.Summary("2026-11-26", None, [], [], [], {}, []))
