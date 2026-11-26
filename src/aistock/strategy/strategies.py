@@ -25,6 +25,7 @@ class Strategy:
     rs: bool = False              # only enter when the stock beat NIFTY 50 over ~3 and ~6 months
     sector: bool = False          # only enter when its sector index is above its SMA50
     rank: str = "score"           # who gets a slot when signals outnumber them: see portfolio.rank_inputs
+    short_rule: str | None = None  # futures only: entry rule for shorts (see technical.rules.SHORT_RULES)
 
     def params(self, **overrides) -> Params:
         """Backtest params, with CLI overrides (None means keep the preset)."""
@@ -43,6 +44,8 @@ class Strategy:
         exits.append(f"max {self.max_hold} days")
         filters = [name for name, on in [("market", self.regime), ("RS", self.rs), ("sector", self.sector)] if on]
         entry = self.rule + "".join(f" + {f} filter" for f in filters)
+        if self.short_rule:
+            entry = f"long {entry}, short {self.short_rule}"
         ranked = "" if self.rank == "score" else f"; ranked by {self.rank}"
         return f"{entry}; {', '.join(exits)}{ranked}"
 

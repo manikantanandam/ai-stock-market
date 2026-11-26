@@ -9,6 +9,7 @@ from rich.progress import track
 from rich.table import Table
 
 from aistock.backtest import engine, portfolio, sweep, universe, walkforward
+from aistock.commodity.cli import app as commodity_app
 from aistock.data import fundamentals, prices, sectors, watchlists
 from aistock.data.prices import get_prices, market_phase
 from aistock.data.watchlists import WATCHLISTS
@@ -23,6 +24,7 @@ from aistock.technical import rules
 from aistock.technical.indicators import add_indicators
 
 app = typer.Typer(help="Local AI stock assistant (NSE swing trading)", no_args_is_help=True)
+app.add_typer(commodity_app, name="commodity")
 
 
 @app.callback()

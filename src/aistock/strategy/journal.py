@@ -11,6 +11,8 @@ stock's history. The day files are the source of truth for `load`.
 LLM notes on a session's BUYs go to `notes/<date>.csv`, one row per stock.
 Day rows also keep each score's reasons and the raw fundamental ratios
 (`f_*`), since Yahoo can't serve past fundamentals snapshots.
+Commodity futures get the same layout under `commodities/`, with
+`contracts/` in place of `stocks/`.
 """
 import csv
 from collections import defaultdict
@@ -24,22 +26,26 @@ ROOT = Path(__file__).resolve().parents[3] / "journal"
 DAYS = ROOT / "days"
 STOCKS = ROOT / "stocks"
 NOTES = ROOT / "notes"
+COMMODITIES = ROOT / "commodities"
 
 
-def record(signals: list[Signal]) -> Path:
+def record(signals: list[Signal], root: Path | None = None, per_symbol: str = "stocks") -> Path:
+    """Signals are stock or commodity signals (anything with as_of, symbol, row()).
+    root: None for the stock journal, COMMODITIES (with per_symbol="contracts") for futures."""
+    days, symbols = (DAYS, STOCKS) if root is None else (root / "days", root / per_symbol)
     rows = [{"date": s.as_of, **s.row()} for s in signals]
     by_day, by_stock = defaultdict(list), defaultdict(list)
     for r in rows:
         by_day[r["date"]].append(r)
         by_stock[r["symbol"]].append(r)
     for day, day_rows in by_day.items():
-        _upsert(DAYS / f"{day}.csv", day_rows, key="symbol")
+        _upsert(days / f"{day}.csv", day_rows, key="symbol")
     for symbol, stock_rows in by_stock.items():
-        _upsert(STOCKS / f"{symbol}.csv", stock_rows, key="date")
-    return ROOT
+        _upsert(symbols / f"{symbol}.csv", stock_rows, key="date")
+    return days.parent
 
 
-def record_notes(notes: list[tuple[Signal, str, str]], source: str = "live") -> None:
+def record_notes(notes: list[tuple[Signal, str, str]], source: str = "live", root: Path | None = None) -> None:
     """Save (signal, strategy, note) triples by session; a re-run replaces a stock's note.
     source: "live" (written by the scan) or "backfill" (rebuilt later from the journal)."""
     by_day = defaultdict(list)
@@ -47,7 +53,7 @@ def record_notes(notes: list[tuple[Signal, str, str]], source: str = "live") -> 
         by_day[s.as_of].append({"date": s.as_of, "symbol": s.symbol, "name": s.name,
                                 "strategy": strategy, "note": text, "source": source})
     for day, rows in by_day.items():
-        _upsert(NOTES / f"{day}.csv", rows, key="symbol")
+        _upsert((NOTES if root is None else root / "notes") / f"{day}.csv", rows, key="symbol")
 
 
 def load(**read_csv_kw) -> pd.DataFrame:

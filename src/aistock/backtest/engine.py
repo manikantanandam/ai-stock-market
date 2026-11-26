@@ -1,10 +1,15 @@
-"""Long-only, single-stock, bar-by-bar backtest on daily candles.
+"""Single-stock (or single-contract), bar-by-bar backtest on daily candles.
 
 Rules: when entries[t] is True and flat, buy at bar t+1 open.
 Stop = entry - stop_atr * ATR(t); target = entry + target_atr * ATR(t) (None = no target).
 With trail_atr, the stop ratchets up to (highest high since entry - trail_atr * ATR(t)).
 If a bar hits both stop and target, the stop is assumed (conservative).
 Gaps fill at the open. Positions close at the bar's close after max_hold bars.
+
+Futures can also go short: when shorts[t] is True and flat, sell at bar t+1
+open, with every level mirrored (stop above, target below, trail from the
+lowest low). A short is marked as negative units, so equity = cash + units *
+close. If both fire on one bar, the long wins.
 """
 from dataclasses import dataclass, field
 
@@ -22,6 +27,7 @@ class Params:
     max_hold: int = 20
     capital: float = 100_000.0
     costs: CostModel = field(default_factory=CostModel)
+    fractional: bool = False  # trade fractional units (futures priced above the capital)
 
 
 @dataclass
@@ -31,29 +37,37 @@ class Result:
     stats: dict
 
 
-def run(ind: pd.DataFrame, entries: pd.Series, p: Params = Params()) -> Result:
-    """ind: add_indicators() frame; entries: bool per bar aligned to ind."""
+def run(ind: pd.DataFrame, entries: pd.Series, p: Params = Params(), shorts: pd.Series | None = None) -> Result:
+    """ind: add_indicators() frame; entries (and optional shorts): bool per bar aligned to ind."""
     o, h, l, c = (ind[k].to_numpy() for k in ("Open", "High", "Low", "Close"))
     atr, ent = ind.atr14.to_numpy(), entries.fillna(False).to_numpy(dtype=bool)
-    cash, shares, equity, trades = p.capital, 0, [], []
-    entry_i = stop = target = entry_px = entry_atr = highest = None
+    sht = np.zeros(len(ind), dtype=bool) if shorts is None else shorts.fillna(False).to_numpy(dtype=bool)
+    cash, units, side, equity, trades = p.capital, 0, 0, [], []
+    entry_i = stop = target = entry_px = entry_atr = extreme = None
 
     def close_position(i, px, reason):
-        nonlocal cash, shares
-        fill = px * (1 - p.costs.slippage)
-        value = shares * fill
-        proceeds = value - p.costs.sell_cost(value)
-        cash += proceeds
-        # ret is on the money invested (incl. buy costs), matching portfolio.run;
+        nonlocal cash, units
+        if side > 0:
+            fill = px * (1 - p.costs.slippage)
+            value = units * fill
+            cash += value - p.costs.sell_cost(value)
+            pnl = value - p.costs.sell_cost(value) - basis
+        else:  # buy back a short
+            fill = px * (1 + p.costs.slippage)
+            value = units * fill
+            cash -= value + p.costs.buy_cost(value)
+            pnl = basis - value - p.costs.buy_cost(value)
+        # ret is on the money invested (incl. entry costs), matching portfolio.run;
         # cash left over from rounding to whole shares doesn't dilute it
         trades.append({"entry_date": ind.index[entry_i], "exit_date": ind.index[i],
                        "entry": entry_px, "exit": fill, "bars": i - entry_i + 1,
-                       "reason": reason, "pnl": proceeds - cost_basis,
-                       "ret": proceeds / cost_basis - 1})
-        shares = 0
+                       "reason": reason, "pnl": pnl, "ret": pnl / (basis if side > 0 else units * entry_px),
+                       "side": "long" if side > 0 else "short", "stop": stop,
+                       "target": np.nan if np.isinf(target) else target})
+        units = 0
 
     for i in range(len(ind)):
-        if shares:
+        if units and side > 0:
             if l[i] <= stop:
                 close_position(i, min(o[i], stop), "stop")
             elif h[i] >= target:
@@ -61,23 +75,40 @@ def run(ind: pd.DataFrame, entries: pd.Series, p: Params = Params()) -> Result:
             elif i - entry_i + 1 >= p.max_hold:
                 close_position(i, c[i], "time")
             elif p.trail_atr:
-                highest = max(highest, h[i])
-                stop = max(stop, highest - p.trail_atr * entry_atr)
-        elif i > 0 and ent[i - 1] and not np.isnan(atr[i - 1]):
-            entry_px = o[i] * (1 + p.costs.slippage)
-            n = int(cash / (entry_px * (1 + 0.0012)))  # leave room for buy costs
+                extreme = max(extreme, h[i])
+                stop = max(stop, extreme - p.trail_atr * entry_atr)
+        elif units:
+            if h[i] >= stop:
+                close_position(i, max(o[i], stop), "stop")
+            elif l[i] <= target:
+                close_position(i, min(o[i], target), "target")
+            elif i - entry_i + 1 >= p.max_hold:
+                close_position(i, c[i], "time")
+            elif p.trail_atr:
+                extreme = min(extreme, l[i])
+                stop = min(stop, extreme + p.trail_atr * entry_atr)
+        elif i > 0 and (ent[i - 1] or sht[i - 1]) and not np.isnan(atr[i - 1]):
+            side = 1 if ent[i - 1] else -1
+            entry_px = o[i] * (1 + side * p.costs.slippage)
+            n = cash / (entry_px * (1 + 0.0012))  # leave room for entry costs
+            n = n if p.fractional else int(n)
             if n > 0:
                 value = n * entry_px
-                cost_basis = value + p.costs.buy_cost(value)
-                cash -= cost_basis
-                shares, entry_i, entry_atr, highest = n, i, atr[i - 1], h[i]
-                stop = entry_px - p.stop_atr * entry_atr
-                target = entry_px + p.target_atr * entry_atr if p.target_atr else np.inf
-                if l[i] <= stop:  # stopped out on the entry bar
+                if side > 0:
+                    basis = value + p.costs.buy_cost(value)
+                    cash -= basis
+                else:  # short proceeds sit in cash; the position is marked as -units
+                    basis = value - p.costs.sell_cost(value)
+                    cash += basis
+                units, entry_i, entry_atr = n, i, atr[i - 1]
+                extreme = h[i] if side > 0 else l[i]
+                stop = entry_px - side * p.stop_atr * entry_atr
+                target = entry_px + side * p.target_atr * entry_atr if p.target_atr else side * np.inf
+                if (l[i] <= stop) if side > 0 else (h[i] >= stop):  # stopped out on the entry bar
                     close_position(i, stop, "stop")
-        equity.append(cash + shares * c[i])
+        equity.append(cash + side * units * c[i])
 
-    if shares:
+    if units:
         close_position(len(ind) - 1, c[-1], "end")
         equity[-1] = cash
 

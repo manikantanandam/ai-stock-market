@@ -126,6 +126,19 @@ jobs:
           uv run aistock scan --watchlist nifty500 --top 50 --notes --notes-max 25 | tee scan.txt
           { echo '```'; cat scan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
+      # Commodity futures (journal/commodities/): global contracts in INR, with
+      # LLM notes on any BUY/SELL. Only completed New York sessions are used, so
+      # this run logs the previous US session. A failure here never blocks the
+      # stock journal.
+      - name: Commodity scan
+        continue-on-error: true
+        env:
+          NO_COLOR: "1"
+          COLUMNS: "140"
+        run: |
+          uv run aistock commodity scan --notes | tee commodities.txt
+          { echo '## Commodities'; echo '```'; cat commodities.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       # Notes for journaled sessions that have none (from before notes were
       # saved, or a day Ollama failed). A backfilled note takes ~30s on CI, so
       # two sessions of 25 BUYs per run; the step limit keeps a slow run from

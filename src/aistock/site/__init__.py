@@ -7,7 +7,8 @@ new reports show up without changes here. Pages can't list directories,
 hence the manifest.
 
 Kinds: "day" (one scan session), "notes" (LLM notes on a session's BUYs),
-"stock" (one stock's signal history), "trades" (entry/exit rows), "series"
+"stock" (one stock's signal history), "cday" / "cnotes" / "contract" (the
+same for commodity futures, under journal/commodities/), "trades" (entry/exit rows), "series"
 (Date column + numeric columns, e.g. equity curves), "yearly" (returns per
 calendar year), "table" (anything else).
 """
@@ -20,13 +21,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 STATIC = Path(__file__).parent / "static"
 
-GROUPS = ["Signals", "LLM notes", "Paper accounts", "Reports", "Stocks"]
+GROUPS = ["Signals", "LLM notes", "Commodities", "Commodity notes", "Paper accounts", "Reports", "Stocks", "Contracts"]
+COMMODITY = {"days": ("cday", "Commodities"), "notes": ("cnotes", "Commodity notes"),
+             "contracts": ("contract", "Contracts")}  # journal/commodities/<sub>: (kind, group)
 
 
 def kind_of(rel: str, columns: list[str]) -> str:
     """Decide how the page draws a CSV, from its path and header."""
     parts = rel.split("/")
     name = parts[-1]
+    if parts[:2] == ["journal", "commodities"] and len(parts) == 4 and parts[2] in COMMODITY:
+        return COMMODITY[parts[2]][0]
     if parts[:2] == ["journal", "days"]:
         return "day"
     if parts[:2] == ["journal", "stocks"]:
@@ -44,6 +49,8 @@ def kind_of(rel: str, columns: list[str]) -> str:
 
 def group_of(rel: str) -> str:
     parts = rel.split("/")
+    if parts[:2] == ["journal", "commodities"] and len(parts) == 4 and parts[2] in COMMODITY:
+        return COMMODITY[parts[2]][1]
     if parts[:2] == ["journal", "days"]:
         return "Signals"
     if parts[:2] == ["journal", "stocks"]:

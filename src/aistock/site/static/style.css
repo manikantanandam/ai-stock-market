@@ -113,6 +113,10 @@ td a, .sub a { color: var(--accent); text-decoration: none; }
 .neg { color: var(--critical); }
 .badge { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; border: 1px solid var(--border); }
 .badge.BUY { border-color: var(--good); color: var(--good); }
+.badge.SELL { border-color: var(--critical); color: var(--critical); }
+.badge.EXIT { border-color: var(--s7); color: var(--s7); }
+.badge.HOLD { border-color: var(--accent); color: var(--accent); }
+.badge.MIXED { border-color: var(--s4); color: var(--s4); }
 .more { margin-top: 10px; }
 .note { padding: 10px 0; border-top: 1px solid var(--border); }
 .note:first-of-type { border-top: none; }
