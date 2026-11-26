@@ -1,3 +1,5 @@
+import pytest
+
 from aistock import alerts
 
 
@@ -41,8 +43,44 @@ def test_names_cap_long_lists():
     assert alerts._names([str(i) for i in range(18)]).endswith("14 +3 more")
 
 
-def test_send_skips_telegram_without_secrets(monkeypatch):
-    monkeypatch.delenv("TELEGRAM_BOT_TOKEN", raising=False)
-    monkeypatch.delenv("TELEGRAM_CHAT_ID", raising=False)
-    assert alerts.send("hi", to_telegram=True, to_issue=False) == [
-        "Telegram: skipped (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not set)"]
+def test_message_for_an_earlier_session_uses_that_days_state(tmp_path):
+    text = alerts.message(journal(tmp_path), date="2026-11-25")
+
+    assert text.splitlines() == [
+        "AI stock · 2026-11-25",
+        "- BUY 2: A, B",
+        "Paper accounts (return · equal-weight hold since start):",
+        # C entered 11-25 and is still open; B (traded 11-20 to 11-26) was open too; A came later
+        "- trend: +0.0% · hold +0.0% · 2 open · in: C",
+    ]
+
+
+def test_message_rejects_a_date_without_session(tmp_path):
+    with pytest.raises(ValueError, match="latest before it is 2026-11-26"):
+        alerts.message(journal(tmp_path), date="2026-11-27")
+
+
+def test_send_skips_channels_without_secrets(monkeypatch):
+    for k in ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "SMTP_USERNAME", "SMTP_PASSWORD"):
+        monkeypatch.delenv(k, raising=False)
+    assert alerts.send("hi", to_telegram=True, to_issue=False, to_email=True) == [
+        "Telegram: skipped (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not set)",
+        "Email: skipped (SMTP_USERNAME / SMTP_PASSWORD not set)"]
+
+
+def test_a_failing_channel_does_not_stop_the_others(monkeypatch):
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "t")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "c")
+    monkeypatch.setenv("SMTP_USERNAME", "me@example.org")
+    monkeypatch.setenv("SMTP_PASSWORD", "p")
+    monkeypatch.delenv("ALERT_EMAIL_TO", raising=False)
+
+    def refuse(*a, **k):
+        raise RuntimeError("Telegram refused the message")
+
+    sent = []
+    monkeypatch.setattr(alerts, "telegram", refuse)
+    monkeypatch.setattr(alerts, "email", lambda text, user, pw, to, server, port: sent.append((to, server, port)))
+    assert alerts.send("hi", to_issue=False) == [
+        "Telegram: failed (RuntimeError: Telegram refused the message)", "Email: sent to me@example.org"]
+    assert sent == [("me@example.org", "smtp.gmail.com", 465)]

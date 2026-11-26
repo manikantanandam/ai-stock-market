@@ -320,23 +320,34 @@ def pr_screenshots(
 
 @app.command()
 def alert(
+    date: str = typer.Option("", help="Session date YYYY-MM-DD (default: the latest journaled session)"),
     telegram: bool = typer.Option(True, "--telegram/--no-telegram", help="Send via the Telegram bot "
                                                                          "(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)"),
+    email: bool = typer.Option(True, "--email/--no-email", help="Send by email (SMTP_USERNAME, SMTP_PASSWORD; "
+                                                               "optional ALERT_EMAIL_TO, SMTP_SERVER, SMTP_PORT)"),
     issue: bool = typer.Option(True, "--issue/--no-issue", help="Comment on the 'Daily alerts' GitHub issue"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Print the message only"),
     url: str = typer.Option("", help="Dashboard link to end the message with"),
 ):
-    """Summary of the latest session (BUYs, paper accounts) to Telegram and a GitHub issue."""
+    """Summary of a session (BUYs, paper accounts) to Telegram, email and a GitHub issue; channels whose
+    secrets aren't set are skipped. Exits non-zero if a configured channel fails."""
     from aistock import alerts
 
-    text = alerts.message(url=url or None)
+    try:
+        text = alerts.message(url=url or None, date=date or None)
+    except ValueError as e:
+        raise typer.BadParameter(str(e), param_hint="--date")
     if not text:
         print("No journaled session yet")
         return
     typer.echo(text)
-    if not dry_run:
-        for line in alerts.send(text, telegram, issue):
-            typer.echo(line)
+    if dry_run:
+        return
+    results = alerts.send(text, telegram, issue, email)
+    for line in results:
+        typer.echo(line)
+    if any(": failed (" in line for line in results):
+        raise typer.Exit(1)
 
 
 @app.command("update-watchlists")

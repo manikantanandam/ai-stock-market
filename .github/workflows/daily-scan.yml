@@ -225,7 +225,7 @@ jobs:
           gh workflow run tests.yml --ref "$branch"
           gh pr merge "$branch" --auto --squash --delete-branch
 
-      # Summary of the session to Telegram (when the bot secrets are set) and the "Daily alerts" issue.
+      # Summary of the session to Telegram and email (when their secrets are set) and the "Daily alerts" issue.
       # Last, and allowed to fail: an alert problem must never cost a scan.
       - name: Daily alert
         continue-on-error: true
@@ -233,4 +233,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
         run: uv run aistock alert --url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"

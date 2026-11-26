@@ -1,0 +1,58 @@
+# Send the alert for any journaled session by hand (the Daily scan workflow sends the latest one itself).
+# Actions -> Send alert -> Run workflow, or: gh workflow run alert.yml -f date=2026-11-25
+# Channels without their secrets are skipped (see `aistock alert --help`); the run fails if one that is set fails.
+name: Send alert
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Session date YYYY-MM-DD (empty: the latest journaled session, normally today's)"
+        required: false
+        default: ""
+      telegram:
+        description: "Telegram"
+        type: boolean
+        default: true
+      email:
+        description: "Email"
+        type: boolean
+        default: true
+      issue:
+        description: "Comment on the Daily alerts issue"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --locked
+
+      - name: Send
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+          DATE: ${{ inputs.date }}
+        run: >
+          uv run aistock alert --date "$DATE"
+          ${{ inputs.telegram && '--telegram' || '--no-telegram' }}
+          ${{ inputs.email && '--email' || '--no-email' }}
+          ${{ inputs.issue && '--issue' || '--no-issue' }}
+          --url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
