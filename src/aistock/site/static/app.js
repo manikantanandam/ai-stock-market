@@ -620,8 +620,35 @@ async function renderStock(file, rows) {
     ...(history.length ? historyTables(history, years, last.sector) : []),
     notes.length ? (file.kind === 'stock' ? notesCard(notes, 'LLM notes', rows, stockEntries, stockHref, true)
       : notesCard(notes, 'LLM notes', rows, commodityEntries, contractHref, true)) : null,
-    card('Logged sessions', table(rows.slice().reverse(), file.columns)),
+    card('Logged sessions', sessionsTable(file, rows)),
   ];
+}
+
+// A stock's or contract's journal rows, newest first, with the scan tables' cells. Name, sector and unit
+// are in the page subtitle; close shows its change since the previous logged session, raw ratios sit
+// behind 'All columns'.
+const SESSION_HIDDEN = ['symbol', 'name', 'sector', 'group', 'unit', 'side'];
+const SESSION_LABELS = { date: 'Session', stop: 'Stop', target: 'Target', shares: 'Shares',
+  sentiment_reasons: 'News reasons', fundamental_reasons: 'Fundamental reasons', f_trailingPE: 'P/E',
+  f_priceToBook: 'P/B', f_returnOnEquity: 'ROE', f_debtToEquity: 'Debt/Equity (%)', f_revenueGrowth: 'Revenue growth',
+  f_earningsGrowth: 'Earnings growth', f_profitMargins: 'Net margin', f_currentRatio: 'Current ratio',
+  f_dividendYield: 'Dividend yield (%)', f_trailingPegRatio: 'PEG' };
+
+function sessionsTable(file, rows) {
+  const stock = file.kind === 'stock';
+  const prev = new Map(rows.map((r, i) => [r, rows[i - 1]]));
+  const close = (v, r) => {
+    if (!num(v)) return dash();
+    const before = prev.get(r)?.close, d = num(before) && before ? v / before - 1 : NaN;
+    return h('div', {}, fmt(v), num(d) ? h('div', { class: 'cell-sub ' + sign(d) }, (d > 0 ? '+' : '') + pct(d)) : null);
+  };
+  const order = ['date', ...(stock ? SCAN_COLS : COMMODITY_COLS), 'stop', 'target', 'fundamental_reasons', 'sentiment_reasons'];
+  const columns = file.columns.filter(c => !SESSION_HIDDEN.includes(c));
+  const main = order.filter(c => columns.includes(c) && !c.startsWith('f_') && rows.some(r => r[c] != null && r[c] !== ''));
+  const extra = columns.filter(c => !main.includes(c));
+  return table(rows.slice().reverse(), [...main, ...extra], { filters: ['action'], extra,
+    labels: { ...(stock ? SCAN_LABELS : COMMODITY_LABELS), ...SESSION_LABELS },
+    cells: { ...(stock ? SCAN_CELLS : COMMODITY_CELLS), close } });
 }
 
 function renderTrades(file, rows) {
