@@ -103,7 +103,7 @@ def analyze(
         raise typer.BadParameter(str(e))
     print(f"[bold]{s.symbol}[/bold] {s.name} ({s.group})  close ₹{s.close:,.2f} per {s.unit} "
           f"(USD {s.close_usd:,.2f} at {s.usdinr:.2f})  ATR {s.atr:,.2f}  as of {s.as_of}")
-    print(f"[bold {COLORS[s.action]}]{s.action}[/]  combined {s.combined:+.2f}")
+    print(f"[bold {COLORS[s.action]}]{s.action}{' ' + s.side.upper() if s.side else ''}[/]  combined {s.combined:+.2f}")
     for part, value in [("technical", s.technical), ("sentiment", s.sentiment)]:
         print(f"\n[bold]{part.capitalize()}[/bold] {score(value)}")
         for w in s.reasons[part]:
@@ -146,7 +146,7 @@ def scan(
     for s in results:
         acting = [n for n, r in s.strategies.items() if r.action == s.action] if s.action != "MIXED" else s.entries
         r = s.strategies[acting[0]] if acting and s.action != "WATCH" else None
-        table.add_row(s.symbol, f"[{COLORS[s.action]}]{s.action}[/]",
+        table.add_row(s.symbol, f"[{COLORS[s.action]}]{s.action}{' ' + s.side.upper() if s.side else ''}[/]",
                       ", ".join(f"{n} ({s.strategies[n].side})" for n in acting) if r else "-",
                       f"{s.combined:+.2f}", f"{s.technical:+.2f}", score(s.sentiment), f"{s.close:,.2f}", s.unit,
                       level(r.stop) if r else "-", level(r.target) if r else "-")

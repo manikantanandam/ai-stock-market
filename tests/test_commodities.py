@@ -172,3 +172,20 @@ def test_site_routes_commodity_journal():
     assert site.group_of("journal/commodities/contracts/GOLD.csv") == "Contracts"
     assert site.group_of("journal/commodities/notes/2026-11-25.csv") is None  # drawn on the session page
     assert site.kind_of("journal/days/2026-11-25.csv", ["date"]) == "day"
+
+
+def test_side_of_the_overall_action(offline):
+    offline(random_walk(400, seed=3, drift=-0.004))
+    s = signal.evaluate("GOLD", news="none")
+    mk = lambda a, side: signal.StrategySignal("x", a, side, None, None, 0.0, [])
+    s.strategies = {"a": mk("HOLD", "short"), "b": mk("WATCH", None)}
+    s.action = signal.overall(s.strategies)
+    assert (s.action, s.side, s.row()["side"]) == ("HOLD", "short", "short")
+    s.strategies["b"] = mk("HOLD", "long")
+    assert s.side == "mixed"
+    s.strategies = {"a": mk("BUY", "long"), "b": mk("SELL", "short")}
+    s.action = signal.overall(s.strategies)
+    assert (s.action, s.side) == ("MIXED", "mixed")
+    s.strategies = {"a": mk("WATCH", None)}
+    s.action = "WATCH"
+    assert s.side is None and s.row()["side"] == ""

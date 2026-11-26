@@ -247,6 +247,7 @@ function notesCard(rows, title, days, entries = stockEntries, href = stockHref) 
       return h('div', { class: 'note' },
         h('div', { class: 'note-head' }, h('a', { href: href(r.symbol) }, r.symbol), ' ',
           h('span', { class: 'muted' }, r.name || ''),
+          day.action && day.side ? h('span', {}, h('span', { class: 'badge ' + day.action }, day.action), ' ', sideBadge(day.side)) : null,
           num(day.combined) ? h('span', { class: 'score ' + (day.combined >= 0 ? 'pos' : 'neg') },
             'combined ' + (day.combined >= 0 ? '+' : '') + day.combined.toFixed(2)) : null,
           buys.map(([b, a]) => h('span', { class: 'badge ' + (b === r.strategy ? a : 'tag'),
@@ -292,7 +293,7 @@ const commodityEntries = day => [['buys', 'BUY'], ['sells', 'SELL'], ['exits', '
 // exits/holds are "strategy:side" pairs
 const sideTags = (v, cls) => v ? String(v).split(';').map(t => {
   const [name, side] = t.split(':');
-  return h('span', { class: 'badge ' + cls, title: side }, `${name} ${side === 'short' ? '▼' : '▲'}`);
+  return h('span', { class: 'badge ' + cls, title: `${cls} ${side}` }, `${name} · ${side}`);
 }) : dash();
 
 const COMMODITY_COLS = ['symbol', 'group', 'action', 'buys', 'sells', 'exits', 'holds', 'combined', 'technical',
@@ -301,7 +302,12 @@ const COMMODITY_LABELS = { symbol: 'Contract', group: 'Group', action: 'Action',
   sells: 'SELL (short)', exits: 'EXIT', holds: 'HOLD', combined: 'Combined', technical: 'Tech', sentiment: 'News',
   close: 'Close ₹', atr: 'ATR ₹', close_usd: 'Close USD', usdinr: 'USDINR', technical_reasons: 'Technical reasons',
   sentiment_reasons: 'News reasons' };
+// Direction of a commodity verdict (journal "side" column: long, short, mixed or blank for WATCH).
+const sideBadge = v => v === 'long' || v === 'short' ? h('span', { class: 'badge ' + v }, v.toUpperCase())
+  : v ? h('span', { class: 'badge MIXED' }, String(v).toUpperCase()) : null;
+
 const COMMODITY_CELLS = {
+  action: (v, r) => h('span', {}, h('span', { class: 'badge ' + v }, v), ' ', sideBadge(r.side)),
   symbol: (v, r) => h('div', {}, h('a', { href: contractHref(v) }, v), r.name ? h('div', { class: 'cell-sub' }, r.name) : null),
   buys: v => v ? String(v).split(';').map(b => h('span', { class: 'badge BUY' }, b)) : dash(),
   sells: v => v ? String(v).split(';').map(b => h('span', { class: 'badge SELL' }, b)) : dash(),

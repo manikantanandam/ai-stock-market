@@ -98,10 +98,18 @@ class Signal:
         holding; None when every strategy says WATCH."""
         return next((names[0] for a in ("BUY", "SELL", "EXIT", "HOLD") if (names := self.named(a))), None)
 
+    @property
+    def side(self) -> str | None:
+        """Direction of the overall action: long or short, "mixed" when the
+        strategies behind it disagree (always for MIXED), None for WATCH."""
+        acting = self.entries if self.action == "MIXED" else self.named(self.action)
+        sides = {self.strategies[n].side for n in acting} - {None}
+        return None if not sides else sides.pop() if len(sides) == 1 else "mixed"
+
     def row(self) -> dict:
         tagged = lambda a: ";".join(f"{n}:{s.side}" for n, s in self.strategies.items() if s.action == a)
         return {"symbol": self.symbol, "name": self.name, "group": self.group, "unit": self.unit,
-                "action": self.action, "buys": ";".join(self.named("BUY")), "sells": ";".join(self.named("SELL")),
+                "action": self.action, "side": self.side or "", "buys": ";".join(self.named("BUY")), "sells": ";".join(self.named("SELL")),
                 "exits": tagged("EXIT"), "holds": tagged("HOLD"), "combined": self.combined,
                 "technical": self.technical, "sentiment": self.sentiment, "close": self.close, "atr": self.atr,
                 "close_usd": self.close_usd, "usdinr": self.usdinr,
