@@ -128,10 +128,20 @@ button.page:disabled:not(.current) { opacity: .4; cursor: default; }
 .note:first-of-type { border-top: none; }
 td.clip { max-width: 360px; overflow: hidden; text-overflow: ellipsis; }
 td.reasons { white-space: normal; min-width: 260px; max-width: 480px; }
-td.reasons > div + div { margin-top: 2px; }
 td.reasons summary { cursor: pointer; }
+td.reasons summary .chips { display: inline-flex; }
 h3.section { margin: 24px 0 4px; }
-td.reasons .headline { font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; white-space: nowrap;
+  color: var(--ink-2); background: color-mix(in srgb, var(--ink-3) 14%, transparent); }
+.chip.pos { color: var(--good); background: color-mix(in srgb, var(--good) 14%, transparent); }
+.chip.neg { color: var(--critical); background: color-mix(in srgb, var(--critical) 14%, transparent); }
+td.reasons .headline { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: baseline;
+  font-size: 12px; margin-top: 8px; }
+td.reasons .headline .chip { font-variant-numeric: tabular-nums; }
+td.reasons .headline a { color: var(--ink); text-decoration: none; }
+td.reasons .headline a:hover { color: var(--accent); }
+td.reasons .headline .cell-sub { grid-column: 2; max-width: none; }
 .note-head .badge, .note-head .score { margin-left: 6px; }
 .note-head .score { font-size: 13px; font-variant-numeric: tabular-nums; }
 .note-head a { color: var(--accent); font-weight: 600; text-decoration: none; }

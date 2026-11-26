@@ -107,6 +107,42 @@ function tiles(items) {
 
 const sign = v => num(v) ? (v > 0 ? 'pos' : v < 0 ? 'neg' : '') : '';
 
+// ---------- reasons ----------
+
+// *_reasons cells hold " | "-joined reasons (journal.REASONS_SEP), drawn as chips toned by what they say:
+// fundamental reasons end in "(good)"/"(weak)" (fundamental/score.py), technical ones name the trend,
+// RSI and MACD (technical/indicators.py). News reasons are a count summary plus scored headlines
+// (sentiment/finbert.py), which fold away behind the counts.
+const BULLISH = /^(uptrend|MACD histogram positive)/, BEARISH = /^(downtrend|MACD histogram negative|RSI overbought|news veto)/;
+const NEWS_SUMMARY = /^(\d+) headlines: (\d+) positive, (\d+) negative, (\d+) neutral$/;
+const HEADLINE = /^([+-]\d+(?:\.\d+)?) (\S*) (.*?)(?: \(([^()]*)\))?$/;
+
+function reasonChip(text) {
+  const m = text.match(/^(.*) \((good|weak)\)$/);
+  const tone = m ? (m[2] === 'good' ? 'pos' : 'neg') : BULLISH.test(text) ? 'pos' : BEARISH.test(text) ? 'neg' : '';
+  return h('span', { class: 'chip ' + tone }, m ? m[1] : text);
+}
+
+function headlineRow(text) {
+  const m = text.match(HEADLINE);
+  if (!m) return h('div', { class: 'headline' }, text);
+  const [, score, date, title, source] = m;
+  return h('div', { class: 'headline' }, h('span', { class: 'chip ' + sign(+score) }, score),
+    h('a', { href: 'https://news.google.com/search?q=' + encodeURIComponent(`"${title}"`), target: '_blank', rel: 'noopener' }, title),
+    h('div', { class: 'cell-sub' }, [date, source].filter(Boolean).join(' · ')));
+}
+
+function reasonsCell(col, value) {
+  const [first, ...rest] = value.split(' | ');
+  const counts = col === 'sentiment_reasons' && first.match(NEWS_SUMMARY);
+  if (!counts) return h('div', { class: 'chips' }, [first, ...rest].map(reasonChip));
+  const [, , pos, neg, neutral] = counts.map(Number);
+  const summary = h('span', { class: 'chips' }, h('span', { class: 'chip pos' }, `▲ ${pos} positive`),
+    h('span', { class: 'chip neg' }, `▼ ${neg} negative`), h('span', { class: 'chip' }, `${neutral} neutral`));
+  return rest.length ? h('details', {}, h('summary', {}, summary, h('span', { class: 'muted' }, ` ${counts[1]} headlines`)),
+    rest.map(headlineRow)) : summary;
+}
+
 // ---------- table ----------
 
 // Numbered pages (0-based `page`): ‹ Prev 1 … 4 5 6 … 20 Next ›; go(p) shows page p.
@@ -195,16 +231,7 @@ function table(rows, columns, opts = {}) {
       if (cells[c]) return h('td', { class: cls }, cells[c](v, r));
       const content = link[c] && v ? h('a', { href: link[c](v) }, String(v))
         : c === 'action' && v ? h('span', { class: 'badge ' + v }, v) : fmt(v, c);
-      // *_reasons cells hold " | "-joined reasons (journal.REASONS_SEP): one per line. News
-      // reasons are a summary plus headlines, so the headlines fold away behind the summary.
-      if (c.endsWith('_reasons') && typeof v === 'string') {
-        const [first, ...rest] = v.split(' | ');
-        if (c === 'sentiment_reasons' && rest.length) {  // all headlines: commodity day pages, Headlines card
-          return h('td', { class: cls + ' reasons' }, h('details', {}, h('summary', {}, first),
-            rest.map(w => h('div', { class: 'headline' }, w))));
-        }
-        return h('td', { class: cls + ' reasons' }, [first, ...rest].map(w => h('div', {}, w)));
-      }
+      if (c.endsWith('_reasons') && typeof v === 'string') return h('td', { class: cls + ' reasons' }, reasonsCell(c, v));
       const long = typeof v === 'string' && v.length > 60;
       return h('td', long ? { class: cls + ' clip', title: v } : { class: cls }, content);
     }))));
