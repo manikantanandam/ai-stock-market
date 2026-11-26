@@ -160,9 +160,19 @@ def _bar(fraction: float, cells: int) -> str:
     return "▰" * full + "▱" * (cells - full)
 
 
+def _company(b: Stock, url: str | None) -> str:
+    """The company name as a link to its dashboard page when there's a dashboard: Telegram can't colour text,
+    but links show in the accent colour, so names stand out and open the stock."""
+    name = html.escape(b.name)
+    if not url:
+        return f"<i>{name}</i>"
+    return f'<a href="{html.escape(url)}#journal/stocks/{urllib.parse.quote(b.symbol)}.csv">{name}</a>'
+
+
 def telegram_html(s: Summary, url: str | None = None) -> str:
     """Telegram HTML, laid out as a card: a header with the verdict counts and a breadth bar (share of scanned
-    stocks that are BUYs), the hot sectors, each new BUY with a sector icon and its score, the
+    stocks that are BUYs), the hot sectors one per line, each new BUY with a sector icon, its score and the
+    company (a link, see _company), the
     strongest BUYs with medals, and the dropped BUYs folded into an expandable quote."""
     e = html.escape
     total = sum(s.actions.values()) or 1
@@ -171,19 +181,19 @@ def telegram_html(s: Summary, url: str | None = None) -> str:
              f"🟢 <b>{buy}</b> BUY   🟡 <b>{watch}</b> WATCH   🔴 <b>{avoid}</b> AVOID",
              f"<code>{_bar(buy / total, 10)}</code> {buy / total:.0%} of {total} stocks say BUY"]
     if s.sectors:
-        lines.append("🔥 " + " · ".join(f"{_icon(k)} {e(k)} <b>{n}</b>" for k, n in s.sectors[:3]))
+        lines += ["", "🔥 <b>HOT SECTORS</b>"] + [f"{_icon(k)} {e(k)} · <b>{n}</b> BUYs" for k, n in s.sectors[:3]]
     if s.prev is not None:
         lines += ["", f"🆕 <b>NEW BUYS</b> · {len(s.new)}" + (f"  <i>(➖ {len(s.dropped)} dropped)</i>" if s.dropped else "")]
         if not s.new:
             lines.append("<i>No new BUYs since " + _day(s.prev)[:-5] + "</i>")
         for b in s.new[:MAX_NEW]:
             lines += [f"{_icon(b.sector)} <b>{e(b.symbol)}</b>  <code>{_score(b.combined)}</code>",
-                      f"      <i>{e(b.name)} · {e(_strategies(b))}</i>"]
+                      f"      {_company(b, url)} · <i>{e(_strategies(b))}</i>"]
         if _more(s.new, MAX_NEW):
             lines.append(f"<i>+{_more(s.new, MAX_NEW)} more on the dashboard</i>")
     if s.buys:
         lines += ["", "🏆 <b>STRONGEST BUYS</b>"]
-        lines += [f"{MEDALS[k]} <b>{e(b.symbol)}</b> <code>{_score(b.combined)}</code> {_icon(b.sector)} <i>{e(b.name)}</i>"
+        lines += [f"{MEDALS[k]} <b>{e(b.symbol)}</b> <code>{_score(b.combined)}</code> {_icon(b.sector)} {_company(b, url)}"
                   for k, b in enumerate(s.buys[:TOP])]
     if s.dropped:
         lines += ["", f"<blockquote expandable>➖ <b>No longer BUY</b> ({len(s.dropped)})\n{e(', '.join(s.dropped))}</blockquote>"]

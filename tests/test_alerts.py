@@ -55,16 +55,24 @@ def test_plain_text(tmp_path):
 def test_telegram_card(tmp_path):
     s = alerts.summary(journal(tmp_path))
     s.new[0].name = "M&M"
-    lines = alerts.telegram_html(s, url="https://example.org/?a=1&b=2").splitlines()
-    assert lines[:6] == ["📈 <b>AI STOCK DAILY</b>", "<i>Thu 26 Nov 2026 · NSE close</i>", alerts.RULE,
+    lines = alerts.telegram_html(s, url="https://example.org/").splitlines()
+    assert lines[:9] == ["📈 <b>AI STOCK DAILY</b>", "<i>Thu 26 Nov 2026 · NSE close</i>", alerts.RULE,
                          "🟢 <b>2</b> BUY   🟡 <b>1</b> WATCH   🔴 <b>0</b> AVOID",
-                         "<code>▰▰▰▰▰▰▰▱▱▱</code> 67% of 3 stocks say BUY",
-                         "🔥 ▫️ Tech <b>2</b>"]  # unknown sector: plain marker
+                         "<code>▰▰▰▰▰▰▰▱▱▱</code> 67% of 3 stocks say BUY", "",
+                         "🔥 <b>HOT SECTORS</b>", "▫️ Tech · <b>2</b> BUYs", ""]  # unknown sector: plain marker
     text = "\n".join(lines)
-    assert "🆕 <b>NEW BUYS</b> · 1  <i>(➖ 1 dropped)</i>\n▫️ <b>C</b>  <code>+0.60</code>\n      <i>M&amp;M · 3 strategies</i>" in text
-    assert "🥇 <b>C</b> <code>+0.60</code> ▫️ <i>M&amp;M</i>\n🥈 <b>A</b>" in text
+    # company names link to their dashboard page (escaped), so they show in the link colour
+    link = '<a href="https://example.org/#journal/stocks/C.csv">M&amp;M</a>'
+    assert f"🆕 <b>NEW BUYS</b> · 1  <i>(➖ 1 dropped)</i>\n▫️ <b>C</b>  <code>+0.60</code>\n      {link} · <i>3 strategies</i>" in text
+    assert f"🥇 <b>C</b> <code>+0.60</code> ▫️ {link}\n🥈 <b>A</b>" in text
     assert "<blockquote expandable>➖ <b>No longer BUY</b> (1)\nB</blockquote>" in text
-    assert lines[-1] == '👉 <a href="https://example.org/?a=1&amp;b=2"><b>Open dashboard</b></a>'
+    assert lines[-1] == '👉 <a href="https://example.org/"><b>Open dashboard</b></a>'
+
+
+def test_company_without_a_dashboard_is_italic():
+    stock = alerts.Stock("M&M", "Mahindra & Mahindra", "Consumer Cyclical", 0.5, [])
+    assert alerts._company(stock, None) == "<i>Mahindra &amp; Mahindra</i>"
+    assert 'stocks/M%26M.csv">' in alerts._company(stock, "https://x/")
 
 
 def test_bar():
