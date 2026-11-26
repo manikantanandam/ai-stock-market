@@ -10,14 +10,15 @@ push summary and chose both channels.
 ## Decision
 `aistock alert` (`src/aistock/alerts.py`) builds a short summary from the session's journal day file only
 (no LLM, 0001). Telegram gets a card: verdict counts with a breadth bar (share of scanned stocks saying BUY,
-with its change on the previous session), the three sectors with most BUYs (with their change), each new BUY (sector icon, score, symbol, company; then close and the journal's planned stop when recorded,
-and the strategies beyond those all new BUYs share, which the header names once), the
+with its change on the previous session), the three sectors with most BUYs (with their change), the new BUYs grouped under a header per strategy set with its count (broadest agreement
+first; each stock: sector icon, score, symbol, company), the
 five strongest BUYs with medals, the dropped BUYs folded in an expandable quote, and links to the session page and the dashboard. The issue
 gets the same as markdown tables, email as plain text. Rejected along the way at the user's request: paper
 accounts in the alert (too much text; they're on the dashboard), a comma-separated wall of tickers, and
 per-stock score bars (BUY scores sit in a narrow band, so every bar looked the same), and counting a stock's
 strategies ("5 strategies") instead of naming them: which strategies fired is the point. Scores and sector
-counts lead their lines so they form columns. Symbols are bold links to their dashboard page (Telegram can't
+counts lead their lines so they form columns. Also rejected: a close/stop line per stock (the user reads
+levels on the dashboard) and "➕ extra strategies" lines (strategy-set headers read better and separate groups). Symbols are bold links to their dashboard page (Telegram can't
 colour text; links show in the accent colour), with the company name after them in plain italics. `--date` rebuilds it for any journaled session. The Daily scan workflow runs it as its last step with `continue-on-error`; the
 Send alert workflow (`alert.yml`) runs it by hand for a chosen date (default: the latest session). Channels:
 - Telegram, when the `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` repo secrets exist;
