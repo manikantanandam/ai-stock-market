@@ -150,9 +150,15 @@ function table(rows, columns, opts = {}) {
       if (cells[c]) return h('td', { class: cls }, cells[c](v, r));
       const content = link[c] && v ? h('a', { href: link[c](v) }, String(v))
         : c === 'action' && v ? h('span', { class: 'badge ' + v }, v) : fmt(v, c);
-      // *_reasons cells hold " | "-joined reasons (journal.REASONS_SEP): one per line
+      // *_reasons cells hold " | "-joined reasons (journal.REASONS_SEP): one per line. News
+      // reasons are a summary plus headlines, so the headlines fold away behind the summary.
       if (c.endsWith('_reasons') && typeof v === 'string') {
-        return h('td', { class: cls + ' reasons' }, v.split(' | ').map(w => h('div', {}, w)));
+        const [first, ...rest] = v.split(' | ');
+        if (c === 'sentiment_reasons' && rest.length) {
+          return h('td', { class: cls + ' reasons' }, h('details', {}, h('summary', {}, first),
+            rest.map(w => h('div', { class: 'headline' }, w))));
+        }
+        return h('td', { class: cls + ' reasons' }, [first, ...rest].map(w => h('div', {}, w)));
       }
       const long = typeof v === 'string' && v.length > 60;
       return h('td', long ? { class: cls + ' clip', title: v } : { class: cls }, content);
