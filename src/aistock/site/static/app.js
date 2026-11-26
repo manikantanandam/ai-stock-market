@@ -35,7 +35,7 @@ const mean = xs => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : NaN;
 
 // Columns holding fractions (0.05 = 5%) are shown as percents.
 const PCT = ['ret', 'rate', 'cagr', 'drawdown', 'return', 'excess', 'avg_trade', 'median_trade',
-  'exposure', 'exit_stop', 'exit_target', 'exit_time', 'profitable', 'beat', 'buy_hold'];
+  'exposure', 'exit_stop', 'exit_target', 'exit_time', 'profitable', 'beat', 'buy_hold', 'growth', 'margin'];
 const isPct = col => PCT.some(p => col.toLowerCase().includes(p));
 
 function fmt(v, col = '') {
@@ -487,11 +487,53 @@ function historyCard(history, rows) {
     h('div', { class: 'controls' }, btns), priceBox, h('h3', {}, 'Scores (−1 to 1)'), scoreBox);
 }
 
+// Full history tables (data/prices/ and data/fundamentals/, written at build time; see aistock/site/__init__.py).
+const DAILY_LABELS = { Date: 'Date', Volume: 'Volume', sma20: 'SMA20', sma50: 'SMA50', sma200: 'SMA200', ema100: 'EMA100',
+  ema200: 'EMA200', rsi14: 'RSI14', macd_hist: 'MACD hist', atr14: 'ATR14', vol_avg20: 'Avg vol 20', Technical: 'Tech score',
+  trailingPE: 'P/E (est.)', priceToBook: 'P/B (est.)', marketCap: 'Mkt cap ₹ (est.)', Fundamental: 'Fund score (est.)' };
+const DAILY_EXTRA = ['Open', 'High', 'Low', 'ema100', 'ema200', 'vol_avg20', 'priceToBook', 'marketCap'];
+const YEAR_LABELS = { date: 'Fiscal year end', start: 'In effect from', revenue: 'Revenue', net_income: 'Net income',
+  eps: 'EPS', equity: 'Equity', debt: 'Debt', current_assets: 'Current assets', current_liabilities: 'Current liabilities',
+  shares: 'Shares', returnOnEquity: 'ROE', debtToEquity: 'Debt/Equity (%)', revenueGrowth: 'Revenue growth',
+  earningsGrowth: 'Earnings growth', profitMargins: 'Net margin', currentRatio: 'Current ratio' };
+
+// Change from the previous trading day under each value: percent for levels, points where a percent
+// misleads (RSI is already 0-100, MACD hist crosses zero, scores are -1..1).
+const POINT_CHANGE = ['rsi14', 'macd_hist', 'Technical', 'Fundamental'];
+
+function changeCells(history, columns) {
+  const prev = new Map(history.map((p, i) => [p, history[i - 1]]));
+  const cell = c => (v, r) => {
+    const before = prev.get(r)?.[c];
+    if (!num(v)) return dash();
+    if (!num(before)) return fmt(v, c);
+    const points = POINT_CHANGE.includes(c), d = points ? v - before : before ? v / before - 1 : NaN;
+    const text = !num(d) ? '' : d === 0 ? '0' : (d > 0 ? '+' : '') + (points ? +d.toFixed(2) + ' pt' : (d * 100).toFixed(2) + '%');
+    return h('div', {}, fmt(v, c), h('div', { class: 'cell-sub ' + sign(d) }, text));
+  };
+  return Object.fromEntries(columns.filter(c => c !== 'Date').map(c => [c, cell(c)]));
+}
+
+function historyTables(history, years) {
+  const columns = Object.keys(history[0]);
+  return [
+    card('Daily history: prices and technicals',
+      h('p', { class: 'muted' }, 'Every trading day Yahoo has; under each value, its change from the previous trading day (points for RSI, MACD and scores). P/E, P/B, market cap and fundamental score are estimated from annual results.'),
+      table(history.slice().reverse(), columns,
+        { labels: DAILY_LABELS, extra: DAILY_EXTRA, pageSize: 25, cells: changeCells(history, columns) })),
+    years.length ? card('Fundamentals by fiscal year',
+      h('p', { class: 'muted' }, "Amounts are in the company's reporting currency (some report in USD). Ratios take effect about 60 days after the year end."),
+      table(years.slice().reverse(), Object.keys(years[0]), { labels: YEAR_LABELS })) : null,
+  ];
+}
+
 async function renderStock(file, rows) {
   const last = rows[rows.length - 1] || {};
   const labels = rows.map(r => r.date);
   const history = file.kind === 'stock' && (manifest.prices || []).includes(file.title)
     ? (await load('prices/' + file.title + '.csv')).filter(p => num(p.Close)) : [];
+  const years = history.length && (manifest.fundamentals || []).includes(file.title)
+    ? await load('fundamentals/' + file.title + '.csv') : [];
   const scores = ['combined', 'technical', 'fundamental', 'sentiment'].filter(c => file.columns.includes(c));
   return [
     h('p', { class: 'sub' }, [last.name, last.sector || last.group, last.unit && 'INR per ' + last.unit].filter(Boolean).join(' · ')),
@@ -502,7 +544,8 @@ async function renderStock(file, rows) {
       chartCard('Close', lineConfig(labels, [{ label: 'Close', data: rows.map(r => r.close), borderColor: series(0) }])),
       chartCard('Scores (−1 to 1)', lineConfig(labels, scores.map((c, i) =>
         ({ label: c, data: rows.map(r => r[c]), borderColor: series(i), backgroundColor: series(i), pointRadius: 3 })), { min: -1, max: 1 }))),
-    table(rows.slice().reverse(), file.columns),
+    ...(history.length ? historyTables(history, years) : []),
+    card('Logged sessions', table(rows.slice().reverse(), file.columns)),
   ];
 }
 

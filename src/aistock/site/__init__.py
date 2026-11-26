@@ -14,11 +14,12 @@ are drawn on its cday page), "trades" (entry/exit rows), "series"
 calendar year), "table" (anything else).
 
 With prices=True, `build` also writes each journaled stock's full Yahoo
-history to data/prices/<SYMBOL>.csv and lists those symbols in the manifest,
-so a stock page charts more than the logged sessions. Columns: Date, Close,
-Technical (per-bar technical score, blank until SMA200 exists), Fundamental
-(estimated from annual statements by `fundamental.history`, blank before
-them; Yahoo has no fundamental history). News has no history to add.
+history to data/prices/<SYMBOL>.csv (OHLCV, indicators, the per-bar
+technical score, and P/E, P/B, market cap and fundamental score estimated
+by `fundamental.history`, since Yahoo has no fundamental history) and its
+fiscal-year statement figures and ratios to data/fundamentals/<SYMBOL>.csv,
+listing the symbols of each in the manifest, so a stock page shows more than
+the logged sessions. News has no history to add.
 """
 import csv
 import json
@@ -103,17 +104,24 @@ def _float(v: str | None) -> float | None:
         return None
 
 
-def write_prices(out: Path, symbols: list[str], root: Path = ROOT) -> list[str]:
-    """Full daily close, technical and estimated fundamental score history per symbol into
-    <out>/data/prices/; returns the symbols written."""
+# Daily history columns: OHLCV, add_indicators' columns, the technical score, then the estimated fundamentals
+INDICATORS = ["sma20", "sma50", "sma200", "ema100", "ema200", "rsi14", "macd_hist", "atr14", "vol_avg20"]
+DAILY = ["Open", "High", "Low", "Close", "Volume", *INDICATORS, "Technical",
+         "trailingPE", "priceToBook", "marketCap", "Fundamental"]
+
+
+def write_history(out: Path, symbols: list[str], root: Path = ROOT) -> dict:
+    """Per symbol, the full daily history (DAILY columns) into <out>/data/prices/ and the fiscal-year
+    fundamentals into <out>/data/fundamentals/; returns the symbols written for each, by folder."""
     from aistock.data import fundamentals, prices
-    from aistock.fundamental.history import score_history
+    from aistock.fundamental import history
     from aistock.technical.indicators import add_indicators, score_series
 
-    (out / "data" / "prices").mkdir(parents=True, exist_ok=True)
+    for sub in ("prices", "fundamentals"):
+        (out / "data" / sub).mkdir(parents=True, exist_ok=True)
     prices.prefetch(symbols, None)
     fundamentals.prefetch(symbols, fetch=fundamentals.get_statements)
-    written = []
+    written = {"prices": [], "fundamentals": []}
     for sym in symbols:
         try:
             df = prices.get_prices(sym, None)
@@ -121,17 +129,27 @@ def write_prices(out: Path, symbols: list[str], root: Path = ROOT) -> list[str]:
             print(f"prices: skipped {sym}: {e}")
             continue
         # pandas-ta returns None on series shorter than its window; the score needs SMA200 anyway
-        df = df.assign(Technical=score_series(add_indicators(df)) if len(df) >= 200 else float("nan"))
+        if len(df) >= 200:
+            df = add_indicators(df)
+            df["Technical"] = score_series(df)
         try:
             years = fundamentals.get_statements(sym)
         except Exception as e:  # the chart keeps the logged sessions' fundamental scores
             print(f"statements: skipped {sym}: {e}")
             years = []
         last = _last_row(root / "journal" / "stocks" / f"{sym}.csv")
-        df["Fundamental"] = score_history(years, df.Close, _float(last.get("f_trailingPE")), _float(last.get("close")))
-        df[["Close", "Technical", "Fundamental"]].round(2).to_csv(
+        now = {"trailingPE": _float(last.get("f_trailingPE")), "priceToBook": _float(last.get("f_priceToBook")),
+               "close": _float(last.get("close"))}
+        df = df.join(history.estimate(years, df.Close, now).rename(columns={"score": "Fundamental"}))
+        df = df.reindex(columns=DAILY).round(2)
+        for col in ("Volume", "vol_avg20", "marketCap"):  # whole numbers; ".0" on ~7000 rows adds up
+            df[col] = df[col].round().astype("Int64")
+        df.to_csv(
             out / "data" / "prices" / f"{sym}.csv", index_label="Date", date_format="%Y-%m-%d")
-        written.append(sym)
+        written["prices"].append(sym)
+        if years:
+            history.yearly(years).round(4).to_csv(out / "data" / "fundamentals" / f"{sym}.csv", index=False)
+            written["fundamentals"].append(sym)
     return written
 
 
@@ -153,7 +171,7 @@ def build(out: Path, root: Path = ROOT, prices: bool = False) -> dict:
     stocks = [f["title"] for f in files if f["kind"] == "stock"]
     manifest = {"built": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "groups": GROUPS, "files": files, "accounts": accounts,
-                "prices": write_prices(out, stocks, root) if prices else []}
+                **(write_history(out, stocks, root) if prices else {"prices": [], "fundamentals": []})}
     (out / "data").mkdir(exist_ok=True)
     (out / "data" / "manifest.json").write_text(json.dumps(manifest))
     return manifest
