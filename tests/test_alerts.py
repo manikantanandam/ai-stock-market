@@ -21,7 +21,8 @@ def test_summary_of_the_latest_session(tmp_path):
     s = alerts.summary(journal(tmp_path))
     assert (s.date, s.prev, s.dropped) == ("2026-11-26", "2026-11-25", ["B"])
     assert [b.symbol for b in s.buys] == ["C", "A"]  # best score first
-    assert s.new == [alerts.Stock("C", "Tech", 0.6, ["swing", "trend", "breakout"])]
+    assert s.new == [alerts.Stock("C", "Gamma", "Tech", 0.6, ["swing", "trend", "breakout"])]
+    assert s.buys[1].name == "Alpha"  # legal suffix dropped
 
 
 def test_summary_of_the_first_session_has_nothing_to_compare(tmp_path):
@@ -42,7 +43,7 @@ def test_plain_text(tmp_path):
         "2 BUY · 1 WATCH · 0 AVOID (67% of 3 stocks say BUY)",
         "Hot sectors: Tech 2", "",
         "New BUYs (1, 1 dropped since Wed 25 Nov)",
-        "  C · Tech · score +0.60 · swing, trend, breakout", "",
+        "  C · Gamma · Tech · score +0.60 · swing, trend, breakout", "",
         "Top 2 by score",
         "  C  +0.60  Tech",
         "  A  +0.50  Tech", "",
@@ -62,15 +63,15 @@ def test_telegram_card(tmp_path):
     text = "\n".join(lines)
     # symbols link to their dashboard page (escaped), so they show in the link colour; scores lead, so they align
     link = '<b><a href="https://example.org/#journal/stocks/M%26M.csv">M&amp;M</a></b>'
-    assert (f"🆕 <b>NEW BUYS</b> · 1  <i>(➖ 1 dropped)</i>\n▫️ <code>+0.60</code> {link}\n"
+    assert (f"🆕 <b>NEW BUYS</b> · 1  <i>(➖ 1 dropped)</i>\n▫️ <code>+0.60</code> {link} · <i>Gamma</i>\n"
             f"{alerts.INDENT}<i>swing · trend · breakout</i>") in text
-    assert f"🥇 <code>+0.60</code> {link}\n🥈 <code>+0.50</code> <b><a " in text
+    assert f"🥇 <code>+0.60</code> {link} · <i>Gamma</i>\n🥈 <code>+0.50</code> <b><a " in text
     assert "<blockquote expandable>➖ <b>No longer BUY</b> (1)\nB</blockquote>" in text
     assert lines[-1] == '👉 <a href="https://example.org/"><b>Open dashboard</b></a>'
 
 
 def test_symbol_without_a_dashboard_is_just_bold():
-    assert alerts._symbol(alerts.Stock("M&M", "Consumer Cyclical", 0.5, []), None) == "<b>M&amp;M</b>"
+    assert alerts._symbol(alerts.Stock("M&M", "Mahindra", "Consumer Cyclical", 0.5, []), None) == "<b>M&amp;M</b>"
 
 
 def test_bar():
@@ -80,7 +81,7 @@ def test_bar():
 def test_markdown_tables(tmp_path):
     text = alerts.markdown(alerts.summary(journal(tmp_path)), url="https://example.org/")
     assert text.splitlines()[1:3] == ["🟢 **2** BUY · 🟡 1 WATCH · 🔴 0 AVOID", "🔥 Tech 2"]
-    assert "| **C** | Tech | +0.60 | swing, trend, breakout |" in text
+    assert "| **C** | Gamma | Tech | +0.60 | swing, trend, breakout |" in text
     assert "| **A** | +0.50 | Tech |" in text
     assert text.endswith("[Open dashboard →](https://example.org/)")
 

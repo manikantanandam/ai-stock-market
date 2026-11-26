@@ -3,7 +3,7 @@
 date through the Send alert workflow).
 
 `summary` reads the session's journal day file only (no LLM, decision 0001): the BUY signals with each
-stock's sector, combined score and strategies, which of them are new since the previous session, and
+stock's company name, sector, combined score and strategies, which of them are new since the previous session, and
 which BUYs were dropped. Paper accounts are left to the dashboard. Each channel gets its own rendering of the
 same summary: `telegram_html` (a block per new BUY, the top BUYs aligned), `markdown` (tables, for the issue)
 and `plain` (email and the terminal).
@@ -32,6 +32,7 @@ MAX_DROPPED = 8   # dropped symbols on their one line
 @dataclass
 class Stock:
     symbol: str
+    name: str      # company name without the legal suffix
     sector: str
     combined: float
     strategies: list[str]
@@ -53,6 +54,14 @@ def _names(symbols: list[str], limit: int) -> str:
     return ", ".join(symbols[:limit]) + (f" +{more} more" if more > 0 else "")
 
 
+def _short(name: str) -> str:
+    """Company name without the legal suffix: "Mphasis Limited" -> "Mphasis"."""
+    for suffix in (" Limited", " Ltd.", " Ltd"):
+        if name.endswith(suffix):
+            return name[: -len(suffix)]
+    return name
+
+
 def sessions(root: Path = ROOT) -> list[str]:
     return [p.stem for p in sorted((root / "journal" / "days").glob("*.csv"))]
 
@@ -71,7 +80,7 @@ def summary(root: Path = ROOT, date: str | None = None) -> Summary | None:
     today = pd.read_csv(root / "journal" / "days" / f"{date}.csv")
     rows = today[today.action == "BUY"].sort_values("combined", ascending=False)
     get = lambda r, col: r.get(col) if isinstance(r.get(col), str) else ""
-    buys = [Stock(r["symbol"], get(r, "sector"), float(r["combined"]),
+    buys = [Stock(r["symbol"], _short(get(r, "name")) or r["symbol"], get(r, "sector"), float(r["combined"]),
                   [b for b in get(r, "buys").split(";") if b]) for _, r in rows.iterrows()]
     prev, new, dropped = None, [], []
     if i > 0:
@@ -120,7 +129,7 @@ def plain(s: Summary, url: str | None = None) -> str:
     if s.new:
         lines += ["", f"New BUYs ({len(s.new)}, {len(s.dropped)} dropped since {_day(s.prev)[:-5]})"]
         for b in s.new[:MAX_NEW]:
-            lines.append(f"  {b.symbol} · {b.sector} · score {_score(b.combined)} · {_strategies(b)}")
+            lines.append(f"  {b.symbol} · {b.name} · {b.sector} · score {_score(b.combined)} · {_strategies(b)}")
         if _more(s.new, MAX_NEW):
             lines.append(f"  +{_more(s.new, MAX_NEW)} more")
     if s.buys:
@@ -164,7 +173,7 @@ def _symbol(b: Stock, url: str | None) -> str:
 def telegram_html(s: Summary, url: str | None = None) -> str:
     """Telegram HTML, laid out as a card: a header with the verdict counts and a breadth bar (share of scanned
     stocks that are BUYs), the hot sectors one per line, each new BUY with a sector icon, its score, the symbol
-    (a link, see _symbol) and its strategies, the
+    (a link, see _symbol), the company and its strategies, the
     strongest BUYs with medals, and the dropped BUYs folded into an expandable quote."""
     e = html.escape
     total = sum(s.actions.values()) or 1
@@ -181,13 +190,13 @@ def telegram_html(s: Summary, url: str | None = None) -> str:
         for b in s.new[:MAX_NEW]:
             # score first: fixed width, so scores form a column and symbols start at the same place
             # strategies on a line of their own: a wrapped line loses the indent
-            lines += [f"{_icon(b.sector)} <code>{_score(b.combined)}</code> {_symbol(b, url)}",
+            lines += [f"{_icon(b.sector)} <code>{_score(b.combined)}</code> {_symbol(b, url)} · <i>{e(b.name)}</i>",
                       f"{INDENT}<i>{e(' · '.join(b.strategies))}</i>"]
         if _more(s.new, MAX_NEW):
             lines.append(f"<i>+{_more(s.new, MAX_NEW)} more on the dashboard</i>")
     if s.buys:
         lines += ["", "🏆 <b>STRONGEST BUYS</b>"]
-        lines += [f"{MEDALS[k]} <code>{_score(b.combined)}</code> {_symbol(b, url)}"
+        lines += [f"{MEDALS[k]} <code>{_score(b.combined)}</code> {_symbol(b, url)} · <i>{e(b.name)}</i>"
                   for k, b in enumerate(s.buys[:TOP])]
     if s.dropped:
         lines += ["", f"<blockquote expandable>➖ <b>No longer BUY</b> ({len(s.dropped)})\n{e(', '.join(s.dropped))}</blockquote>"]
@@ -201,8 +210,8 @@ def markdown(s: Summary, url: str | None = None) -> str:
     lines = [f"### 📈 AI Stock · {_day(s.date)}", f"🟢 **{s.actions.get('BUY', 0)}** BUY · 🟡 {s.actions.get('WATCH', 0)} WATCH · "
              f"🔴 {s.actions.get('AVOID', 0)} AVOID"] + ([f"🔥 {_hot(s)}"] if s.sectors else [])
     if s.new:
-        lines += ["", f"**🆕 New BUYs** ({len(s.new)}, ➖ {len(s.dropped)} dropped)", "", "| Stock | Sector | Score | Strategies |", "|---|---|---:|---|"]
-        lines += [f"| **{b.symbol}** | {b.sector} | {_score(b.combined)} | {_strategies(b)} |"
+        lines += ["", f"**🆕 New BUYs** ({len(s.new)}, ➖ {len(s.dropped)} dropped)", "", "| Stock | Name | Sector | Score | Strategies |", "|---|---|---|---:|---|"]
+        lines += [f"| **{b.symbol}** | {b.name} | {b.sector} | {_score(b.combined)} | {_strategies(b)} |"
                   for b in s.new[:MAX_NEW]]
         if _more(s.new, MAX_NEW):
             lines.append(f"\n_+{_more(s.new, MAX_NEW)} more on the dashboard_")
