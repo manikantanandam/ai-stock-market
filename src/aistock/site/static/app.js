@@ -435,8 +435,9 @@ function historyCard(history, rows) {
   const buys = new Map(rows.filter(r => r.action === 'BUY').map(r => [r.date, r.close]));
   const box = h('div', { class: 'chart-box tall' });
   const draw = years => {
-    charts.filter(c => c.canvas.parentNode === box).forEach(c => c.destroy());
-    charts = charts.filter(c => c.canvas.parentNode !== box);
+    const mine = charts.filter(c => c.canvas.parentNode === box);  // destroy() nulls c.canvas, so split first
+    charts = charts.filter(c => !mine.includes(c));
+    mine.forEach(c => c.destroy());
     box.replaceChildren();
     const end = new Date(history[history.length - 1].Date);
     const from = years ? new Date(end.getFullYear() - years, end.getMonth(), end.getDate()).toISOString().slice(0, 10) : '';
