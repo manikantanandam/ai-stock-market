@@ -76,11 +76,17 @@ class Signal:
         return [n for n, s in self.strategies.items() if s.action == "BUY"]
 
     def row(self) -> dict:
-        """Flat dict for the journal. Stops/targets are recomputable from close, atr and the preset.
+        """Flat dict for the journal. `stops`/`targets` hold each BUY strategy's planned levels (from the
+        signal's close), ";"-joined in `buys` order, a blank target where there is none; they are saved
+        because presets change, so recomputing them later from close and atr could give different levels.
         Reasons and raw ratios are kept so notes can be rewritten and fundamentals
         backtested later (Yahoo only serves today's snapshot)."""
+        plans = [self.strategies[n] for n in self.buys]
         return {"symbol": self.symbol, "name": self.name, "sector": self.sector, "action": self.action,
-                "buys": ";".join(self.buys), "combined": self.combined, "technical": self.technical,
+                "buys": ";".join(self.buys),
+                "stops": ";".join(str(p.stop) for p in plans),
+                "targets": ";".join("" if p.target is None else str(p.target) for p in plans),
+                "combined": self.combined, "technical": self.technical,
                 "fundamental": self.fundamental, "sentiment": self.sentiment, "close": self.close,
                 "atr": self.atr, "rs_3m": self.rs_3m, "rs_6m": self.rs_6m, "sector_up": self.sector_up,
                 **{f"{part}_reasons": REASONS_SEP.join(self.reasons.get(part, []))

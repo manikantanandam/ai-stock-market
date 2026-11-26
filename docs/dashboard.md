@@ -28,7 +28,7 @@ Kinds (`site.kind_of`): `day`, `notes`, `stock`, `cday`, `cnotes`, `cheadlines`,
 | `#today` (default) | `renderToday` | latest session tiles, changes vs previous session, BUY table, paper accounts table + return chart, starred stocks | latest 2 day files, all paper files |
 | `#accounts` | `renderAccounts` | accounts vs hold, return chart, live vs backtest, open positions, closed trades, settings | paper files, latest `compare_*_stats.csv` |
 | `#journal/days/<date>.csv` | `renderDay` | tiles, sector and score charts, changes card, scan table, LLM notes | that day + previous day, its notes |
-| `#journal/stocks/<SYM>.csv` | `renderStock` | price chart (BUYs, paper stops/targets/exits), scores, paper positions/trades, daily and fiscal tables, notes, logged sessions | price/fundamental history, all notes files, paper files |
+| `#journal/stocks/<SYM>.csv` | `renderStock` | price chart (BUYs; paper stops/targets/exits if held, else the journal's planned levels), scores, paper positions/trades, daily and fiscal tables, notes, logged sessions | price/fundamental history, all notes files, paper files |
 | commodity day / contract | `renderCommodityDay` / `renderStock` | same idea for futures | |
 | reports | `renderTrades` / `renderSeries` / `renderYearly` / `table` | by kind | the file |
 
