@@ -2,10 +2,11 @@
 "Daily alerts" GitHub issue (`aistock alert`; run at the end of the Daily scan workflow, and by hand for any
 date through the Send alert workflow).
 
-`summary` reads the session's journal day file only (no LLM, decision 0001): BUY count with the new and
-dropped BUYs against the previous session. Paper accounts are left to the dashboard. Each channel gets its own
-rendering of the same summary: `telegram_html` (bold titles), `markdown` (the issue) and `plain` (email and the
-terminal).
+`summary` reads the session's journal day file only (no LLM, decision 0001): the BUY signals with each
+stock's name, sector, combined score and strategies, which of them are new since the previous session, and
+which BUYs were dropped. Paper accounts are left to the dashboard. Each channel gets its own rendering of the
+same summary: `telegram_html` (a block per new BUY, the top BUYs aligned), `markdown` (tables, for the issue)
+and `plain` (email and the terminal).
 """
 import html
 import json
@@ -23,21 +24,40 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[2]
 ISSUE_TITLE = "Daily alerts"
-MAX_NAMES = 8  # symbols listed before "+N more"
+MAX_NEW = 8       # new BUYs listed one per line
+TOP = 5           # strongest BUYs by combined score
+MAX_DROPPED = 8   # dropped symbols on their one line
+
+
+@dataclass
+class Stock:
+    symbol: str
+    name: str
+    sector: str
+    combined: float
+    strategies: list[str]
 
 
 @dataclass
 class Summary:
     date: str
     prev: str | None
-    buys: list[str]  # best combined score first
-    new: list[str]
+    buys: list[Stock]  # best combined score first
+    new: list[Stock]   # BUYs that weren't BUYs in the previous session, best first
     dropped: list[str]
 
 
-def _names(symbols: list[str], limit: int = MAX_NAMES) -> str:
+def _names(symbols: list[str], limit: int) -> str:
     more = len(symbols) - limit
     return ", ".join(symbols[:limit]) + (f" +{more} more" if more > 0 else "")
+
+
+def _short(name: str) -> str:
+    """Company name without the legal suffix: "Mphasis Limited" -> "Mphasis"."""
+    for suffix in (" Limited", " Ltd.", " Ltd"):
+        if name.endswith(suffix):
+            return name[: -len(suffix)]
+    return name
 
 
 def sessions(root: Path = ROOT) -> list[str]:
@@ -56,13 +76,17 @@ def summary(root: Path = ROOT, date: str | None = None) -> Summary | None:
         raise ValueError(f"no session on {date}" + (f"; the latest before it is {before[-1]}" if before else ""))
     i = days.index(date)
     today = pd.read_csv(root / "journal" / "days" / f"{date}.csv")
-    buys = list(today[today.action == "BUY"].sort_values("combined", ascending=False).symbol)
+    rows = today[today.action == "BUY"].sort_values("combined", ascending=False)
+    get = lambda r, col: r.get(col) if isinstance(r.get(col), str) else ""
+    buys = [Stock(r["symbol"], _short(get(r, "name")) or r["symbol"], get(r, "sector"), float(r["combined"]),
+                  [b for b in get(r, "buys").split(";") if b]) for _, r in rows.iterrows()]
     prev, new, dropped = None, [], []
     if i > 0:
         prev = days[i - 1]
         before = pd.read_csv(root / "journal" / "days" / f"{prev}.csv")
         was = set(before.symbol[before.action == "BUY"])
-        new, dropped = [s for s in buys if s not in was], sorted(was - set(buys))
+        new = [b for b in buys if b.symbol not in was]
+        dropped = sorted(was - {b.symbol for b in buys})
     return Summary(date, prev, buys, new, dropped)
 
 
@@ -72,44 +96,82 @@ def _day(d: str) -> str:
     return datetime.strptime(d, "%Y-%m-%d").strftime("%a %d %b %Y")
 
 
-def _buy_line(s: Summary) -> str:
+def _score(x: float) -> str:
+    return f"{x:+.2f}".replace("-", "−")
+
+
+def _counts(s: Summary) -> str:
     if s.prev is None:
-        return f"BUY signals: {len(s.buys)}"
-    return f"BUY signals: {len(s.buys)} ({len(s.new)} new · {len(s.dropped)} dropped since {_day(s.prev)[:-5]})"
+        return f"{len(s.buys)} BUY signals"
+    return f"{len(s.buys)} BUY signals · {len(s.new)} new · {len(s.dropped)} dropped"
+
+
+def _strategies(b: Stock) -> str:
+    """The strategies that say BUY: named when one or two, counted when more (keeps a line short)."""
+    return ", ".join(b.strategies) if len(b.strategies) <= 2 else f"{len(b.strategies)} strategies"
+
+
+def _more(items: list, limit: int) -> int:
+    return max(0, len(items) - limit)
 
 
 def plain(s: Summary, url: str | None = None) -> str:
     """Plain text: email and the terminal."""
-    lines = [f"AI Stock · {_day(s.date)}", "", _buy_line(s)]
+    lines = [f"AI Stock · {_day(s.date)}", _counts(s)]
     if s.new:
-        lines.append(f"New: {_names(s.new)}")
+        lines += ["", "New BUYs"]
+        for b in s.new[:MAX_NEW]:
+            lines.append(f"  {b.symbol} · {b.name} · {b.sector} · score {_score(b.combined)} · {_strategies(b)}")
+        if _more(s.new, MAX_NEW):
+            lines.append(f"  +{_more(s.new, MAX_NEW)} more")
+    if s.buys:
+        width = max(len(b.symbol) for b in s.buys[:TOP])
+        lines += ["", f"Top {min(TOP, len(s.buys))} by score"]
+        lines += [f"  {b.symbol:<{width}}  {_score(b.combined)}  {b.sector}" for b in s.buys[:TOP]]
     if s.dropped:
-        lines.append(f"Dropped: {_names(s.dropped)}")
+        lines += ["", f"Dropped: {_names(s.dropped, MAX_DROPPED)}"]
     if url:
         lines += ["", f"Dashboard: {url}"]
     return "\n".join(lines)
 
 
 def telegram_html(s: Summary, url: str | None = None) -> str:
-    """Telegram HTML: bold title and BUY line, emoji markers for new and dropped BUYs."""
+    """Telegram HTML: one block per new BUY (bold symbol, name, then sector, score and strategies), the top
+    BUYs as an aligned monospace list, dropped BUYs on one short line."""
     e = html.escape
-    lines = [f"📈 <b>AI Stock · {_day(s.date)}</b>", "", f"<b>{e(_buy_line(s))}</b>"]
+    lines = [f"📈 <b>AI Stock</b> · {_day(s.date)}", f"<i>{e(_counts(s))}</i>"]
     if s.new:
-        lines.append(f"🆕 {e(_names(s.new))}")
+        lines += ["", "🆕 <b>New BUYs</b>"]
+        for b in s.new[:MAX_NEW]:
+            lines += [f"<b>{e(b.symbol)}</b> · {e(b.name)}",
+                      f"    {e(b.sector)} · <code>{_score(b.combined)}</code> · <i>{e(_strategies(b))}</i>"]
+        if _more(s.new, MAX_NEW):
+            lines.append(f"<i>+{_more(s.new, MAX_NEW)} more on the dashboard</i>")
+    if s.buys:
+        width = max(len(b.symbol) for b in s.buys[:TOP])
+        lines += ["", f"🏆 <b>Top {min(TOP, len(s.buys))} by score</b>"]
+        lines += [f"<code>{e(b.symbol):<{width}} {_score(b.combined)}</code>  {e(b.sector)}" for b in s.buys[:TOP]]
     if s.dropped:
-        lines.append(f"➖ {e(_names(s.dropped))}")
+        lines += ["", f"➖ <b>Dropped</b>  <i>{e(_names(s.dropped, MAX_DROPPED))}</i>"]
     if url:
-        lines += ["", f'<a href="{e(url)}">Open dashboard →</a>']
+        lines += ["", f'👉 <a href="{e(url)}">Open dashboard</a>']
     return "\n".join(lines)
 
 
 def markdown(s: Summary, url: str | None = None) -> str:
-    """GitHub markdown: the issue comment."""
-    lines = [f"### AI Stock · {_day(s.date)}", "", f"**{_buy_line(s)}**", ""]
+    """GitHub markdown: the issue comment, new and top BUYs as tables."""
+    lines = [f"### 📈 AI Stock · {_day(s.date)}", f"_{_counts(s)}_"]
     if s.new:
-        lines.append(f"- 🆕 {_names(s.new)}")
+        lines += ["", "**🆕 New BUYs**", "", "| Stock | Name | Sector | Score | Strategies |", "|---|---|---|---:|---|"]
+        lines += [f"| **{b.symbol}** | {b.name} | {b.sector} | {_score(b.combined)} | {_strategies(b)} |"
+                  for b in s.new[:MAX_NEW]]
+        if _more(s.new, MAX_NEW):
+            lines.append(f"\n_+{_more(s.new, MAX_NEW)} more on the dashboard_")
+    if s.buys:
+        lines += ["", f"**🏆 Top {min(TOP, len(s.buys))} by score**", "", "| Stock | Score | Sector |", "|---|---:|---|"]
+        lines += [f"| **{b.symbol}** | {_score(b.combined)} | {b.sector} |" for b in s.buys[:TOP]]
     if s.dropped:
-        lines.append(f"- ➖ {_names(s.dropped)}")
+        lines += ["", f"**➖ Dropped** {_names(s.dropped, MAX_DROPPED)}"]
     if url:
         lines += ["", f"[Open dashboard →]({url})"]
     return "\n".join(lines)

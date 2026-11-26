@@ -9,10 +9,11 @@ push summary and chose both channels.
 
 ## Decision
 `aistock alert` (`src/aistock/alerts.py`) builds a short summary from the session's journal day file only
-(no LLM, 0001): BUY count with the new and dropped BUYs since the previous session, and the dashboard link.
-Paper accounts were in the first version and dropped at the user's request (too much text for a phone
-alert; they're on the dashboard). Each channel gets its own rendering: Telegram HTML (bold titles), markdown
-for the issue, plain text for email. `--date` rebuilds it for any journaled session. The Daily scan workflow runs it as its last step with `continue-on-error`; the
+(no LLM, 0001): BUY count, each new BUY on its own line (symbol, company, sector, combined score, strategies),
+the top 5 BUYs by score, the dropped BUYs on one line, and the dashboard link. Paper accounts were in the first
+version and dropped at the user's request (too much text for a phone alert; they're on the dashboard); a
+comma-separated list of tickers was also rejected as unreadable. Each channel gets its own rendering: Telegram
+HTML, markdown tables for the issue, plain text for email. `--date` rebuilds it for any journaled session. The Daily scan workflow runs it as its last step with `continue-on-error`; the
 Send alert workflow (`alert.yml`) runs it by hand for a chosen date (default: the latest session). Channels:
 - Telegram, when the `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` repo secrets exist;
 - email over SMTP (stdlib, SSL), when `SMTP_USERNAME` and `SMTP_PASSWORD` exist (Gmail app password by

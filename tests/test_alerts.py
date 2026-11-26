@@ -2,26 +2,33 @@ import pytest
 
 from aistock import alerts
 
+COLS = "date,symbol,name,sector,action,buys,combined\n"
+
 
 def journal(tmp_path):
     days = tmp_path / "journal" / "days"
     days.mkdir(parents=True)
-    (days / "2026-11-25.csv").write_text("date,symbol,action,combined\n"
-                                         "2026-11-25,A,BUY,0.5\n2026-11-25,B,BUY,0.4\n2026-11-25,C,WATCH,0.1\n")
-    (days / "2026-11-26.csv").write_text("date,symbol,action,combined\n"
-                                         "2026-11-26,A,BUY,0.5\n2026-11-26,B,WATCH,0.2\n2026-11-26,C,BUY,0.6\n")
+    (days / "2026-11-25.csv").write_text(COLS + "2026-11-25,A,Alpha Limited,Tech,BUY,swing,0.5\n"
+                                                "2026-11-25,B,Beta Ltd.,Energy,BUY,trend,0.4\n"
+                                                "2026-11-25,C,Gamma,Tech,WATCH,,0.1\n")
+    (days / "2026-11-26.csv").write_text(COLS + "2026-11-26,A,Alpha Limited,Tech,BUY,swing,0.5\n"
+                                                "2026-11-26,B,Beta Ltd.,Energy,WATCH,,0.2\n"
+                                                "2026-11-26,C,Gamma,Tech,BUY,swing;trend;breakout,0.6\n")
     return tmp_path
 
 
 def test_summary_of_the_latest_session(tmp_path):
     s = alerts.summary(journal(tmp_path))
-    assert (s.date, s.prev, s.buys, s.new, s.dropped) == ("2026-11-26", "2026-11-25", ["C", "A"], ["C"], ["B"])
+    assert (s.date, s.prev, s.dropped) == ("2026-11-26", "2026-11-25", ["B"])
+    assert [b.symbol for b in s.buys] == ["C", "A"]  # best score first
+    assert s.new == [alerts.Stock("C", "Gamma", "Tech", 0.6, ["swing", "trend", "breakout"])]
+    assert s.buys[1].name == "Alpha"  # legal suffix dropped
 
 
 def test_summary_of_the_first_session_has_nothing_to_compare(tmp_path):
     s = alerts.summary(journal(tmp_path), date="2026-11-25")
-    assert (s.prev, s.buys, s.new, s.dropped) == (None, ["A", "B"], [], [])
-    assert alerts.plain(s).splitlines()[2] == "BUY signals: 2"
+    assert (s.prev, [b.symbol for b in s.buys], s.new, s.dropped) == (None, ["A", "B"], [], [])
+    assert alerts.plain(s).splitlines()[1] == "2 BUY signals"
 
 
 def test_summary_rejects_a_date_without_session(tmp_path):
@@ -32,31 +39,40 @@ def test_summary_rejects_a_date_without_session(tmp_path):
 
 def test_plain_text(tmp_path):
     assert alerts.plain(alerts.summary(journal(tmp_path)), url="https://example.org/").splitlines() == [
-        "AI Stock · Thu 26 Nov 2026", "",
-        "BUY signals: 2 (1 new · 1 dropped since Wed 25 Nov)",
-        "New: C",
+        "AI Stock · Thu 26 Nov 2026",
+        "2 BUY signals · 1 new · 1 dropped", "",
+        "New BUYs",
+        "  C · Gamma · Tech · score +0.60 · 3 strategies", "",
+        "Top 2 by score",
+        "  C  +0.60  Tech",
+        "  A  +0.50  Tech", "",
         "Dropped: B", "",
         "Dashboard: https://example.org/",
     ]
 
 
-def test_telegram_html_escapes(tmp_path):
+def test_telegram_html_escapes_and_formats_each_new_buy(tmp_path):
     s = alerts.summary(journal(tmp_path))
-    s.new = ["M&M"]
+    s.new[0].name = "M&M"
     text = alerts.telegram_html(s, url="https://example.org/?a=1&b=2")
-    assert text.startswith("📈 <b>AI Stock · Thu 26 Nov 2026</b>")
-    assert "🆕 M&amp;M" in text
-    assert '<a href="https://example.org/?a=1&amp;b=2">Open dashboard →</a>' in text
+    assert text.startswith("📈 <b>AI Stock</b> · Thu 26 Nov 2026")
+    assert "<b>C</b> · M&amp;M\n    Tech · <code>+0.60</code> · <i>3 strategies</i>" in text
+    assert "<code>A +0.50</code>  Tech" in text
+    assert '👉 <a href="https://example.org/?a=1&amp;b=2">Open dashboard</a>' in text
 
 
-def test_markdown(tmp_path):
+def test_markdown_tables(tmp_path):
     text = alerts.markdown(alerts.summary(journal(tmp_path)), url="https://example.org/")
-    assert "**BUY signals: 2 (1 new · 1 dropped since Wed 25 Nov)**" in text
-    assert "- ➖ B" in text and text.endswith("[Open dashboard →](https://example.org/)")
+    assert "| **C** | Gamma | Tech | +0.60 | 3 strategies |" in text
+    assert "| **A** | +0.50 | Tech |" in text
+    assert text.endswith("[Open dashboard →](https://example.org/)")
 
 
-def test_long_lists_are_capped():
-    assert alerts._names([str(i) for i in range(11)]) == "0, 1, 2, 3, 4, 5, 6, 7 +3 more"
+def test_long_lists_are_capped(tmp_path):
+    assert alerts._names([str(i) for i in range(11)], 8) == "0, 1, 2, 3, 4, 5, 6, 7 +3 more"
+    s = alerts.summary(journal(tmp_path))
+    s.new = s.new * 10
+    assert "+2 more on the dashboard" in alerts.telegram_html(s)
 
 
 def test_send_skips_channels_without_secrets(tmp_path, monkeypatch):
