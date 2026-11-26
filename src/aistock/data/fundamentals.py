@@ -39,13 +39,13 @@ STATEMENT_ROWS = {"revenue": ("income_stmt", "Total Revenue"), "net_income": ("i
 
 def get_statements(symbol: str) -> list[dict]:
     """Annual statement figures (about 4 fiscal years), oldest first: one dict per year end with
-    `date` and the STATEMENT_ROWS keys (None when missing), cached for 7 days. Amounts are in the
-    company's reporting currency, which for some NSE stocks is USD."""
+    `date`, `currency` (the reporting currency: some NSE stocks report in USD) and the
+    STATEMENT_ROWS keys (None when missing), cached for 7 days."""
     path = CACHE / "statements" / f"{symbol}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists() and time.time() - path.stat().st_mtime < TTL_SECONDS:
         years = json.loads(path.read_text())
-        if all(k in y for y in years for k in STATEMENT_ROWS):  # else cached before a figure was added
+        if all(k in y for y in years for k in [*STATEMENT_ROWS, "currency"]):  # else cached before a field was added
             return years
     ticker = yf.Ticker(f"{symbol}.NS")
     frames = {name: getattr(ticker, name) for name in ("income_stmt", "balance_sheet")}
@@ -56,7 +56,8 @@ def get_statements(symbol: str) -> list[dict]:
         return float(df.at[row, col])
 
     ends = sorted(set(frames["income_stmt"].columns) | set(frames["balance_sheet"].columns))
-    years = [{"date": pd.Timestamp(end).date().isoformat(),
+    currency = ticker.info.get("financialCurrency")
+    years = [{"date": pd.Timestamp(end).date().isoformat(), "currency": currency,
               **{k: figure(frames[stmt], row, end) for k, (stmt, row) in STATEMENT_ROWS.items()}} for end in ends]
     years = [y for y in years if any(y[k] is not None for k in STATEMENT_ROWS)]  # Yahoo pads with empty years
     path.write_text(json.dumps(years))

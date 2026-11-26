@@ -47,6 +47,25 @@ function fmt(v, col = '') {
 }
 const pct = v => num(v) ? (v * 100).toFixed(1) + '%' : '–';
 
+// Large numbers in Indian units (Cr = 1e7, L = 1e5), or K/M/B for amounts reported in another currency.
+function compact(v, intl = false) {
+  const units = intl ? [[1e9, 'B'], [1e6, 'M'], [1e3, 'K']] : [[1e7, 'Cr'], [1e5, 'L'], [1e3, 'K']];
+  const [n, u] = units.find(([n]) => Math.abs(v) >= n) || [1, ''];
+  return (v / n).toLocaleString(intl ? 'en-US' : 'en-IN', { maximumFractionDigits: 2 }) + (u ? ' ' + u : '');
+}
+
+// History columns shown compact: 'count' (no currency) or 'money' (in the row's `currency`, else INR).
+const AMOUNTS = { Volume: 'count', vol_avg20: 'count', shares: 'count', marketCap: 'money', revenue: 'money',
+  net_income: 'money', equity: 'money', debt: 'money', current_assets: 'money', current_liabilities: 'money' };
+const SYMBOL = { INR: '₹', USD: '$' };
+
+function amount(v, c, r) {
+  if (!AMOUNTS[c] || !num(v)) return fmt(v, c);
+  if (AMOUNTS[c] === 'count') return compact(v);
+  const cur = r.currency || 'INR';
+  return (v < 0 ? '-' : '') + (SYMBOL[cur] ?? cur + ' ') + compact(Math.abs(v), cur !== 'INR');
+}
+
 // ---------- theme & charts ----------
 
 const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -490,9 +509,9 @@ function historyCard(history, rows) {
 // Full history tables (data/prices/ and data/fundamentals/, written at build time; see aistock/site/__init__.py).
 const DAILY_LABELS = { Date: 'Date', Volume: 'Volume', sma20: 'SMA20', sma50: 'SMA50', sma200: 'SMA200', ema100: 'EMA100',
   ema200: 'EMA200', rsi14: 'RSI14', macd_hist: 'MACD hist', atr14: 'ATR14', vol_avg20: 'Avg vol 20', Technical: 'Tech score',
-  trailingPE: 'P/E (est.)', priceToBook: 'P/B (est.)', marketCap: 'Mkt cap ₹ (est.)', Fundamental: 'Fund score (est.)' };
+  trailingPE: 'P/E (est.)', priceToBook: 'P/B (est.)', marketCap: 'Mkt cap (est.)', Fundamental: 'Fund score (est.)' };
 const DAILY_EXTRA = ['Open', 'High', 'Low', 'ema100', 'ema200', 'vol_avg20', 'priceToBook', 'marketCap'];
-const YEAR_LABELS = { date: 'Fiscal year end', start: 'In effect from', revenue: 'Revenue', net_income: 'Net income',
+const YEAR_LABELS = { date: 'Fiscal year end', start: 'In effect from', currency: 'Currency', revenue: 'Revenue', net_income: 'Net income',
   eps: 'EPS', equity: 'Equity', debt: 'Debt', current_assets: 'Current assets', current_liabilities: 'Current liabilities',
   shares: 'Shares', returnOnEquity: 'ROE', debtToEquity: 'Debt/Equity (%)', revenueGrowth: 'Revenue growth',
   earningsGrowth: 'Earnings growth', profitMargins: 'Net margin', currentRatio: 'Current ratio' };
@@ -503,18 +522,18 @@ const YEAR_LABELS = { date: 'Fiscal year end', start: 'In effect from', revenue:
 const POINT_CHANGE = { rsi14: [1, ' pt'], macd_hist: [1, ' pt'], Technical: [1, ' pt'], Fundamental: [1, ' pt'],
   returnOnEquity: [100, ' pp'], revenueGrowth: [100, ' pp'], earningsGrowth: [100, ' pp'], profitMargins: [100, ' pp'],
   debtToEquity: [1, ' pp'], currentRatio: [1, ''] };
-const NO_CHANGE = ['Date', 'date', 'start'];
+const NO_CHANGE = ['Date', 'date', 'start', 'currency'];
 
 function changeCells(rows, columns) {
   const prev = new Map(rows.map((p, i) => [p, rows[i - 1]]));
   const cell = c => (v, r) => {
     const before = prev.get(r)?.[c];
     if (!num(v)) return dash();
-    if (!num(before)) return fmt(v, c);
+    if (!num(before)) return amount(v, c, r);
     const [scale, unit] = POINT_CHANGE[c] || [];
     const d = scale ? (v - before) * scale : before ? v / before - 1 : NaN;
     const text = !num(d) ? '' : d === 0 ? '0' : (d > 0 ? '+' : '') + (scale ? +d.toFixed(2) + unit : (d * 100).toFixed(2) + '%');
-    return h('div', {}, fmt(v, c), h('div', { class: 'cell-sub ' + sign(d) }, text));
+    return h('div', {}, amount(v, c, r), h('div', { class: 'cell-sub ' + sign(d) }, text));
   };
   return Object.fromEntries(columns.filter(c => !NO_CHANGE.includes(c)).map(c => [c, cell(c)]));
 }
