@@ -20,10 +20,17 @@ by `fundamental.history`, since Yahoo has no fundamental history) and its
 fiscal-year statement figures and ratios to data/fundamentals/<SYMBOL>.csv,
 listing the symbols of each in the manifest, so a stock page shows more than
 the logged sessions. News has no history to add.
+
+`write_summaries` also gathers what a stock page would otherwise collect from every notes and paper-account
+file: data/summaries/stocks/<SYMBOL>.json (its LLM notes, closed paper trades, open paper positions) and
+data/summaries/contracts/<CONTRACT>.json (its notes), plus data/decisions/<date>.csv (every account's
+decisions on that session's BUYs, with a strategy column). Pages then load a few small files however long
+the journal gets.
 """
 import csv
 import json
 import shutil
+from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -176,6 +183,52 @@ def equal_weight(root: Path = ROOT) -> dict[str, float]:
     return out
 
 
+def _records(path: Path) -> list[dict]:
+    """A CSV's rows with numbers parsed (as the page's CSV parser does); NaN and infinity become null."""
+    import numpy as np
+    import pandas as pd
+
+    if not path.exists() or path.stat().st_size == 0:
+        return []
+    df = pd.read_csv(path).replace([np.inf, -np.inf], np.nan)
+    return json.loads(df.to_json(orient="records"))
+
+
+def write_summaries(out: Path, root: Path = ROOT) -> dict:
+    """Per-stock and per-contract JSON summaries and per-session decision files (see the module docstring);
+    returns the manifest fields listing what was written."""
+    import pandas as pd
+
+    data, journal = out / "data", root / "journal"
+    notes = defaultdict(list)  # (kind, symbol) -> notes rows
+    for kind, folder in (("stocks", journal / "notes"), ("contracts", journal / "commodities" / "notes")):
+        for path in sorted(folder.glob("*.csv")):
+            for r in _records(path):
+                notes[kind, r["symbol"]].append(r)
+    trades, positions, decisions = defaultdict(list), defaultdict(list), defaultdict(list)
+    for account in sorted(p for p in (journal / "paper").glob("*") if p.is_dir()):
+        tag = {"strategy": account.name}
+        for r in _records(account / "trades.csv"):
+            trades[r["symbol"]].append(tag | r)
+        for r in _records(account / "positions.csv"):
+            positions[r["sym"]].append(tag | r)
+        for r in _records(account / "decisions.csv"):
+            decisions[r["signal_date"]].append(tag | r)
+    written = {}
+    for kind, folder in (("stocks", journal / "stocks"), ("contracts", journal / "commodities" / "contracts")):
+        (data / "summaries" / kind).mkdir(parents=True, exist_ok=True)
+        written[kind] = [p.stem for p in sorted(folder.glob("*.csv"))]
+        for sym in written[kind]:
+            summary = {"notes": notes[kind, sym]}
+            if kind == "stocks":
+                summary |= {"paper_trades": trades[sym], "positions": positions[sym]}
+            (data / "summaries" / kind / f"{sym}.json").write_text(json.dumps(summary))
+    (data / "decisions").mkdir(parents=True, exist_ok=True)
+    for date, rows in decisions.items():
+        pd.DataFrame(rows).to_csv(data / "decisions" / f"{date}.csv", index=False)
+    return {"summaries": written, "decisions": sorted(decisions)}
+
+
 def build(out: Path, root: Path = ROOT, prices: bool = False) -> dict:
     """Write the site to `out`; returns the manifest."""
     shutil.rmtree(out / "data", ignore_errors=True)  # drop CSVs that no longer exist
@@ -194,6 +247,7 @@ def build(out: Path, root: Path = ROOT, prices: bool = False) -> dict:
     stocks = [f["title"] for f in files if f["kind"] == "stock"]
     manifest = {"built": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "groups": GROUPS, "files": files, "accounts": accounts, "equal_weight": equal_weight(root),
+                **write_summaries(out, root),
                 **(write_history(out, stocks, root) if prices else {"prices": [], "fundamentals": []})}
     (out / "data").mkdir(exist_ok=True)
     (out / "data" / "manifest.json").write_text(json.dumps(manifest))
