@@ -329,7 +329,7 @@ def alert(
     dry_run: bool = typer.Option(False, "--dry-run", help="Print the message only"),
     url: str = typer.Option("", help="Dashboard link to end the message with"),
 ):
-    """Summary of a session (BUYs, paper accounts) to Telegram, email and a GitHub issue; channels whose
+    """Summary of a session (BUY signals, new and dropped) to Telegram, email and a GitHub issue; channels whose
     secrets aren't set are skipped. Exits non-zero if a configured channel fails."""
     from aistock import alerts
 
