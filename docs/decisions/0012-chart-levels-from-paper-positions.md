@@ -17,8 +17,7 @@ strategy, reason and return in the tooltip.
 ## Consequences
 - An account keeps only the current stop, so a trailing stop shows as a flat line at today's level, not
   its history.
-- Stocks no paper account holds show no levels, even on BUY days.
+- Stocks no paper account holds show the journal's planned levels instead (0013).
 
 ## Revisit when
-The journal starts recording per-strategy stop/target (would allow levels for every BUY), or accounts save
-stop history.
+Accounts save stop history (would show trailing stops moving).

@@ -727,10 +727,37 @@ function bucketed(pts, key) {
   });
 }
 
+// A BUY session's planned levels per strategy (journal `stops`/`targets`, ";"-joined in `buys` order):
+// [{ name, stop, target }], target null when the strategy has none.
+function sessionPlans(r) {
+  const split = v => v == null || v === '' ? [] : String(v).split(';');
+  const [names, stops, targets] = [split(r.buys), split(r.stops), split(r.targets)];
+  return names.map((name, i) => ({ name, stop: parseFloat(stops[i]), target: targets[i] ? parseFloat(targets[i]) : null }))
+    .filter(l => num(l.stop));
+}
+
+// Planned levels in force per trading day: each BUY session's plans from that session (a later BUY replaces
+// them) until a close crosses the stop or target. Closes only, so it approximates the intraday exits.
+function planLevels(history, rows) {
+  const sessions = new Map(rows.filter(r => r.action === 'BUY').map(r => [String(r.date), sessionPlans(r)]));
+  const out = new Map();
+  let open = [];
+  for (const b of history) {
+    const d = String(b.Date);
+    if (sessions.get(d)?.length) open = sessions.get(d);
+    if (!open.length) continue;
+    out.set(d, open);
+    open = open.filter(l => b.Close > l.stop && !(num(l.target) && b.Close >= l.target));
+  }
+  return out;
+}
+
 // paper: this symbol's closed paper-account trades (with `strategy`), marked at their exits.
-// held: its open paper positions (positionRows), whose stop and target are drawn from their entry. The journal
-// doesn't keep levels, and an account keeps only a position's current stop (trailing stops move up).
+// held: its open paper positions (positionRows), whose stop and target are drawn from their entry; an account
+// keeps only a position's current stop (trailing stops move up). Stocks no account holds show the journal's
+// planned levels instead (planLevels), so the two never stack.
 function historyCard(history, rows, paper = [], held = []) {
+  const plans = held.length ? new Map() : planLevels(history, rows);
   const buys = new Map(rows.filter(r => r.action === 'BUY').map(r => [r.date, r.close]));
   const fund = new Map(rows.filter(r => num(r.fundamental)).map(r => [r.date, r.fundamental]));
   const priceBox = h('div', { class: 'chart-box tall' }), scoreBox = h('div', { class: 'chart-box' });
@@ -756,6 +783,26 @@ function historyCard(history, rows, paper = [], held = []) {
         borderColor: css('--critical'), backgroundColor: css('--critical') });
       if (num(p.target)) prices.push({ label: `Target · ${p.strategy}`, data: level(p, p.target), borderWidth: 1.5,
         borderDash: [5, 4], borderColor: css('--good'), backgroundColor: css('--good') });
+    }
+    // Strategies sharing a level share a line ("Plan stop · swing, trend"); a bucket's point takes the levels at
+    // its last day. A level on a single point (a BUY on the last session) is drawn as a short dash.
+    const planned = new Map();
+    const put = (label, i, v) => {
+      if (!planned.has(label)) planned.set(label, pts.map(() => null));
+      planned.get(label)[i] = v;
+    };
+    pts.forEach((p, i) => {
+      const open = plans.get(String(p.Date)) || [];
+      for (const side of ['stop', 'target']) {
+        const groups = new Map();
+        open.filter(l => num(l[side])).forEach(l => groups.set(l[side], [...(groups.get(l[side]) || []), l.name]));
+        groups.forEach((names, v) => put(`Plan ${side} · ${names.join(', ')}`, i, v));
+      }
+    });
+    for (const [label, data] of planned) {
+      const color = css(label.startsWith('Plan stop') ? '--critical' : '--good');
+      prices.push({ label, data, stepped: true, borderWidth: 1.5, borderDash: [2, 3], borderColor: color, backgroundColor: color,
+        pointStyle: 'line', pointRadius: data.filter(num).length === 1 ? 8 : 0 });
     }
     if (paper.length) {
       const exits = new Map();
@@ -889,7 +936,7 @@ async function renderStock(file, rows) {
 // are in the page subtitle; close shows its change since the previous logged session, raw ratios sit
 // behind 'All columns'.
 const SESSION_HIDDEN = ['symbol', 'name', 'sector', 'group', 'unit', 'side'];
-const SESSION_LABELS = { date: 'Session', stop: 'Stop', target: 'Target', shares: 'Shares',
+const SESSION_LABELS = { date: 'Session', stop: 'Stop', target: 'Target', shares: 'Shares', stops: 'Plan stops', targets: 'Plan targets',
   sentiment_reasons: 'News reasons', fundamental_reasons: 'Fundamental reasons', f_trailingPE: 'P/E',
   f_priceToBook: 'P/B', f_returnOnEquity: 'ROE', f_debtToEquity: 'Debt/Equity (%)', f_revenueGrowth: 'Revenue growth',
   f_earningsGrowth: 'Earnings growth', f_profitMargins: 'Net margin', f_currentRatio: 'Current ratio',
@@ -904,7 +951,7 @@ function sessionsTable(file, rows, history) {
     const before = prev.get(r)?.close, d = num(before) && before ? v / before - 1 : NaN;
     return h('div', {}, fmt(v), num(d) ? h('div', { class: 'cell-sub ' + sign(d) }, (d > 0 ? '+' : '') + pct(d)) : null);
   };
-  const order = ['date', ...(stock ? SCAN_COLS : COMMODITY_COLS), 'stop', 'target', 'fundamental_reasons', 'sentiment_reasons'];
+  const order = ['date', ...(stock ? SCAN_COLS : COMMODITY_COLS), 'stops', 'targets', 'stop', 'target', 'fundamental_reasons', 'sentiment_reasons'];
   const columns = file.columns.filter(c => !SESSION_HIDDEN.includes(c));
   const main = order.filter(c => columns.includes(c) && !c.startsWith('f_') && rows.some(r => r[c] != null && r[c] !== ''));
   const extra = columns.filter(c => !main.includes(c));

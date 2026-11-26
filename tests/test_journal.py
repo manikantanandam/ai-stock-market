@@ -75,3 +75,15 @@ def test_notes_saved_per_session_and_rerun_replaces(tmp_journal):
     assert sorted((r["symbol"], r["note"]) for r in rows) == [("A", "second"), ("B", "other")]
     assert rows[0].keys() == {"date", "symbol", "name", "strategy", "action", "note", "source"}
     assert rows[0]["source"] == "live"
+
+
+def test_rows_keep_planned_levels_per_buy_strategy(tmp_journal):
+    s = sig("A", "2026-11-18", buy=True)
+    s.strategies["trend"] = StrategySignal("trend", "BUY", True, 85.0, None, 8, [])
+    s.strategies["breakout"] = StrategySignal("breakout", "WATCH", False, 85.0, None, 8, [])
+
+    journal.record([s])
+
+    (row,) = read(tmp_journal / "days" / "2026-11-18.csv")
+    assert (row["buys"], row["stops"], row["targets"]) == ("swing;trend", "90.0;85.0", "115.0;")
+    assert sig("B", "2026-11-19").row()["stops"] == ""  # WATCH: no planned levels
