@@ -3,7 +3,7 @@
 The LLM only explains a verdict the rules already reached: it is given the
 signal's numbers and reasons, chooses nothing, and changes nothing. A 3B model
 can invent figures, so a note that quotes any number not in the facts it was
-given is withheld. Notes are optional: `scan --notes` saves them to
+given is retried once with those numbers named, then withheld. Notes are optional: `scan --notes` saves them to
 journal/notes/ (`commodity scan --notes` to journal/commodities/notes/), and
 the daily CI scan runs Ollama on CPU to write them.
 """
@@ -121,11 +121,21 @@ def commodity_note(s: commodity_signal.Signal, strategy: str | None, model: str 
     return write(commodity_facts(s, strategy), COMMODITY_SYSTEM, model)
 
 
+RETRIES = 1  # a note quoting figures not in the facts is asked again this many times
+
+
 def write(known: str, system: str, model: str = MODEL) -> str:
-    out = _post({"model": model, "system": system, "prompt": known, "stream": False,
-                 "options": {"temperature": 0, "seed": 0, "num_predict": 220}})
-    text = " ".join(out.get("response", "").split())
-    bad = invented_numbers(text, known)
-    if bad:
-        return f"(note withheld: the model quoted figures not in the data: {', '.join(bad[:5])})"
-    return text
+    """The model's note on `known`. If it quotes figures not in the facts, it is
+    asked again with those figures named as off limits (usually a single
+    miscopied number); still wrong after RETRIES, the note is withheld."""
+    prompt = known
+    for _ in range(1 + RETRIES):
+        out = _post({"model": model, "system": system, "prompt": prompt, "stream": False,
+                     "options": {"temperature": 0, "seed": 0, "num_predict": 220}})
+        text = " ".join(out.get("response", "").split())
+        bad = invented_numbers(text, known)
+        if not bad:
+            return text
+        prompt = (f"{known}\n\nA previous note quoted numbers that are not in these facts: {', '.join(bad[:5])}. "
+                  "Do not write them; use only numbers that appear above, exactly as written.")
+    return f"(note withheld: the model quoted figures not in the data: {', '.join(bad[:5])})"
