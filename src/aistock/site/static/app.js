@@ -514,7 +514,7 @@ const YEAR_LABELS = { date: 'Fiscal year end', start: 'In effect from', currency
   revenue: 'Revenue', net_income: 'Net income',
   eps: 'EPS', equity: 'Equity', debt: 'Debt', current_assets: 'Current assets', current_liabilities: 'Current liabilities',
   shares: 'Shares', returnOnEquity: 'ROE', debtToEquity: 'Debt/Equity (%)', revenueGrowth: 'Revenue growth',
-  earningsGrowth: 'Earnings growth', profitMargins: 'Net margin', currentRatio: 'Current ratio' };
+  earningsGrowth: 'Earnings growth', profitMargins: 'Net margin', currentRatio: 'Current ratio', check: 'Data check' };
 
 // Change from the previous row (trading day or fiscal year) under each value: percent for levels and
 // amounts, a difference where a percent misleads: [scale, unit] (RSI is already 0-100, MACD hist crosses
@@ -522,7 +522,7 @@ const YEAR_LABELS = { date: 'Fiscal year end', start: 'In effect from', currency
 const POINT_CHANGE = { rsi14: [1, ' pt'], macd_hist: [1, ' pt'], Technical: [1, ' pt'], Fundamental: [1, ' pt'],
   returnOnEquity: [100, ' pp'], revenueGrowth: [100, ' pp'], earningsGrowth: [100, ' pp'], profitMargins: [100, ' pp'],
   debtToEquity: [1, ' pp'], currentRatio: [1, ''] };
-const NO_CHANGE = ['Date', 'date', 'start', 'currency', 'converted_from'];
+const NO_CHANGE = ['Date', 'date', 'start', 'currency', 'converted_from', 'check'];
 
 function changeCells(rows, columns) {
   const prev = new Map(rows.map((p, i) => [p, rows[i - 1]]));
@@ -538,8 +538,17 @@ function changeCells(rows, columns) {
   return Object.fromEntries(columns.filter(c => !NO_CHANGE.includes(c)).map(c => [c, cell(c)]));
 }
 
-function historyTables(history, years) {
+// Yahoo's statements for banks, NBFCs and insurers don't match their filings (e.g. HDFCBANK equity +47% vs
+// Screener after the merger), and debt/equity means little for a lender.
+const UNRELIABLE_SECTORS = ['Financial Services'];
+const fundamentalsWarning = sector => UNRELIABLE_SECTORS.includes(sector)
+  ? h('p', { class: 'warning' }, `Fundamentals for ${sector} stocks (banks, NBFCs, insurers) are unreliable on Yahoo: `
+    + "figures such as equity and revenue can differ widely from the company's filings. Verify before relying on them.")
+  : null;
+
+function historyTables(history, years, sector) {
   const columns = Object.keys(history[0]);
+  const flagged = years.filter(y => y.check).length;
   return [
     card('Daily history: prices and technicals',
       h('p', { class: 'muted' }, 'Every trading day Yahoo has; under each value, its change from the previous trading day (points for RSI, MACD and scores). P/E, P/B, market cap and fundamental score are estimated from annual results.'),
@@ -547,6 +556,8 @@ function historyTables(history, years) {
         { labels: DAILY_LABELS, extra: DAILY_EXTRA, pageSize: 25, cells: changeCells(history, columns) })),
     years.length ? card('Fundamentals by fiscal year',
       h('p', { class: 'muted' }, "Amounts are in ₹; companies reporting in USD are converted at the fiscal year's average USD/INR rate (income) or its year-end rate (balance sheet). Ratios take effect about 60 days after the year end. Under each value, its change from the previous year (percentage points for ratios)."),
+      fundamentalsWarning(sector),
+      flagged ? h('p', { class: 'warning' }, `${flagged} of ${years.length} years fail a data check (last column): verify those figures against the filings.`) : null,
       table(years.slice().reverse(), Object.keys(years[0]), { labels: YEAR_LABELS, cells: changeCells(years, Object.keys(years[0])) })) : null,
   ];
 }
@@ -561,6 +572,7 @@ async function renderStock(file, rows) {
   const scores = ['combined', 'technical', 'fundamental', 'sentiment'].filter(c => file.columns.includes(c));
   return [
     h('p', { class: 'sub' }, [last.name, last.sector || last.group, last.unit && 'INR per ' + last.unit].filter(Boolean).join(' · ')),
+    fundamentalsWarning(last.sector),
     tiles([['Last action', last.action || '–', last.action === 'BUY' ? 'pos' : last.action === 'SELL' ? 'neg' : ''],
       ['Close', fmt(last.close)], ...scores.map(c => [c[0].toUpperCase() + c.slice(1), fmt(last[c])]),
       ['Sessions logged', rows.length]]),
@@ -568,7 +580,7 @@ async function renderStock(file, rows) {
       chartCard('Close', lineConfig(labels, [{ label: 'Close', data: rows.map(r => r.close), borderColor: series(0) }])),
       chartCard('Scores (−1 to 1)', lineConfig(labels, scores.map((c, i) =>
         ({ label: c, data: rows.map(r => r[c]), borderColor: series(i), backgroundColor: series(i), pointRadius: 3 })), { min: -1, max: 1 }))),
-    ...(history.length ? historyTables(history, years) : []),
+    ...(history.length ? historyTables(history, years, last.sector) : []),
     card('Logged sessions', table(rows.slice().reverse(), file.columns)),
   ];
 }
