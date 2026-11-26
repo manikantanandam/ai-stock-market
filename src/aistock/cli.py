@@ -306,13 +306,16 @@ def pr_screenshots(
     site_dir: str = typer.Option("site", "--site", help="Built site folder (aistock site)"),
     page: list[str] = typer.Option(None, "--page", help="Page hash to capture, e.g. today (repeatable); "
                                                         "default: the PR body's <!-- screenshots: ... --> line, else a standard set"),
+    theme: str = typer.Option("dark", help="dark or light"),
 ):
     """Screenshot dashboard pages and put them in the PR description (images on the pr-screenshots branch)."""
     from pathlib import Path
 
     from aistock.site import screenshots
 
-    print(screenshots.publish(pr, Path(site_dir), Path.cwd(), page or None))
+    if theme not in screenshots.THEMES:
+        raise typer.BadParameter(f"theme must be one of {', '.join(screenshots.THEMES)}")
+    print(screenshots.publish(pr, Path(site_dir), Path.cwd(), page or None, theme))
 
 
 @app.command("update-watchlists")

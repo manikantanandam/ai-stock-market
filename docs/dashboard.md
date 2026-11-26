@@ -53,9 +53,10 @@ touching `src/aistock/site/` and rewrites the description's screenshots section.
 `gh workflow run pr-screenshots.yml -f pr=<N>`). Locally, after `uv run aistock site`:
 
 ```sh
-uv run aistock pr-screenshots <N> [--page today --page accounts ...]   # needs gh auth and push access
+uv run aistock pr-screenshots <N> [--page today --page accounts ...] [--theme light]   # needs gh auth and push access
 ```
 
-It serves `site/` on a free port, so a running `--serve` doesn't clash. Today needs a long virtual-time budget
-(40 s, set in `screenshots.py`). Don't capture while a build runs: it deletes `site/data` first. Images live on
+It serves `site/` on a free port, so a running `--serve` doesn't clash, and captures in dark theme once the page sets
+`body[data-shown]` (`show` in `app.js`; keep that line when changing `show`). Don't capture while a build runs: it
+deletes `site/data` first. Images live on
 the orphan `pr-screenshots` branch (`pr-<N>/*.png`), linked by commit via raw.githubusercontent.com.
