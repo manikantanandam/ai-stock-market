@@ -123,6 +123,8 @@ td a, .sub a { color: var(--accent); text-decoration: none; }
 .note { padding: 10px 0; border-top: 1px solid var(--border); }
 .note:first-of-type { border-top: none; }
 td.clip { max-width: 360px; overflow: hidden; text-overflow: ellipsis; }
+td.reasons { white-space: normal; min-width: 260px; max-width: 480px; }
+td.reasons > div + div { margin-top: 2px; }
 .note-head .badge, .note-head .score { margin-left: 6px; }
 .note-head .score { font-size: 13px; font-variant-numeric: tabular-nums; }
 .note-head a { color: var(--accent); font-weight: 600; text-decoration: none; }
