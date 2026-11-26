@@ -43,3 +43,11 @@ def test_section_links_each_page_in_order():
     assert block.startswith(shots.SECTION_START) and block.endswith(shots.SECTION_END)
     assert "from abcdef1" in block
     assert block.index("![today](https://x/today.png)") < block.index("![accounts](https://x/accounts.png)")
+
+
+def test_pages_from_body_ignores_quoted_examples_and_the_bot_section():
+    quoted = "Pick pages with a `<!-- screenshots: ... -->` line."
+    assert shots.pages_from_body(quoted) == []
+    bot = shots.section([("today", "https://x/today.png")], "abc", ["today"])
+    assert shots.pages_from_body(f"Summary\n\n{bot}\n") == []
+    assert shots.pages_from_body("<!-- screenshots: ... accounts -->") == ["accounts"]

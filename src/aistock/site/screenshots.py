@@ -26,7 +26,8 @@ from pathlib import Path
 BRANCH = "pr-screenshots"
 ORPHAN = BRANCH + "-new"  # local name while creating the branch; deleted afterwards
 SECTION_START, SECTION_END = "<!-- screenshots:start -->", "<!-- screenshots:end -->"
-PAGES_LINE = re.compile(r"<!--\s*screenshots:\s*(.*?)\s*-->")
+# not inside backticks: descriptions (and the bot's own section) quote the syntax as an example
+PAGES_LINE = re.compile(r"(?<!`)<!--\s*screenshots:\s*(.*?)\s*-->(?!`)")
 MAC_CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 WIDTH, HEIGHT = 1400, 2000
 BUDGET_MS = 40_000  # virtual time for data loads and charts; Today needs the most
@@ -44,9 +45,10 @@ def chrome() -> str:
 
 
 def pages_from_body(body: str) -> list[str]:
-    """Pages listed in the PR description's `<!-- screenshots: ... -->` line, if any."""
-    m = PAGES_LINE.search(body or "")
-    return m.group(1).split() if m else []
+    """Pages listed in the PR description's `<!-- screenshots: ... -->` line, if any. The bot's own section is
+    skipped, and so are names without a letter or digit (e.g. a "..." placeholder)."""
+    m = PAGES_LINE.search(replace_section(body, "") if SECTION_START in (body or "") else body or "")
+    return [p for p in m.group(1).split() if re.search(r"[A-Za-z0-9]", p)] if m else []
 
 
 def default_pages(site: Path) -> list[str]:
