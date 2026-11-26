@@ -54,4 +54,6 @@ def test_empty_results_are_not_cached(tmp_path, monkeypatch):
     monkeypatch.setattr(news, "_publisher_items", lambda: ())
     assert news.get_news("INFY", "Infosys Limited") == []
     assert news.get_commodity_news("GOLD", "gold price") == []
+    monkeypatch.setattr(news, "_google_news_query", lambda q: [])
+    assert news.get_news_as_of("INFY", "Infosys Limited", date(2026, 11, 18)) == []
     assert not list(tmp_path.iterdir())

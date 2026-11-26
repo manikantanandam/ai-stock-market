@@ -110,7 +110,8 @@ def get_news_as_of(symbol: str, company: str | None, day: date, days: int = 14) 
         if n["title"].lower() not in seen:
             seen.add(n["title"].lower())
             news.append(n)
-    path.write_text(json.dumps(news))
+    if news:  # an empty result is usually a failed fetch; retry next run rather than cache it
+        path.write_text(json.dumps(news))
     return news
 
 
