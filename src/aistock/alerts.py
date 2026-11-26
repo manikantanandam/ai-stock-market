@@ -190,13 +190,13 @@ def _change(now: int | float, before: int | float | None, pct: bool = False) -> 
 
 
 def _tint(now: int | float, before: int | float | None, pct: bool = False) -> str:
-    """A change as a coloured marker for Telegram, which can't colour text: '🟢 +3', '🔴 −1%', '⚪ =' or
+    """A change as a coloured marker for Telegram, which can't colour text: '🟢 +3', '🔴 −1%', '⚪ 0' or
     '✨ new' (no previous value)."""
     if before is None:
         return "✨ new"
     d = round((now - before) * 100) if pct else now - before
     unit = "%" if pct else ""
-    return "⚪ =" if d == 0 else (f"🟢 +{d}{unit}" if d > 0 else f"🔴 −{-d}{unit}")
+    return f"⚪ 0{unit}" if d == 0 else (f"🟢 +{d}{unit}" if d > 0 else f"🔴 −{-d}{unit}")
 
 
 def _squares(fraction: float, cells: int = 10) -> str:
@@ -208,7 +208,7 @@ def _squares(fraction: float, cells: int = 10) -> str:
 def telegram_html(s: Summary, url: str | None = None) -> str:
     """Telegram HTML, laid out as a card. Telegram can't colour text, so colour comes from what it does tint:
     emoji (a green-square breadth bar, 🟢/🔴 change markers), links (symbols, see _symbol) and quote blocks
-    (each strategy group of new BUYs is its own tinted card with its strategies as the header). Sections: the
+    (the new BUYs sit in one tinted card, a header per strategy set inside). Sections: the
     verdict counts and breadth (share of scanned stocks saying BUY) with its change, the hot sectors with their
     change, the new BUYs by strategy set (broadest first), the strongest BUYs with medals (🆕 on new ones), the
     dropped BUYs folded into an expandable quote, and links to the session page and the dashboard."""
@@ -230,12 +230,14 @@ def telegram_html(s: Summary, url: str | None = None) -> str:
         lines += ["", f"🆕 <b>NEW BUYS</b> · {len(s.new)}"]
         if not s.new:
             lines.append("<i>No new BUYs since " + _day(s.prev)[:-5] + "</i>")
-        # each strategy set is a tinted quote card: its strategies head it once, then its stocks, score first
-        # (fixed width) so scores form a column
+        # one tinted quote card (separate cards each shrink to their own width); inside, a header per strategy
+        # set, then its stocks with the score first (fixed width) so scores form a column
+        rows = []
         for strategies, group in _groups(s.new[:MAX_NEW]):
-            rows = [f"<b>{e(' · '.join(strategies) or 'no strategy')}</b>  <i>×{len(group)}</i>"]
+            rows += ([""] if rows else []) + [f"🔹 <b>{e(' · '.join(strategies) or 'no strategy')}</b>  <i>×{len(group)}</i>"]
             rows += [f"{_icon(b.sector)} <code>{_score(b.combined)}</code> {_symbol(b, url)} · <i>{e(b.name)}</i>"
                      for b in group]
+        if rows:
             lines.append("<blockquote>" + "\n".join(rows) + "</blockquote>")
         if _more(s.new, MAX_NEW):
             lines.append(f"<i>+{_more(s.new, MAX_NEW)} more on the dashboard</i>")

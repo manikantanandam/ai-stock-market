@@ -60,18 +60,27 @@ def test_telegram_card(tmp_path):
     lines = alerts.telegram_html(s, url="https://example.org/").splitlines()
     assert lines[:10] == ["📈 <b>AI STOCK DAILY</b>", "<i>Thu 26 Nov 2026 · NSE close</i>", alerts.RULE,
                           "🟢 <b>2</b> BUY   🟡 <b>1</b> WATCH   🔴 <b>0</b> AVOID",
-                          "🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜", "<b>67%</b> of 3 stocks say BUY  ⚪ =", "",
+                          "🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜", "<b>67%</b> of 3 stocks say BUY  ⚪ 0%", "",
                           "🔥 <b>HOT SECTORS</b> <i>· BUYs</i>", "▫️ <code>  2</code> Tech  🟢 +1", ""]
     text = "\n".join(lines)
     # symbols link to their dashboard page (escaped), so they show in the link colour; each strategy set is a
     # quote card headed by its strategies, scores first so they align
     link = '<b><a href="https://example.org/#journal/stocks/M%26M.csv">M&amp;M</a></b>'
-    assert ("🆕 <b>NEW BUYS</b> · 1\n<blockquote><b>swing · trend · breakout</b>  <i>×1</i>\n"
+    assert ("🆕 <b>NEW BUYS</b> · 1\n<blockquote>🔹 <b>swing · trend · breakout</b>  <i>×1</i>\n"
             f"▫️ <code>+0.60</code> {link} · <i>Gamma</i></blockquote>") in text
     assert f"🥇 <code>+0.60</code> {link} 🆕 · <i>Gamma</i>\n🥈 <code>+0.50</code> <b><a " in text
     assert "<blockquote expandable>➖ <b>No longer BUY</b> (1)\nB</blockquote>" in text
     assert lines[-1] == ('👉 <a href="https://example.org/#journal/days/2026-11-26.csv"><b>Open this session</b></a>'
                          '  ·  <a href="https://example.org/">Dashboard</a>')
+
+
+def test_new_buys_share_one_card_with_a_header_per_strategy_set():
+    stock = lambda sym, strategies: alerts.Stock(sym, sym, "Tech", 0.5, strategies)
+    summary = alerts.Summary("2026-11-26", "2026-11-25", [], [stock("A", ["swing", "trend"]), stock("B", ["swing"])],
+                             [], {"BUY": 2}, [])
+    text = alerts.telegram_html(summary)
+    assert text.count("<blockquote>") == 1
+    assert "🔹 <b>swing · trend</b>  <i>×1</i>\n▫️ <code>+0.50</code> <b>A</b> · <i>A</i>\n\n🔹 <b>swing</b>" in text
 
 
 def test_new_buys_are_grouped_by_strategy_set_broadest_first():
@@ -96,7 +105,7 @@ def test_squares_and_tint():
     assert (alerts._squares(0.21), alerts._squares(1.5, 4), alerts._squares(-1, 3)) == \
         ("🟩🟩⬜⬜⬜⬜⬜⬜⬜⬜", "🟩🟩🟩🟩", "⬜⬜⬜")
     assert [alerts._tint(5, 2), alerts._tint(1, 4), alerts._tint(3, 3), alerts._tint(3, None),
-            alerts._tint(0.21, 0.22, pct=True)] == ["🟢 +3", "🔴 −3", "⚪ =", "✨ new", "🔴 −1%"]
+            alerts._tint(0.21, 0.22, pct=True)] == ["🟢 +3", "🔴 −3", "⚪ 0", "✨ new", "🔴 −1%"]
 
 
 def test_markdown_tables(tmp_path):
