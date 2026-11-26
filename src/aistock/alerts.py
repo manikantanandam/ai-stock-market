@@ -15,7 +15,7 @@ import smtplib
 import subprocess
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from email.message import EmailMessage
 from pathlib import Path
@@ -36,6 +36,8 @@ class Stock:
     sector: str
     combined: float
     strategies: list[str]
+    close: float | None = None
+    stops: list[float] = field(default_factory=list)  # each BUY strategy's planned stop (journal `stops`)
 
 
 @dataclass
@@ -47,6 +49,8 @@ class Summary:
     dropped: list[str]
     actions: dict[str, int]              # stocks per verdict (BUY / WATCH / AVOID)
     sectors: list[tuple[str, int]]       # sectors with the most BUYs, most first
+    prev_share: float | None = None      # share of scanned stocks saying BUY in the previous session
+    prev_sectors: dict[str, int] = field(default_factory=dict)  # BUYs per sector in the previous session
 
 
 def _names(symbols: list[str], limit: int) -> str:
@@ -60,6 +64,14 @@ def _short(name: str) -> str:
         if name.endswith(suffix):
             return name[: -len(suffix)]
     return name
+
+
+def _stops(cell) -> list[float]:
+    """A journal `stops` cell: one number (read as a float), a ";"-joined list (text), or blank / no column
+    (rows from before stops were recorded)."""
+    if cell is None or (isinstance(cell, float) and pd.isna(cell)):
+        return []
+    return [float(x) for x in str(cell).split(";") if x]
 
 
 def sessions(root: Path = ROOT) -> list[str]:
@@ -81,17 +93,22 @@ def summary(root: Path = ROOT, date: str | None = None) -> Summary | None:
     rows = today[today.action == "BUY"].sort_values("combined", ascending=False)
     get = lambda r, col: r.get(col) if isinstance(r.get(col), str) else ""
     buys = [Stock(r["symbol"], _short(get(r, "name")) or r["symbol"], get(r, "sector"), float(r["combined"]),
-                  [b for b in get(r, "buys").split(";") if b]) for _, r in rows.iterrows()]
-    prev, new, dropped = None, [], []
+                  [b for b in get(r, "buys").split(";") if b],
+                  float(r["close"]) if pd.notna(r.get("close")) else None, _stops(r.get("stops")))
+            for _, r in rows.iterrows()]
+    by_sector = lambda df: {k: int(v) for k, v in df.sector.value_counts().items()} if "sector" in df else {}
+    prev, new, dropped, prev_share, prev_sectors = None, [], [], None, {}
     if i > 0:
         prev = days[i - 1]
         before = pd.read_csv(root / "journal" / "days" / f"{prev}.csv")
         was = set(before.symbol[before.action == "BUY"])
         new = [b for b in buys if b.symbol not in was]
         dropped = sorted(was - {b.symbol for b in buys})
+        prev_share = len(was) / len(before) if len(before) else None
+        prev_sectors = by_sector(before[before.action == "BUY"])
     actions = today.action.value_counts().to_dict()
-    sectors = [(k, int(v)) for k, v in rows.sector.value_counts().items()] if "sector" in rows else []
-    return Summary(date, prev, buys, new, dropped, actions, sectors)
+    sectors = list(by_sector(rows).items())
+    return Summary(date, prev, buys, new, dropped, actions, sectors, prev_share, prev_sectors)
 
 
 # ---------- rendering: one summary, three formats ----------
@@ -106,8 +123,11 @@ def _score(x: float) -> str:
 
 def _verdicts(s: Summary) -> str:
     total = sum(s.actions.values()) or 1
+    share = s.actions.get('BUY', 0) / total
     return (f"{s.actions.get('BUY', 0)} BUY · {s.actions.get('WATCH', 0)} WATCH · {s.actions.get('AVOID', 0)} AVOID "
-            f"({s.actions.get('BUY', 0) / total:.0%} of {total} stocks say BUY)")
+            f"({share:.0%} of {total} stocks say BUY"
+            + (f", {_change(share, s.prev_share, pct=True)[1:-1]} on the previous session" if s.prev_share is not None else "")
+            + ")")
 
 
 def _hot(s: Summary) -> str:
@@ -129,7 +149,8 @@ def plain(s: Summary, url: str | None = None) -> str:
     if s.new:
         lines += ["", f"New BUYs ({len(s.new)}, {len(s.dropped)} dropped since {_day(s.prev)[:-5]})"]
         for b in s.new[:MAX_NEW]:
-            lines.append(f"  {b.symbol} · {b.name} · {b.sector} · score {_score(b.combined)} · {_strategies(b)}")
+            lines.append(f"  {b.symbol} · {b.name} · {b.sector} · score {_score(b.combined)}"
+                         + (f" · {_plan(b)}" if _plan(b) else "") + f" · {_strategies(b)}")
         if _more(s.new, MAX_NEW):
             lines.append(f"  +{_more(s.new, MAX_NEW)} more")
     if s.buys:
@@ -170,38 +191,84 @@ def _symbol(b: Stock, url: str | None) -> str:
     return f'<b><a href="{html.escape(url)}#journal/stocks/{urllib.parse.quote(b.symbol)}.csv">{sym}</a></b>'
 
 
+def _shared(s: Summary) -> list[str]:
+    """Strategies every new BUY has (said once in the header); empty with fewer than two new BUYs."""
+    if len(s.new) < 2:
+        return []
+    common = set.intersection(*(set(b.strategies) for b in s.new))
+    return [x for x in s.new[0].strategies if x in common]
+
+
+def _rupees(x: float) -> str:
+    return f"₹{x:,.0f}"
+
+
+def _plan(b: Stock) -> str:
+    """'₹2,510 · stop ₹2,254 (−10%)'; a range when its strategies' stops differ; just the close without stops."""
+    if b.close is None:
+        return ""
+    if not b.stops:
+        return _rupees(b.close)
+    lo, hi = min(b.stops), max(b.stops)
+    if lo == hi:
+        return f"{_rupees(b.close)} · stop {_rupees(lo)} ({hi / b.close - 1:+.0%})".replace("-", "−")
+    return f"{_rupees(b.close)} · stop {_rupees(lo)}–{_rupees(hi)}"
+
+
+def _change(now: int | float, before: int | float | None, pct: bool = False) -> str:
+    """'(▲3)', '(▼1)', '(=)' or '(new)' against the previous session; percentage points when pct."""
+    if before is None:
+        return "(new)"
+    d = round((now - before) * 100) if pct else now - before
+    return "(=)" if d == 0 else f"({'▲' if d > 0 else '▼'}{abs(d)}{' pt' if pct else ''})"
+
+
 def telegram_html(s: Summary, url: str | None = None) -> str:
-    """Telegram HTML, laid out as a card: a header with the verdict counts and a breadth bar (share of scanned
-    stocks that are BUYs), the hot sectors one per line, each new BUY with a sector icon, its score, the symbol
-    (a link, see _symbol), the company and its strategies, the
-    strongest BUYs with medals, and the dropped BUYs folded into an expandable quote."""
+    """Telegram HTML, laid out as a card: the verdict counts with a breadth bar (share of scanned stocks saying
+    BUY, against the previous session), the hot sectors one per line with their change, each new BUY (sector
+    icon, score, the symbol as a link (see _symbol), company, close and stop, and strategies beyond those all
+    new BUYs share), the strongest BUYs with medals (🆕 on new ones), the dropped BUYs folded into an
+    expandable quote, and links to the session page and the dashboard."""
     e = html.escape
     total = sum(s.actions.values()) or 1
     buy, watch, avoid = (s.actions.get(a, 0) for a in ("BUY", "WATCH", "AVOID"))
-    lines = [f"📈 <b>AI STOCK DAILY</b>", f"<i>{_day(s.date)} · NSE close</i>", RULE,
+    share = buy / total
+    lines = ["📈 <b>AI STOCK DAILY</b>", f"<i>{_day(s.date)} · NSE close</i>", RULE,
              f"🟢 <b>{buy}</b> BUY   🟡 <b>{watch}</b> WATCH   🔴 <b>{avoid}</b> AVOID",
-             f"<code>{_bar(buy / total, 10)}</code> {buy / total:.0%} of {total} stocks say BUY"]
+             f"<code>{_bar(share, 10)}</code> {share:.0%} say BUY"
+             + (f" <i>{_change(share, s.prev_share, pct=True)}</i>" if s.prev_share is not None else "")]
     if s.sectors:
-        lines += ["", "🔥 <b>HOT SECTORS</b> <i>(BUYs)</i>"] + [f"{_icon(k)} <code>{n:>3}</code> {e(k)}" for k, n in s.sectors[:3]]
+        lines += ["", "🔥 <b>HOT SECTORS</b> <i>(BUYs)</i>"]
+        lines += [f"{_icon(k)} <code>{n:>3}</code> {e(k)}"
+                  + (f" <i>{_change(n, s.prev_sectors.get(k))}</i>" if s.prev is not None else "")
+                  for k, n in s.sectors[:3]]
     if s.prev is not None:
+        shared = _shared(s)
         lines += ["", f"🆕 <b>NEW BUYS</b> · {len(s.new)}" + (f"  <i>(➖ {len(s.dropped)} dropped)</i>" if s.dropped else "")]
+        if shared:
+            lines.append(f"<i>All fire {e(' + '.join(shared))}; extra strategies shown</i>")
         if not s.new:
             lines.append("<i>No new BUYs since " + _day(s.prev)[:-5] + "</i>")
         for b in s.new[:MAX_NEW]:
-            # score first: fixed width, so scores form a column and symbols start at the same place
-            # strategies on a line of their own: a wrapped line loses the indent
-            lines += [f"{_icon(b.sector)} <code>{_score(b.combined)}</code> {_symbol(b, url)} · <i>{e(b.name)}</i>",
-                      f"{INDENT}<i>{e(' · '.join(b.strategies))}</i>"]
+            # score first (fixed width) so scores form a column; detail lines short so they keep their indent
+            lines.append(f"{_icon(b.sector)} <code>{_score(b.combined)}</code> {_symbol(b, url)} · <i>{e(b.name)}</i>")
+            if _plan(b):
+                lines.append(f"{INDENT}{e(_plan(b))}")
+            extra = [x for x in b.strategies if x not in shared]
+            if extra:
+                lines.append(f"{INDENT}{'➕ ' if shared else ''}<i>{e(' · '.join(extra))}</i>")
         if _more(s.new, MAX_NEW):
             lines.append(f"<i>+{_more(s.new, MAX_NEW)} more on the dashboard</i>")
     if s.buys:
+        fresh = {b.symbol for b in s.new}
         lines += ["", "🏆 <b>STRONGEST BUYS</b>"]
-        lines += [f"{MEDALS[k]} <code>{_score(b.combined)}</code> {_symbol(b, url)} · <i>{e(b.name)}</i>"
-                  for k, b in enumerate(s.buys[:TOP])]
+        lines += [f"{MEDALS[k]} <code>{_score(b.combined)}</code> {_symbol(b, url)}{' 🆕' if b.symbol in fresh else ''}"
+                  f" · <i>{e(b.name)}</i>" for k, b in enumerate(s.buys[:TOP])]
     if s.dropped:
         lines += ["", f"<blockquote expandable>➖ <b>No longer BUY</b> ({len(s.dropped)})\n{e(', '.join(s.dropped))}</blockquote>"]
     if url:
-        lines += [RULE, f'👉 <a href="{e(url)}"><b>Open dashboard</b></a>']
+        session = f"{url}#journal/days/{s.date}.csv"
+        lines += [RULE, f'👉 <a href="{e(session)}"><b>Open this session</b></a> · <a href="{e(url)}">Dashboard</a>']
     return "\n".join(lines)
 
 
@@ -210,8 +277,8 @@ def markdown(s: Summary, url: str | None = None) -> str:
     lines = [f"### 📈 AI Stock · {_day(s.date)}", f"🟢 **{s.actions.get('BUY', 0)}** BUY · 🟡 {s.actions.get('WATCH', 0)} WATCH · "
              f"🔴 {s.actions.get('AVOID', 0)} AVOID"] + ([f"🔥 {_hot(s)}"] if s.sectors else [])
     if s.new:
-        lines += ["", f"**🆕 New BUYs** ({len(s.new)}, ➖ {len(s.dropped)} dropped)", "", "| Stock | Name | Sector | Score | Strategies |", "|---|---|---|---:|---|"]
-        lines += [f"| **{b.symbol}** | {b.name} | {b.sector} | {_score(b.combined)} | {_strategies(b)} |"
+        lines += ["", f"**🆕 New BUYs** ({len(s.new)}, ➖ {len(s.dropped)} dropped)", "", "| Stock | Name | Sector | Score | Close / stop | Strategies |", "|---|---|---|---:|---|---|"]
+        lines += [f"| **{b.symbol}** | {b.name} | {b.sector} | {_score(b.combined)} | {_plan(b) or '–'} | {_strategies(b)} |"
                   for b in s.new[:MAX_NEW]]
         if _more(s.new, MAX_NEW):
             lines.append(f"\n_+{_more(s.new, MAX_NEW)} more on the dashboard_")

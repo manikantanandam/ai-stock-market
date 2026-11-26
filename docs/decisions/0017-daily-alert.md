@@ -9,9 +9,10 @@ push summary and chose both channels.
 
 ## Decision
 `aistock alert` (`src/aistock/alerts.py`) builds a short summary from the session's journal day file only
-(no LLM, 0001). Telegram gets a card: verdict counts with a breadth bar (share of scanned stocks saying BUY),
-the three sectors with most BUYs, each new BUY (sector icon, score, symbol, company; strategies on their own line), the
-five strongest BUYs with medals, the dropped BUYs folded in an expandable quote, and the dashboard link. The issue
+(no LLM, 0001). Telegram gets a card: verdict counts with a breadth bar (share of scanned stocks saying BUY,
+with its change on the previous session), the three sectors with most BUYs (with their change), each new BUY (sector icon, score, symbol, company; then close and the journal's planned stop when recorded,
+and the strategies beyond those all new BUYs share, which the header names once), the
+five strongest BUYs with medals, the dropped BUYs folded in an expandable quote, and links to the session page and the dashboard. The issue
 gets the same as markdown tables, email as plain text. Rejected along the way at the user's request: paper
 accounts in the alert (too much text; they're on the dashboard), a comma-separated wall of tickers, and
 per-stock score bars (BUY scores sit in a narrow band, so every bar looked the same), and counting a stock's

@@ -2,18 +2,19 @@ import pytest
 
 from aistock import alerts
 
-COLS = "date,symbol,name,sector,action,buys,combined\n"
+COLS = "date,symbol,name,sector,action,buys,combined,close,stops\n"
 
 
 def journal(tmp_path):
     days = tmp_path / "journal" / "days"
     days.mkdir(parents=True)
-    (days / "2026-11-25.csv").write_text(COLS + "2026-11-25,A,Alpha Limited,Tech,BUY,swing,0.5\n"
-                                                "2026-11-25,B,Beta Ltd.,Energy,BUY,trend,0.4\n"
-                                                "2026-11-25,C,Gamma,Tech,WATCH,,0.1\n")
-    (days / "2026-11-26.csv").write_text(COLS + "2026-11-26,A,Alpha Limited,Tech,BUY,swing,0.5\n"
-                                                "2026-11-26,B,Beta Ltd.,Energy,WATCH,,0.2\n"
-                                                "2026-11-26,C,Gamma,Tech,BUY,swing;trend;breakout,0.6\n")
+    # 11-25 predates recorded stops (blank); 11-26 has them
+    (days / "2026-11-25.csv").write_text(COLS + "2026-11-25,A,Alpha Limited,Tech,BUY,swing,0.5,100,\n"
+                                                "2026-11-25,B,Beta Ltd.,Energy,BUY,trend,0.4,50,\n"
+                                                "2026-11-25,C,Gamma,Tech,WATCH,,0.1,200,\n")
+    (days / "2026-11-26.csv").write_text(COLS + "2026-11-26,A,Alpha Limited,Tech,BUY,swing,0.5,110,99.0\n"
+                                                "2026-11-26,B,Beta Ltd.,Energy,WATCH,,0.2,50,\n"
+                                                "2026-11-26,C,Gamma,Tech,BUY,swing;trend;breakout,0.6,200,180.0;180.0;170.0\n")
     return tmp_path
 
 
@@ -21,7 +22,9 @@ def test_summary_of_the_latest_session(tmp_path):
     s = alerts.summary(journal(tmp_path))
     assert (s.date, s.prev, s.dropped) == ("2026-11-26", "2026-11-25", ["B"])
     assert [b.symbol for b in s.buys] == ["C", "A"]  # best score first
-    assert s.new == [alerts.Stock("C", "Gamma", "Tech", 0.6, ["swing", "trend", "breakout"])]
+    assert s.new == [alerts.Stock("C", "Gamma", "Tech", 0.6, ["swing", "trend", "breakout"], 200.0, [180.0, 180.0, 170.0])]
+    assert s.buys[1].stops == [99.0]  # one stop: a float cell
+    assert (s.prev_share, s.prev_sectors) == (pytest.approx(2 / 3), {"Tech": 1, "Energy": 1})
     assert s.buys[1].name == "Alpha"  # legal suffix dropped
 
 
@@ -40,10 +43,10 @@ def test_summary_rejects_a_date_without_session(tmp_path):
 def test_plain_text(tmp_path):
     assert alerts.plain(alerts.summary(journal(tmp_path)), url="https://example.org/").splitlines() == [
         "AI Stock · Thu 26 Nov 2026",
-        "2 BUY · 1 WATCH · 0 AVOID (67% of 3 stocks say BUY)",
+        "2 BUY · 1 WATCH · 0 AVOID (67% of 3 stocks say BUY, = on the previous session)",
         "Hot sectors: Tech 2", "",
         "New BUYs (1, 1 dropped since Wed 25 Nov)",
-        "  C · Gamma · Tech · score +0.60 · swing, trend, breakout", "",
+        "  C · Gamma · Tech · score +0.60 · ₹200 · stop ₹170–₹180 · swing, trend, breakout", "",
         "Top 2 by score",
         "  C  +0.60  Tech",
         "  A  +0.50  Tech", "",
@@ -58,16 +61,37 @@ def test_telegram_card(tmp_path):
     lines = alerts.telegram_html(s, url="https://example.org/").splitlines()
     assert lines[:9] == ["📈 <b>AI STOCK DAILY</b>", "<i>Thu 26 Nov 2026 · NSE close</i>", alerts.RULE,
                          "🟢 <b>2</b> BUY   🟡 <b>1</b> WATCH   🔴 <b>0</b> AVOID",
-                         "<code>▰▰▰▰▰▰▰▱▱▱</code> 67% of 3 stocks say BUY", "",
-                         "🔥 <b>HOT SECTORS</b> <i>(BUYs)</i>", "▫️ <code>  2</code> Tech", ""]  # unknown sector: plain marker
+                         "<code>▰▰▰▰▰▰▰▱▱▱</code> 67% say BUY <i>(=)</i>", "",
+                         "🔥 <b>HOT SECTORS</b> <i>(BUYs)</i>", "▫️ <code>  2</code> Tech <i>(▲1)</i>", ""]
     text = "\n".join(lines)
     # symbols link to their dashboard page (escaped), so they show in the link colour; scores lead, so they align
     link = '<b><a href="https://example.org/#journal/stocks/M%26M.csv">M&amp;M</a></b>'
-    assert (f"🆕 <b>NEW BUYS</b> · 1  <i>(➖ 1 dropped)</i>\n▫️ <code>+0.60</code> {link} · <i>Gamma</i>\n"
-            f"{alerts.INDENT}<i>swing · trend · breakout</i>") in text
-    assert f"🥇 <code>+0.60</code> {link} · <i>Gamma</i>\n🥈 <code>+0.50</code> <b><a " in text
+    assert (f"▫️ <code>+0.60</code> {link} · <i>Gamma</i>\n{alerts.INDENT}₹200 · stop ₹170–₹180\n"
+            f"{alerts.INDENT}<i>swing · trend · breakout</i>") in text  # one new BUY: nothing shared to factor out
+    assert f"🥇 <code>+0.60</code> {link} 🆕 · <i>Gamma</i>\n🥈 <code>+0.50</code> <b><a " in text
     assert "<blockquote expandable>➖ <b>No longer BUY</b> (1)\nB</blockquote>" in text
-    assert lines[-1] == '👉 <a href="https://example.org/"><b>Open dashboard</b></a>'
+    assert lines[-1] == ('👉 <a href="https://example.org/#journal/days/2026-11-26.csv"><b>Open this session</b></a>'
+                         ' · <a href="https://example.org/">Dashboard</a>')
+
+
+def test_strategies_shared_by_all_new_buys_are_said_once(tmp_path):
+    s = alerts.summary(journal(tmp_path))
+    s.new.append(alerts.Stock("D", "Delta", "Tech", 0.4, ["trend", "swing"]))
+    text = alerts.telegram_html(s)
+    assert "<i>All fire swing + trend; extra strategies shown</i>" in text
+    assert f"{alerts.INDENT}➕ <i>breakout</i>" in text  # C's extra
+    assert "<b>D</b> · <i>Delta</i>\n\n🏆" in text  # D: no close, nothing extra, so no detail lines
+
+
+def test_plan_and_change():
+    stock = lambda stops, close=100.0: alerts.Stock("X", "X", "Tech", 0.5, ["swing"], close, stops)
+    assert alerts._plan(stock([90.0])) == "₹100 · stop ₹90 (−10%)"
+    assert alerts._plan(stock([90.0, 85.0])) == "₹100 · stop ₹85–₹90"
+    assert alerts._plan(stock([])) == "₹100"
+    assert alerts._plan(stock([], None)) == ""
+    assert [alerts._change(5, 2), alerts._change(1, 4), alerts._change(3, 3), alerts._change(3, None)] == \
+        ["(▲3)", "(▼3)", "(=)", "(new)"]
+    assert alerts._change(0.21, 0.22, pct=True) == "(▼1 pt)"
 
 
 def test_symbol_without_a_dashboard_is_just_bold():
@@ -81,7 +105,7 @@ def test_bar():
 def test_markdown_tables(tmp_path):
     text = alerts.markdown(alerts.summary(journal(tmp_path)), url="https://example.org/")
     assert text.splitlines()[1:3] == ["🟢 **2** BUY · 🟡 1 WATCH · 🔴 0 AVOID", "🔥 Tech 2"]
-    assert "| **C** | Gamma | Tech | +0.60 | swing, trend, breakout |" in text
+    assert "| **C** | Gamma | Tech | +0.60 | ₹200 · stop ₹170–₹180 | swing, trend, breakout |" in text
     assert "| **A** | +0.50 | Tech |" in text
     assert text.endswith("[Open dashboard →](https://example.org/)")
 
