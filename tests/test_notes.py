@@ -38,10 +38,24 @@ def test_note_is_deterministic_and_passes_when_figures_match(monkeypatch):
     assert calls[0]["prompt"] == notes.facts(sig(), "trend")
 
 
-def test_note_with_invented_figures_is_withheld(monkeypatch):
-    monkeypatch.setattr(notes, "_post", fake("Upside of 15% to 1420 looks likely.", []))
+def test_note_with_invented_figures_is_withheld_after_a_retry(monkeypatch):
+    calls = []
+    monkeypatch.setattr(notes, "_post", fake("Upside of 15% to 1420 looks likely.", calls))
     out = notes.note(sig(), "trend")
     assert out.startswith("(note withheld") and "15" in out and "1420" in out
+    assert len(calls) == 1 + notes.RETRIES
+
+
+def test_retry_names_the_invented_figures_and_can_pass(monkeypatch):
+    replies = iter(["Price 1234.50, stop 9.53.", "Price 1234.50, stop 1107.75."])
+    calls = []
+
+    def post(payload):
+        calls.append(payload)
+        return {"response": next(replies)}
+    monkeypatch.setattr(notes, "_post", post)
+    assert notes.note(sig(), "trend") == "Price 1234.50, stop 1107.75."
+    assert calls[1]["prompt"].startswith(notes.facts(sig(), "trend")) and "9.53" in calls[1]["prompt"]
 
 
 def test_unreachable_ollama_raises_unavailable(monkeypatch):
