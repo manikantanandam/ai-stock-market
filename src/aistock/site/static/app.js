@@ -107,6 +107,57 @@ function tiles(items) {
 
 const sign = v => num(v) ? (v > 0 ? 'pos' : v < 0 ? 'neg' : '') : '';
 
+// ---------- reasons ----------
+
+// *_reasons cells hold " | "-joined reasons (journal.REASONS_SEP), drawn as chips toned by what they say:
+// fundamental reasons end in "(good)"/"(weak)" (fundamental/score.py), technical ones name the trend,
+// RSI and MACD (technical/indicators.py). News reasons are a count summary plus scored headlines
+// (sentiment/finbert.py), which fold away behind the counts.
+const BULLISH = /^(uptrend|MACD histogram positive)/, BEARISH = /^(downtrend|MACD histogram negative|RSI overbought|news veto)/;
+const NEWS_SUMMARY = /^(\d+) headlines: (\d+) positive, (\d+) negative, (\d+) neutral$/;
+const HEADLINE = /^([+-]\d+(?:\.\d+)?) (\S*) (.*?)(?: \(([^()]*)\))?$/;
+
+// The figures behind a technical reason, from the session's bar in the price history (stock pages only).
+function withFigures(text, bar) {
+  if (!bar) return text;
+  const { Close, sma50, sma200, macd_hist, Volume, vol_avg20 } = bar;
+  const trend = text.match(/^(uptrend|downtrend):/);
+  if (trend && [Close, sma50, sma200].every(num)) {
+    const op = trend[1] === 'uptrend' ? ' > ' : ' < ';
+    return `${trend[1]}: close ${fmt(Close)}${op}SMA50 ${fmt(sma50)}${op}SMA200 ${fmt(sma200)}`;
+  }
+  if (text.startsWith('MACD histogram') && num(macd_hist)) return `${text} (${macd_hist > 0 ? '+' : ''}${macd_hist.toFixed(2)})`;
+  if (text.startsWith('volume spike') && num(Volume) && vol_avg20 > 0) return `${text} (${(Volume / vol_avg20).toFixed(1)}×)`;
+  return text;
+}
+
+function reasonChip(text, bar) {
+  const m = text.match(/^(.*) \((good|weak)\)$/);
+  const tone = m ? (m[2] === 'good' ? 'pos' : 'neg') : BULLISH.test(text) ? 'pos' : BEARISH.test(text) ? 'neg' : '';
+  return h('span', { class: 'chip ' + tone }, m ? m[1] : withFigures(text, bar));
+}
+
+function headlineRow(text) {
+  const m = text.match(HEADLINE);
+  if (!m) return h('div', { class: 'headline' }, text);
+  const [, score, date, title, source] = m;
+  return h('div', { class: 'headline' }, h('span', { class: 'chip ' + sign(+score) }, score),
+    h('a', { href: 'https://news.google.com/search?q=' + encodeURIComponent(`"${title}"`), target: '_blank', rel: 'noopener' }, title),
+    h('div', { class: 'cell-sub' }, [date, source].filter(Boolean).join(' · ')));
+}
+
+// bar: the session's price-history row, to put numbers on technical reasons.
+function reasonsCell(col, value, bar) {
+  const [first, ...rest] = value.split(' | ');
+  const counts = col === 'sentiment_reasons' && first.match(NEWS_SUMMARY);
+  if (!counts) return h('div', { class: 'chips' }, [first, ...rest].map(t => reasonChip(t, bar)));
+  const [, total, pos, neg, neutral] = counts.map(Number);
+  const chips = [h('span', { class: 'chip pos' }, `▲ ${pos} positive`), h('span', { class: 'chip neg' }, `▼ ${neg} negative`),
+    h('span', { class: 'chip' }, `${neutral} neutral`)];
+  return rest.length ? h('details', {}, h('summary', {}, ...chips, h('span', { class: 'muted' }, `${total} headlines`)),
+    rest.map(headlineRow)) : h('div', { class: 'chips' }, chips);
+}
+
 // ---------- table ----------
 
 // Numbered pages (0-based `page`): ‹ Prev 1 … 4 5 6 … 20 Next ›; go(p) shows page p.
@@ -192,19 +243,10 @@ function table(rows, columns, opts = {}) {
     tbody.replaceChildren(...out.slice(page * size, (page + 1) * size).map(r => h('tr', {}, visible.map(c => {
       const v = r[c];
       const cls = (numeric[c] ? 'num ' : '') + (isPct(c) ? sign(v) : '');
-      if (cells[c]) return h('td', { class: cls }, cells[c](v, r));
+      if (cells[c]) return h('td', { class: cls + (c.endsWith('_reasons') ? ' reasons' : '') }, cells[c](v, r));
       const content = link[c] && v ? h('a', { href: link[c](v) }, String(v))
         : c === 'action' && v ? h('span', { class: 'badge ' + v }, v) : fmt(v, c);
-      // *_reasons cells hold " | "-joined reasons (journal.REASONS_SEP): one per line. News
-      // reasons are a summary plus headlines, so the headlines fold away behind the summary.
-      if (c.endsWith('_reasons') && typeof v === 'string') {
-        const [first, ...rest] = v.split(' | ');
-        if (c === 'sentiment_reasons' && rest.length) {  // all headlines: commodity day pages, Headlines card
-          return h('td', { class: cls + ' reasons' }, h('details', {}, h('summary', {}, first),
-            rest.map(w => h('div', { class: 'headline' }, w))));
-        }
-        return h('td', { class: cls + ' reasons' }, [first, ...rest].map(w => h('div', {}, w)));
-      }
+      if (c.endsWith('_reasons') && typeof v === 'string') return h('td', { class: cls + ' reasons' }, reasonsCell(c, v));
       const long = typeof v === 'string' && v.length > 60;
       return h('td', long ? { class: cls + ' clip', title: v } : { class: cls }, content);
     }))));
@@ -620,8 +662,37 @@ async function renderStock(file, rows) {
     ...(history.length ? historyTables(history, years, last.sector) : []),
     notes.length ? (file.kind === 'stock' ? notesCard(notes, 'LLM notes', rows, stockEntries, stockHref, true)
       : notesCard(notes, 'LLM notes', rows, commodityEntries, contractHref, true)) : null,
-    card('Logged sessions', table(rows.slice().reverse(), file.columns)),
+    card('Logged sessions', sessionsTable(file, rows, history)),
   ];
+}
+
+// A stock's or contract's journal rows, newest first, with the scan tables' cells. Name, sector and unit
+// are in the page subtitle; close shows its change since the previous logged session, raw ratios sit
+// behind 'All columns'.
+const SESSION_HIDDEN = ['symbol', 'name', 'sector', 'group', 'unit', 'side'];
+const SESSION_LABELS = { date: 'Session', stop: 'Stop', target: 'Target', shares: 'Shares',
+  sentiment_reasons: 'News reasons', fundamental_reasons: 'Fundamental reasons', f_trailingPE: 'P/E',
+  f_priceToBook: 'P/B', f_returnOnEquity: 'ROE', f_debtToEquity: 'Debt/Equity (%)', f_revenueGrowth: 'Revenue growth',
+  f_earningsGrowth: 'Earnings growth', f_profitMargins: 'Net margin', f_currentRatio: 'Current ratio',
+  f_dividendYield: 'Dividend yield (%)', f_trailingPegRatio: 'PEG' };
+
+function sessionsTable(file, rows, history) {
+  const stock = file.kind === 'stock';
+  const bars = new Map(history.map(b => [String(b.Date), b]));
+  const prev = new Map(rows.map((r, i) => [r, rows[i - 1]]));
+  const close = (v, r) => {
+    if (!num(v)) return dash();
+    const before = prev.get(r)?.close, d = num(before) && before ? v / before - 1 : NaN;
+    return h('div', {}, fmt(v), num(d) ? h('div', { class: 'cell-sub ' + sign(d) }, (d > 0 ? '+' : '') + pct(d)) : null);
+  };
+  const order = ['date', ...(stock ? SCAN_COLS : COMMODITY_COLS), 'stop', 'target', 'fundamental_reasons', 'sentiment_reasons'];
+  const columns = file.columns.filter(c => !SESSION_HIDDEN.includes(c));
+  const main = order.filter(c => columns.includes(c) && !c.startsWith('f_') && rows.some(r => r[c] != null && r[c] !== ''));
+  const extra = columns.filter(c => !main.includes(c));
+  return table(rows.slice().reverse(), [...main, ...extra], { filters: ['action'], extra,
+    labels: { ...(stock ? SCAN_LABELS : COMMODITY_LABELS), ...SESSION_LABELS },
+    cells: { ...(stock ? SCAN_CELLS : COMMODITY_CELLS), close,
+      technical_reasons: (v, r) => v ? reasonsCell('technical_reasons', String(v), bars.get(String(r.date))) : dash() } });
 }
 
 function renderTrades(file, rows) {
