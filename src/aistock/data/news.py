@@ -147,5 +147,6 @@ def get_commodity_news(symbol: str, phrase: str, days: int = 7) -> list[dict]:
         if n["title"].lower() not in seen:
             seen.add(n["title"].lower())
             news.append(n)
-    path.write_text(json.dumps(news))
+    if news:  # an empty result is usually a failed fetch; retry next run rather than cache it
+        path.write_text(json.dumps(news))
     return news
