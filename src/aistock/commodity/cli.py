@@ -137,6 +137,7 @@ def scan(
         raise typer.Exit(1)
     # Only completed futures sessions are used, so every scan can be logged
     root = journal.record(results, root=journal.COMMODITIES, per_symbol="contracts")
+    journal.record_headlines(results, root=journal.COMMODITIES)
     order = list(COLORS)
     results.sort(key=lambda s: (order.index(s.action), -abs(s.combined)))
 

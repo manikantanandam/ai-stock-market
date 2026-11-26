@@ -20,7 +20,7 @@ from aistock.backtest.costs import FuturesCostModel
 from aistock.commodity.strategies import PRESETS
 from aistock.data import commodities
 from aistock.data.news import get_commodity_news
-from aistock.sentiment.finbert import sentiment_score
+from aistock.sentiment.finbert import score_headlines, summarize
 from aistock.strategy.signal import MIN_HISTORY, REASONS_SEP
 from aistock.strategy.strategies import Strategy
 from aistock.technical import rules
@@ -83,6 +83,7 @@ class Signal:
     strategies: dict[str, StrategySignal] = field(default_factory=dict)
     reasons: dict[str, list[str]] = field(default_factory=dict)
     as_of: str = ""
+    headlines: list[dict] = field(default_factory=list)  # every scored headline (score_headlines), not in row()
 
     def named(self, action: str) -> list[str]:
         return [n for n, s in self.strategies.items() if s.action == action]
@@ -193,8 +194,10 @@ def evaluate(symbol: str, c: Config = Config(), news: str = "all",
                        bool(st.short_rule and rules.build(st.short_rule)(ind).iloc[-1])) for st in strategies}
     positions = {st.name: position(st, ind, c) for st in strategies}
     candidate = any(any(fired[n]) and (p is None or not p.open) for n, p in positions.items())
+    headlines = []
     if news == "all" or (news == "candidates" and candidate):
-        s_score, s_why = sentiment_score(get_commodity_news(contract.symbol, contract.news))
+        headlines = score_headlines(get_commodity_news(contract.symbol, contract.news))
+        s_score, s_why = summarize(headlines)
     else:
         s_score, s_why = None, ["not fetched" + (" (no strategy can enter)" if news == "candidates" else "")]
 
@@ -205,5 +208,5 @@ def evaluate(symbol: str, c: Config = Config(), news: str = "all",
         contract.symbol, contract.name, contract.group, contract.unit, overall(results),
         round(c.combined(t_score, s_score), 3), round(t_score, 3), None if s_score is None else round(s_score, 3),
         round(close, 2), round(atr, 2), round(close / fx / contract.factor, 2), round(float(fx), 2), results,
-        {"technical": t_why, "sentiment": s_why}, as_of=f"{last.name:%Y-%m-%d}",
+        {"technical": t_why, "sentiment": s_why}, as_of=f"{last.name:%Y-%m-%d}", headlines=headlines,
     )

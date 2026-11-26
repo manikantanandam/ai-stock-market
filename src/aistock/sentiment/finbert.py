@@ -45,16 +45,27 @@ def classify(texts: list[str]) -> list[dict]:
     return out
 
 
-def sentiment_score(news: list[dict], now: datetime | None = None) -> tuple[float, list[str]]:
-    """Recency-weighted mean of headline scores in [-1, 1], with the strongest headlines as reasons.
+def score_headlines(news: list[dict], now: datetime | None = None) -> list[dict]:
+    """Each headline with its FinBERT score (positive - negative) and recency weight.
     now: the moment ages are measured from (a past session's cutoff when backfilling)."""
-    if not news:
-        return 0.0, ["no recent headlines"]
     now = now or datetime.now(timezone.utc)
-    scored = []
+    out = []
     for n, s in zip(news, classify([n["title"] for n in news])):
         age = (now - datetime.fromisoformat(n["published"])).total_seconds() / 86400
-        scored.append((n, s["score"], 0.5 ** (max(age, 0) / HALF_LIFE_DAYS)))
+        out.append({**n, "score": s["score"], "weight": 0.5 ** (max(age, 0) / HALF_LIFE_DAYS)})
+    return out
+
+
+def sentiment_score(news: list[dict], now: datetime | None = None) -> tuple[float, list[str]]:
+    """Recency-weighted mean of headline scores in [-1, 1], with the strongest headlines as reasons."""
+    return summarize(score_headlines(news, now))
+
+
+def summarize(headlines: list[dict]) -> tuple[float, list[str]]:
+    """sentiment_score from already-scored headlines (score_headlines)."""
+    if not headlines:
+        return 0.0, ["no recent headlines"]
+    scored = [(n, n["score"], n["weight"]) for n in headlines]
     score = sum(s * w for _, s, w in scored) / sum(w for _, _, w in scored)
     pos = sum(s > 0.3 for _, s, _ in scored)
     neg = sum(s < -0.3 for _, s, _ in scored)
