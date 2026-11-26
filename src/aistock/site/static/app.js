@@ -1022,14 +1022,24 @@ async function loadAccounts() {
   }));
 }
 
-const ACCOUNT_LABELS = { strategy: 'Strategy', date: 'As of', equity: 'Equity ₹', return: 'Return', cash: 'Cash ₹',
-  open: 'Open', trades: 'Closed trades', win_rate: 'Win rate', pnl: 'Realized P&L ₹' };
+// The benchmark's return between two session dates: the equal-weight hold of the scanned stocks
+// (manifest.equal_weight, built from journal/days like the backtests' equal-weight watchlist).
+function holdReturn(from, to) {
+  const ew = manifest.equal_weight || {};
+  return ew[from] && ew[to] ? ew[to] / ew[from] - 1 : null;
+}
+
+const ACCOUNT_LABELS = { strategy: 'Strategy', date: 'As of', equity: 'Equity ₹', return: 'Return',
+  hold_return: 'Hold return', excess: 'vs hold', cash: 'Cash ₹', open: 'Open', trades: 'Closed trades',
+  win_rate: 'Win rate', pnl: 'Realized P&L ₹' };
 
 function accountsTable(accounts) {
   const rows = accounts.map(a => {
     const last = a.equity[a.equity.length - 1] || {}, rets = values(a.trades, 'ret');
-    return { strategy: a.name, date: last.date, equity: last.equity,
-      return: num(last.equity) && a.cfg.capital ? last.equity / a.cfg.capital - 1 : null, cash: last.cash,
+    const ret = num(last.equity) && a.cfg.capital ? last.equity / a.cfg.capital - 1 : null;
+    const hold = holdReturn(String(a.equity[0]?.date), String(last.date));
+    return { strategy: a.name, date: last.date, equity: last.equity, return: ret, hold_return: hold,
+      excess: num(ret) && num(hold) ? ret - hold : null, cash: last.cash,
       open: a.positions.length, trades: a.trades.length,
       win_rate: rets.length ? rets.filter(r => r > 0).length / rets.length : null,
       pnl: values(a.trades, 'pnl').reduce((s, x) => s + x, 0) };
@@ -1069,12 +1079,16 @@ async function renderAccounts() {
     return { label: a.name, data: dates.map(d => by.get(d) ?? null), borderColor: series(i), backgroundColor: series(i),
       pointRadius: dates.length < 30 ? 3 : 0 };
   });
+  const hold = dates.map(d => holdReturn(dates[0], d));
+  if (hold.some(num)) curves.push({ label: 'Equal-weight hold', data: hold, borderColor: css('--ink-3'),
+    backgroundColor: css('--ink-3'), borderDash: [6, 4], borderWidth: 2, pointRadius: 0 });
   const positions = positionRows(accounts);
   const trades = accounts.flatMap(a => a.trades.map(t => ({ strategy: a.name, ...t })));
   const settings = Object.keys(manifest.accounts);
   return [
     h('p', { class: 'sub' }, 'One saved account per strategy (shared capital, same rules as the portfolio backtest), ' +
-      'stepped through every session by the daily run.'),
+      'stepped through every session by the daily run. The benchmark is an equal-weight hold of the scanned stocks, ' +
+      'rebalanced daily without costs; it shares the watchlist\'s survivorship bias, so beating it is the fair test.'),
     accountsTable(accounts),
     chartCard('Return since start', lineConfig(dates, curves, { pct: true })),
     h('h3', { class: 'section' }, `Open positions (${positions.length})`),

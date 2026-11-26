@@ -36,6 +36,21 @@ def test_build_copies_csvs_and_writes_manifest(tmp_path):
     assert manifest["accounts"] == {"trend": {"capital": 100000, "slots": 10}}
 
 
+def test_equal_weight_averages_close_changes_of_stocks_in_both_sessions(tmp_path):
+    days = tmp_path / "journal" / "days"
+    days.mkdir(parents=True)
+    (days / "2026-11-23.csv").write_text("date,symbol,close\n2026-11-23,INFY,100\n2026-11-23,TCS,200\n")
+    # INFY +10%, TCS -5%, NEW has no previous close and is left out
+    (days / "2026-11-24.csv").write_text("date,symbol,close\n2026-11-24,INFY,110\n2026-11-24,TCS,190\n2026-11-24,NEW,50\n")
+    (days / "2026-11-25.csv").write_text("date,symbol,close\n2026-11-25,INFY,110\n2026-11-25,TCS,190\n2026-11-25,NEW,55\n")
+
+    ew = site.equal_weight(tmp_path)
+
+    assert ew["2026-11-23"] == 1.0
+    assert ew["2026-11-24"] == 1.025
+    assert ew["2026-11-25"] == round(1.025 * (1 + 0.1 / 3), 6)
+
+
 def test_build_writes_full_price_history_per_stock(tmp_path, monkeypatch):
     import pandas as pd
 

@@ -159,6 +159,23 @@ def write_history(out: Path, symbols: list[str], root: Path = ROOT) -> dict:
     return written
 
 
+def equal_weight(root: Path = ROOT) -> dict[str, float]:
+    """The paper accounts' benchmark per session date: a daily-rebalanced equal-weight hold of the scanned
+    stocks, as `backtest.portfolio.equal_weight` builds it for backtests (no costs), from the closes in
+    journal/days: each session moves it by the mean close-to-close change of the stocks in both sessions."""
+    out, prev, level = {}, None, 1.0
+    for path in sorted((root / "journal" / "days").glob("*.csv")):
+        with path.open(newline="") as f:
+            close = {r["symbol"]: c for r in csv.DictReader(f) if (c := _float(r.get("close")))}
+        if prev is not None:
+            changes = [close[s] / prev[s] - 1 for s in close.keys() & prev.keys()]
+            if changes:
+                level *= 1 + sum(changes) / len(changes)
+        out[path.stem] = round(level, 6)
+        prev = close
+    return out
+
+
 def build(out: Path, root: Path = ROOT, prices: bool = False) -> dict:
     """Write the site to `out`; returns the manifest."""
     shutil.rmtree(out / "data", ignore_errors=True)  # drop CSVs that no longer exist
@@ -176,7 +193,7 @@ def build(out: Path, root: Path = ROOT, prices: bool = False) -> dict:
         accounts[cfg.parent.name] = json.loads(cfg.read_text())
     stocks = [f["title"] for f in files if f["kind"] == "stock"]
     manifest = {"built": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                "groups": GROUPS, "files": files, "accounts": accounts,
+                "groups": GROUPS, "files": files, "accounts": accounts, "equal_weight": equal_weight(root),
                 **(write_history(out, stocks, root) if prices else {"prices": [], "fundamentals": []})}
     (out / "data").mkdir(exist_ok=True)
     (out / "data" / "manifest.json").write_text(json.dumps(manifest))
