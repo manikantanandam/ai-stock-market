@@ -58,19 +58,20 @@ def test_telegram_card(tmp_path):
     s = alerts.summary(journal(tmp_path))
     s.new[0].symbol = s.buys[0].symbol = "M&M"
     lines = alerts.telegram_html(s, url="https://example.org/").splitlines()
-    assert lines[:9] == ["📈 <b>AI STOCK DAILY</b>", "<i>Thu 26 Nov 2026 · NSE close</i>", alerts.RULE,
-                         "🟢 <b>2</b> BUY   🟡 <b>1</b> WATCH   🔴 <b>0</b> AVOID",
-                         "<code>▰▰▰▰▰▰▰▱▱▱</code> 67% say BUY <i>(=)</i>", "",
-                         "🔥 <b>HOT SECTORS</b> <i>(BUYs)</i>", "▫️ <code>  2</code> Tech <i>(▲1)</i>", ""]
+    assert lines[:10] == ["📈 <b>AI STOCK DAILY</b>", "<i>Thu 26 Nov 2026 · NSE close</i>", alerts.RULE,
+                          "🟢 <b>2</b> BUY   🟡 <b>1</b> WATCH   🔴 <b>0</b> AVOID",
+                          "🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜", "<b>67%</b> of 3 stocks say BUY  ⚪ =", "",
+                          "🔥 <b>HOT SECTORS</b> <i>· BUYs</i>", "▫️ <code>  2</code> Tech  🟢 +1", ""]
     text = "\n".join(lines)
-    # symbols link to their dashboard page (escaped), so they show in the link colour; scores lead, so they align
+    # symbols link to their dashboard page (escaped), so they show in the link colour; each strategy set is a
+    # quote card headed by its strategies, scores first so they align
     link = '<b><a href="https://example.org/#journal/stocks/M%26M.csv">M&amp;M</a></b>'
-    assert ("🆕 <b>NEW BUYS</b> · 1\n🔹 <b>swing · trend · breakout</b> <i>(1)</i>\n"
-            f"▫️ <code>+0.60</code> {link} · <i>Gamma</i>\n") in text
+    assert ("🆕 <b>NEW BUYS</b> · 1\n<blockquote><b>swing · trend · breakout</b>  <i>×1</i>\n"
+            f"▫️ <code>+0.60</code> {link} · <i>Gamma</i></blockquote>") in text
     assert f"🥇 <code>+0.60</code> {link} 🆕 · <i>Gamma</i>\n🥈 <code>+0.50</code> <b><a " in text
     assert "<blockquote expandable>➖ <b>No longer BUY</b> (1)\nB</blockquote>" in text
     assert lines[-1] == ('👉 <a href="https://example.org/#journal/days/2026-11-26.csv"><b>Open this session</b></a>'
-                         ' · <a href="https://example.org/">Dashboard</a>')
+                         '  ·  <a href="https://example.org/">Dashboard</a>')
 
 
 def test_new_buys_are_grouped_by_strategy_set_broadest_first():
@@ -91,8 +92,11 @@ def test_symbol_without_a_dashboard_is_just_bold():
     assert alerts._symbol(alerts.Stock("M&M", "Mahindra", "Consumer Cyclical", 0.5, []), None) == "<b>M&amp;M</b>"
 
 
-def test_bar():
-    assert (alerts._bar(0.21, 10), alerts._bar(1.5, 4), alerts._bar(-1, 3)) == ("▰▰▱▱▱▱▱▱▱▱", "▰▰▰▰", "▱▱▱")
+def test_squares_and_tint():
+    assert (alerts._squares(0.21), alerts._squares(1.5, 4), alerts._squares(-1, 3)) == \
+        ("🟩🟩⬜⬜⬜⬜⬜⬜⬜⬜", "🟩🟩🟩🟩", "⬜⬜⬜")
+    assert [alerts._tint(5, 2), alerts._tint(1, 4), alerts._tint(3, 3), alerts._tint(3, None),
+            alerts._tint(0.21, 0.22, pct=True)] == ["🟢 +3", "🔴 −3", "⚪ =", "✨ new", "🔴 −1%"]
 
 
 def test_markdown_tables(tmp_path):

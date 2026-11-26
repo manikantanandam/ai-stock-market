@@ -163,12 +163,6 @@ def _icon(sector: str) -> str:
     return SECTOR_ICON.get(sector, "▫️")
 
 
-def _bar(fraction: float, cells: int) -> str:
-    """A block bar: _bar(0.3, 10) -> '▰▰▰▱▱▱▱▱▱▱'."""
-    full = round(max(0.0, min(1.0, fraction)) * cells)
-    return "▰" * full + "▱" * (cells - full)
-
-
 def _symbol(b: Stock, url: str | None) -> str:
     """The symbol in bold, as a link to its dashboard page when there's a dashboard: Telegram can't colour text,
     but links show in the accent colour, so symbols stand out and open the stock."""
@@ -195,35 +189,54 @@ def _change(now: int | float, before: int | float | None, pct: bool = False) -> 
     return "(=)" if d == 0 else f"({'▲' if d > 0 else '▼'}{abs(d)}{'%' if pct else ''})"
 
 
+def _tint(now: int | float, before: int | float | None, pct: bool = False) -> str:
+    """A change as a coloured marker for Telegram, which can't colour text: '🟢 +3', '🔴 −1%', '⚪ =' or
+    '✨ new' (no previous value)."""
+    if before is None:
+        return "✨ new"
+    d = round((now - before) * 100) if pct else now - before
+    unit = "%" if pct else ""
+    return "⚪ =" if d == 0 else (f"🟢 +{d}{unit}" if d > 0 else f"🔴 −{-d}{unit}")
+
+
+def _squares(fraction: float, cells: int = 10) -> str:
+    """A coloured bar: _squares(0.21) -> '🟩🟩⬜⬜⬜⬜⬜⬜⬜⬜'."""
+    full = round(max(0.0, min(1.0, fraction)) * cells)
+    return "🟩" * full + "⬜" * (cells - full)
+
+
 def telegram_html(s: Summary, url: str | None = None) -> str:
-    """Telegram HTML, laid out as a card: the verdict counts with a breadth bar (share of scanned stocks saying
-    BUY, against the previous session), the hot sectors one per line with their change, the new BUYs grouped
-    under a header per strategy set (each: sector icon, score, the symbol as a link (see _symbol), company),
-    the strongest BUYs with medals (🆕 on new ones), the dropped BUYs folded into an expandable quote, and
-    links to the session page and the dashboard."""
+    """Telegram HTML, laid out as a card. Telegram can't colour text, so colour comes from what it does tint:
+    emoji (a green-square breadth bar, 🟢/🔴 change markers), links (symbols, see _symbol) and quote blocks
+    (each strategy group of new BUYs is its own tinted card with its strategies as the header). Sections: the
+    verdict counts and breadth (share of scanned stocks saying BUY) with its change, the hot sectors with their
+    change, the new BUYs by strategy set (broadest first), the strongest BUYs with medals (🆕 on new ones), the
+    dropped BUYs folded into an expandable quote, and links to the session page and the dashboard."""
     e = html.escape
     total = sum(s.actions.values()) or 1
     buy, watch, avoid = (s.actions.get(a, 0) for a in ("BUY", "WATCH", "AVOID"))
     share = buy / total
     lines = ["📈 <b>AI STOCK DAILY</b>", f"<i>{_day(s.date)} · NSE close</i>", RULE,
              f"🟢 <b>{buy}</b> BUY   🟡 <b>{watch}</b> WATCH   🔴 <b>{avoid}</b> AVOID",
-             f"<code>{_bar(share, 10)}</code> {share:.0%} say BUY"
-             + (f" <i>{_change(share, s.prev_share, pct=True)}</i>" if s.prev_share is not None else "")]
+             _squares(share),
+             f"<b>{share:.0%}</b> of {total} stocks say BUY"
+             + (f"  {_tint(share, s.prev_share, pct=True)}" if s.prev_share is not None else "")]
     if s.sectors:
-        lines += ["", "🔥 <b>HOT SECTORS</b> <i>(BUYs)</i>"]
+        lines += ["", "🔥 <b>HOT SECTORS</b> <i>· BUYs</i>"]
         lines += [f"{_icon(k)} <code>{n:>3}</code> {e(k)}"
-                  + (f" <i>{_change(n, s.prev_sectors.get(k))}</i>" if s.prev is not None else "")
+                  + (f"  {_tint(n, s.prev_sectors.get(k))}" if s.prev is not None else "")
                   for k, n in s.sectors[:3]]
     if s.prev is not None:
         lines += ["", f"🆕 <b>NEW BUYS</b> · {len(s.new)}"]
         if not s.new:
             lines.append("<i>No new BUYs since " + _day(s.prev)[:-5] + "</i>")
-        # one header per strategy set: says which strategies fired once, and separates the groups
+        # each strategy set is a tinted quote card: its strategies head it once, then its stocks, score first
+        # (fixed width) so scores form a column
         for strategies, group in _groups(s.new[:MAX_NEW]):
-            lines.append(f"🔹 <b>{e(' · '.join(strategies) or 'no strategy')}</b> <i>({len(group)})</i>")
-            # score first (fixed width) so scores form a column
-            lines += [f"{_icon(b.sector)} <code>{_score(b.combined)}</code> {_symbol(b, url)} · <i>{e(b.name)}</i>"
-                      for b in group]
+            rows = [f"<b>{e(' · '.join(strategies) or 'no strategy')}</b>  <i>×{len(group)}</i>"]
+            rows += [f"{_icon(b.sector)} <code>{_score(b.combined)}</code> {_symbol(b, url)} · <i>{e(b.name)}</i>"
+                     for b in group]
+            lines.append("<blockquote>" + "\n".join(rows) + "</blockquote>")
         if _more(s.new, MAX_NEW):
             lines.append(f"<i>+{_more(s.new, MAX_NEW)} more on the dashboard</i>")
     if s.buys:
@@ -235,7 +248,7 @@ def telegram_html(s: Summary, url: str | None = None) -> str:
         lines += ["", f"<blockquote expandable>➖ <b>No longer BUY</b> ({len(s.dropped)})\n{e(', '.join(s.dropped))}</blockquote>"]
     if url:
         session = f"{url}#journal/days/{s.date}.csv"
-        lines += [RULE, f'👉 <a href="{e(session)}"><b>Open this session</b></a> · <a href="{e(url)}">Dashboard</a>']
+        lines += ["", f'👉 <a href="{e(session)}"><b>Open this session</b></a>  ·  <a href="{e(url)}">Dashboard</a>']
     return "\n".join(lines)
 
 
