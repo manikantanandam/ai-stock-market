@@ -73,6 +73,10 @@ async function load(path) {
   return cache.get(path);
 }
 const optional = async path => manifest.files.some(f => f.path === path) ? await load(path) : [];
+async function loadJSON(path) {
+  if (!cache.has(path)) cache.set(path, await (await fetch('data/' + path)).json());
+  return cache.get(path);
+}
 
 const num = v => typeof v === 'number' && isFinite(v);
 const values = (rows, col) => rows.map(r => r[col]).filter(num);
@@ -559,12 +563,13 @@ async function renderNotes(file, rows) {
 
 // What each paper account did with a session's BUYs (decisions.csv, written by strategy/account.py): symbol ->
 // [{ strategy, outcome, rank }]. Entries happen at the next session's open, so the latest session has none yet.
-function decisionsFor(accounts, date) {
+// The build splits decisions per session (data/decisions/<date>.csv, a `strategy` column per row), so a page reads
+// one small file rather than every account's whole history.
+const sessionDecisions = async date => (manifest.decisions || []).includes(date) ? load(`decisions/${date}.csv`) : [];
+
+function decisionsFor(rows) {
   const by = new Map();
-  for (const a of accounts) for (const d of a.decisions || []) {
-    if (String(d.signal_date) !== date) continue;
-    by.set(d.symbol, [...(by.get(d.symbol) || []), { strategy: a.name, outcome: d.outcome, rank: d.rank }]);
-  }
+  for (const d of rows) by.set(d.symbol, [...(by.get(d.symbol) || []), { strategy: d.strategy, outcome: d.outcome, rank: d.rank }]);
   return by;
 }
 
@@ -574,12 +579,13 @@ const DECISION_LABELS = { strategy: 'Strategy', offered: 'BUYs offered', entered
   held: 'Already held', other: 'No data / cash', symbols: 'Entered stocks' };
 
 // Per strategy: how many of a session's BUYs it entered and why it skipped the rest.
-function decisionsCard(accounts, date, entryDate) {
-  const rows = accounts.map(a => {
-    const ds = (a.decisions || []).filter(d => String(d.signal_date) === date);
+function decisionsCard(decisions, date) {
+  const entryDate = decisions[0]?.entry_date;
+  const rows = [...new Set(decisions.map(d => d.strategy))].sort().map(strategy => {
+    const ds = decisions.filter(d => d.strategy === strategy);
     const n = outcome => ds.filter(d => d.outcome === outcome).length;
     const entered = ds.filter(d => String(d.outcome).startsWith('entered'));
-    return { strategy: a.name, offered: ds.length, entered: entered.length, no_slot: n('no slot'), held: n('held'),
+    return { strategy, offered: ds.length, entered: entered.length, no_slot: n('no slot'), held: n('held'),
       other: n('no data') + n('no cash'), symbols: entered.map(d => d.symbol).join(' ') };
   }).filter(r => r.offered);
   if (!rows.length) return null;
@@ -595,9 +601,8 @@ async function renderDay(file, rows) {
   const notes = await optional('journal/notes/' + file.path.split('/').pop());
   const prevFile = previousDay(file.path);
   const prevRows = prevFile ? await load(prevFile.path) : null;
-  const accounts = await loadAccounts(), decided = decisionsFor(accounts, file.title);
+  const decisions = await sessionDecisions(file.title), decided = decisionsFor(decisions);
   rows = withDecisions(withChanges(rows, prevRows), decided);
-  const entryDate = accounts.flatMap(a => a.decisions || []).find(d => String(d.signal_date) === file.title)?.entry_date;
   const actions = countBy(rows, 'action');
   const buys = rows.filter(r => r.action === 'BUY');
   const sectors = countBy(buys.length ? buys : rows.filter(r => r.action === 'WATCH'), 'sector').slice(0, 15);
@@ -614,7 +619,7 @@ async function renderDay(file, rows) {
       }))),
     prevRows ? changesCard(rows, prevRows, prevFile.title) : null,
     scanTable(rows, [...file.columns, ...(prevRows ? ['change'] : []), ...(decided.size ? ['taken'] : [])]),
-    decided.size ? decisionsCard(accounts, file.title, entryDate) : null,
+    decisionsCard(decisions, file.title),
     notes.length ? notesCard(notes, 'LLM notes', rows) : null,
   ];
 }
@@ -649,7 +654,7 @@ async function renderToday() {
     h('h3', { class: 'section' }, `BUY signals (${buys.length})`),
     buys.length ? scanTable(buys, columns) : h('p', { class: 'muted' }, 'No BUY signals in this session.'),
     // this session's BUYs enter at the next open; show what the accounts did with the previous session's
-    prevFile ? decisionsCard(accounts, prevFile.title, file.title) : null,
+    prevFile ? decisionsCard(await sessionDecisions(prevFile.title), prevFile.title) : null,
     accounts.length ? [h('h3', { class: 'section' }, 'Paper accounts'),
       h('p', { class: 'sub' }, h('a', { href: '#accounts' }, 'Equity curves, open positions and trades')),
       accountsTable(accounts), accountsChart(accounts)] : null,
@@ -951,14 +956,14 @@ async function renderStock(file, rows) {
   const years = history.length && (manifest.fundamentals || []).includes(file.title)
     ? await load('fundamentals/' + file.title + '.csv') : [];
   const scores = ['combined', 'technical', 'fundamental', 'sentiment'].filter(c => file.columns.includes(c));
-  // This stock's LLM notes from every session, newest first.
-  const notesDir = file.kind === 'stock' ? 'journal/notes/' : 'journal/commodities/notes/';
-  const notes = (await Promise.all(manifest.files.filter(f => f.path.startsWith(notesDir)).map(f => load(f.path))))
-    .flat().filter(n => n.symbol === file.title).sort((a, b) => String(b.date).localeCompare(String(a.date)));
-  // Paper-account trades in this stock: closed ones are marked on the chart; open ones join them in a table.
-  const accounts = file.kind === 'stock' ? await loadAccounts() : [];
-  const paper = accounts.flatMap(a => a.trades.filter(t => t.symbol === file.title).map(t => ({ strategy: a.name, ...t })));
-  const held = positionRows(accounts).filter(p => p.symbol === file.title);
+  // The build's summary of this stock (data/summaries/, see site/__init__.py): its LLM notes from every session
+  // and its paper trades (closed ones are marked on the chart) and open positions.
+  const kind = file.kind === 'stock' ? 'stocks' : 'contracts';
+  const summary = (manifest.summaries?.[kind] || []).includes(file.title)
+    ? await loadJSON(`summaries/${kind}/${encodeURIComponent(file.title)}.json`) : {};
+  const notes = (summary.notes || []).slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const paper = summary.paper_trades || [];
+  const held = (summary.positions || []).map(p => positionRow(p.strategy, p));
   return [
     h('p', { class: 'sub' }, [last.name, last.sector || last.group, last.unit && 'INR per ' + last.unit].filter(Boolean).join(' · ')),
     fundamentalsWarning(last.sector),
@@ -1096,9 +1101,9 @@ function renderYearly(file, rows) {
 // Each saved account (manifest.accounts: settings per strategy) with its equity, positions and trades files.
 async function loadAccounts() {
   return Promise.all(Object.entries(manifest.accounts || {}).map(async ([name, cfg]) => {
-    const [equity, positions, trades, decisions] = await Promise.all(['equity', 'positions', 'trades', 'decisions']
+    const [equity, positions, trades] = await Promise.all(['equity', 'positions', 'trades']
       .map(k => optional(`journal/paper/${name}/${k}.csv`)));
-    return { name, cfg, equity, positions, trades, decisions };
+    return { name, cfg, equity, positions, trades };
   }));
 }
 
@@ -1128,14 +1133,14 @@ function accountsTable(accounts) {
     cells: { pnl: signed } });
 }
 
-// Open positions valued at their last close (ref_close); to_stop is how far the close may fall before the stop.
-function positionRows(accounts) {
-  return accounts.flatMap(a => a.positions.map(p => {
-    const last = num(p.ref_close) ? p.ref_close : null;
-    return { strategy: a.name, symbol: p.sym, entry_date: p.entry_date, entry: p.entry_px, last, ret: last ? last / p.entry_px - 1 : null,
-      stop: p.stop, to_stop: last && num(p.stop) ? p.stop / last - 1 : null, target: num(p.target) ? p.target : null,
-      shares: p.shares, value: last ? last * p.shares : null };
-  }));
+const positionRows = accounts => accounts.flatMap(a => a.positions.map(p => positionRow(a.name, p)));
+
+// An open position valued at its last close (ref_close); to_stop is how far the close may fall before the stop.
+function positionRow(strategy, p) {
+  const last = num(p.ref_close) ? p.ref_close : null;
+  return { strategy, symbol: p.sym, entry_date: p.entry_date, entry: p.entry_px, last, ret: last ? last / p.entry_px - 1 : null,
+    stop: p.stop, to_stop: last && num(p.stop) ? p.stop / last - 1 : null, target: num(p.target) ? p.target : null,
+    shares: p.shares, value: last ? last * p.shares : null };
 }
 
 const POSITION_LABELS = { strategy: 'Strategy', symbol: 'Stock', entry_date: 'Entry date', entry: 'Entry', last: 'Last close',

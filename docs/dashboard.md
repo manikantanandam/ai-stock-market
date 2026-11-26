@@ -17,6 +17,8 @@ Static page in `src/aistock/site/static/` (`index.html`, `app.js`, `style.css`),
 | `groups` | nav section order |
 | `accounts` | `journal/paper/<strategy>/account.json` per strategy |
 | `equal_weight` | session date → level of the equal-weight hold of scanned stocks ([0011](decisions/0011-paper-vs-backtest-verdict.md)) |
+| `summaries` | symbols with `data/summaries/stocks/<SYM>.json` / `summaries/contracts/<C>.json`: that page's LLM notes, paper trades and open positions, gathered at build time |
+| `decisions` | session dates with `data/decisions/<date>.csv`: every paper account's decisions on that session's BUYs (`strategy` column added) |
 | `prices`, `fundamentals` | symbols with `data/prices/<SYM>.csv` / `data/fundamentals/<SYM>.csv` (full Yahoo history, estimated fundamentals) |
 
 Kinds (`site.kind_of`): `day`, `notes`, `stock`, `cday`, `cnotes`, `cheadlines`, `contract`, `trades`, `series`, `yearly`, `table`.
@@ -25,10 +27,10 @@ Kinds (`site.kind_of`): `day`, `notes`, `stock`, `cday`, `cnotes`, `cheadlines`,
 
 | Route | Renderer | Shows | Loads |
 |---|---|---|---|
-| `#today` (default) | `renderToday` | latest session tiles, changes vs previous session, BUY table, what the accounts did with the previous session's BUYs, paper accounts table + return chart, starred stocks | latest 2 day files, all paper files |
+| `#today` (default) | `renderToday` | latest session tiles, changes vs previous session, BUY table, what the accounts did with the previous session's BUYs, paper accounts table + return chart, starred stocks | latest 2 day files, the previous session's decisions file, paper equity/positions/trades |
 | `#accounts` | `renderAccounts` | accounts vs hold, return chart, live vs backtest, open positions, closed trades, settings | paper files, latest `compare_*_stats.csv` |
-| `#journal/days/<date>.csv` | `renderDay` | tiles, sector and score charts, changes card, scan table (with each account's decision on every BUY), decisions card, LLM notes | that day + previous day, its notes |
-| `#journal/stocks/<SYM>.csv` | `renderStock` | price chart (BUYs; paper stops/targets/exits if held, else the journal's planned levels), scores, paper positions/trades, daily and fiscal tables, notes, logged sessions | price/fundamental history, all notes files, paper files |
+| `#journal/days/<date>.csv` | `renderDay` | tiles, sector and score charts, changes card, scan table (with each account's decision on every BUY), decisions card, LLM notes | that day + previous day, its notes, its decisions file |
+| `#journal/stocks/<SYM>.csv` | `renderStock` | price chart (BUYs; paper stops/targets/exits if held, else the journal's planned levels), scores, paper positions/trades, daily and fiscal tables, notes, logged sessions | its journal CSV, price/fundamental history, its summary JSON (~5 requests however long the journal gets) |
 | commodity day / contract | `renderCommodityDay` / `renderStock` | same idea for futures | |
 | reports | `renderTrades` / `renderSeries` / `renderYearly` / `table` | by kind | the file |
 
@@ -43,7 +45,8 @@ paper account files folded under Overview.
   name new fraction columns accordingly or give them a cell renderer.
 - Scores in [-1, 1] use `scoreCell`; reasons use `reasonsCell` (toned chips).
 - Colors come from CSS tokens (`--s1..--s8`, `--good`, `--critical`, `--ink-3`), light and dark.
-- Heavy data is computed at build time and put in the manifest, not derived from many CSVs in the browser.
+- Heavy data is computed at build time (manifest fields, `summaries/`, `decisions/`), not derived from many CSVs in
+  the browser: no page should load a file per session.
 
 ## Screenshots (for PRs)
 

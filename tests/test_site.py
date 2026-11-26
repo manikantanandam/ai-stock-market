@@ -92,3 +92,38 @@ def test_build_writes_full_price_history_per_stock(tmp_path, monkeypatch):
     assert daily.marketCap.iloc[-1] == 2.0 * close[-1]  # shares x close from the fiscal year in effect
     yearly = pd.read_csv(out / "data" / "fundamentals" / "INFY.csv")
     assert yearly.loc[0, ["date", "profitMargins", "returnOnEquity"]].tolist() == ["2001-03-31", 0.1, 0.2]
+
+
+def test_build_writes_per_stock_summaries_and_session_decisions(tmp_path):
+    root = tmp_path / "repo"
+    j = root / "journal"
+    for d in ("stocks", "notes", "paper/trend", "commodities/contracts"):
+        (j / d).mkdir(parents=True)
+    (j / "stocks" / "INFY.csv").write_text("date,symbol,action\n2026-11-25,INFY,BUY\n")
+    (j / "stocks" / "TCS.csv").write_text("date,symbol,action\n2026-11-25,TCS,WATCH\n")
+    (j / "commodities" / "contracts" / "GOLD.csv").write_text("date,symbol,action\n2026-11-25,GOLD,WATCH\n")
+    (j / "notes" / "2026-11-25.csv").write_text("date,symbol,note\n2026-11-25,INFY,first\n")
+    (j / "notes" / "2026-11-26.csv").write_text("date,symbol,note\n2026-11-26,INFY,second\n2026-11-26,TCS,other\n")
+    paper = j / "paper" / "trend"
+    (paper / "account.json").write_text('{"capital": 100000, "max_positions": 10}')
+    (paper / "positions.csv").write_text("entry_date,sym,shares,entry_px,stop,target\n2026-11-26,INFY,4,100.0,90.0,inf\n")
+    (paper / "trades.csv").write_text("symbol,entry_date,exit_date,ret\nTCS,2026-11-19,2026-11-26,-0.1\n")
+    (paper / "decisions.csv").write_text("signal_date,entry_date,symbol,rank,outcome\n"
+                                         "2026-11-25,2026-11-26,INFY,1,entered\n2026-11-25,2026-11-26,TCS,2,no slot\n")
+    out = tmp_path / "site"
+
+    manifest = site.build(out, root=root)
+
+    assert manifest["summaries"] == {"stocks": ["INFY", "TCS"], "contracts": ["GOLD"]}
+    infy = json.loads((out / "data" / "summaries" / "stocks" / "INFY.json").read_text())
+    assert [n["note"] for n in infy["notes"]] == ["first", "second"]
+    assert infy["positions"] == [{"strategy": "trend", "entry_date": "2026-11-26", "sym": "INFY", "shares": 4,
+                                  "entry_px": 100.0, "stop": 90.0, "target": None}]
+    assert infy["paper_trades"] == []
+    tcs = json.loads((out / "data" / "summaries" / "stocks" / "TCS.json").read_text())
+    assert tcs["paper_trades"][0] == {"strategy": "trend", "symbol": "TCS", "entry_date": "2026-11-19",
+                                          "exit_date": "2026-11-26", "ret": -0.1}
+    assert manifest["decisions"] == ["2026-11-25"]
+    rows = (out / "data" / "decisions" / "2026-11-25.csv").read_text().splitlines()
+    assert rows[0] == "strategy,signal_date,entry_date,symbol,rank,outcome"
+    assert rows[1:] == ["trend,2026-11-25,2026-11-26,INFY,1,entered", "trend,2026-11-25,2026-11-26,TCS,2,no slot"]
