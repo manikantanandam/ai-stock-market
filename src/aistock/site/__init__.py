@@ -137,6 +137,12 @@ def write_history(out: Path, symbols: list[str], root: Path = ROOT) -> dict:
         except Exception as e:  # the chart keeps the logged sessions' fundamental scores
             print(f"statements: skipped {sym}: {e}")
             years = []
+        foreign = {y.get("currency") for y in years} - {None, "INR"}
+        for cur in foreign:  # e.g. INFY reports in USD
+            try:
+                years = history.to_inr(years, prices.get_prices(f"{cur}INR=X", None).Close)
+            except Exception as e:  # amounts stay in the reporting currency, which the page labels
+                print(f"fx: no {cur}INR for {sym}: {e}")
         last = _last_row(root / "journal" / "stocks" / f"{sym}.csv")
         now = {"trailingPE": _float(last.get("f_trailingPE")), "priceToBook": _float(last.get("f_priceToBook")),
                "close": _float(last.get("close"))}

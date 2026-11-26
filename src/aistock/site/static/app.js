@@ -47,6 +47,24 @@ function fmt(v, col = '') {
 }
 const pct = v => num(v) ? (v * 100).toFixed(1) + '%' : '–';
 
+// Large numbers in Indian units: Cr = 1e7, L = 1e5, K = 1e3 (also for amounts reported in USD).
+function compact(v) {
+  const [n, u] = [[1e7, 'Cr'], [1e5, 'L'], [1e3, 'K']].find(([n]) => Math.abs(v) >= n) || [1, ''];
+  return (v / n).toLocaleString('en-IN', { maximumFractionDigits: 2 }) + (u ? ' ' + u : '');
+}
+
+// History columns shown compact: 'count' (no currency) or 'money' (in the row's `currency`, else INR).
+const AMOUNTS = { Volume: 'count', vol_avg20: 'count', shares: 'count', marketCap: 'money', revenue: 'money',
+  net_income: 'money', equity: 'money', debt: 'money', current_assets: 'money', current_liabilities: 'money' };
+const SYMBOL = { INR: '₹', USD: '$' };
+
+function amount(v, c, r) {
+  if (!AMOUNTS[c] || !num(v)) return fmt(v, c);
+  if (AMOUNTS[c] === 'count') return compact(v);
+  const cur = r.currency || 'INR';
+  return (v < 0 ? '-' : '') + (SYMBOL[cur] ?? cur + ' ') + compact(Math.abs(v));
+}
+
 // ---------- theme & charts ----------
 
 const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -490,40 +508,57 @@ function historyCard(history, rows) {
 // Full history tables (data/prices/ and data/fundamentals/, written at build time; see aistock/site/__init__.py).
 const DAILY_LABELS = { Date: 'Date', Volume: 'Volume', sma20: 'SMA20', sma50: 'SMA50', sma200: 'SMA200', ema100: 'EMA100',
   ema200: 'EMA200', rsi14: 'RSI14', macd_hist: 'MACD hist', atr14: 'ATR14', vol_avg20: 'Avg vol 20', Technical: 'Tech score',
-  trailingPE: 'P/E (est.)', priceToBook: 'P/B (est.)', marketCap: 'Mkt cap ₹ (est.)', Fundamental: 'Fund score (est.)' };
+  trailingPE: 'P/E (est.)', priceToBook: 'P/B (est.)', marketCap: 'Mkt cap (est.)', Fundamental: 'Fund score (est.)' };
 const DAILY_EXTRA = ['Open', 'High', 'Low', 'ema100', 'ema200', 'vol_avg20', 'priceToBook', 'marketCap'];
-const YEAR_LABELS = { date: 'Fiscal year end', start: 'In effect from', revenue: 'Revenue', net_income: 'Net income',
+const YEAR_LABELS = { date: 'Fiscal year end', start: 'In effect from', currency: 'Currency', converted_from: 'Converted from',
+  revenue: 'Revenue', net_income: 'Net income',
   eps: 'EPS', equity: 'Equity', debt: 'Debt', current_assets: 'Current assets', current_liabilities: 'Current liabilities',
   shares: 'Shares', returnOnEquity: 'ROE', debtToEquity: 'Debt/Equity (%)', revenueGrowth: 'Revenue growth',
-  earningsGrowth: 'Earnings growth', profitMargins: 'Net margin', currentRatio: 'Current ratio' };
+  earningsGrowth: 'Earnings growth', profitMargins: 'Net margin', currentRatio: 'Current ratio', check: 'Data check' };
 
-// Change from the previous trading day under each value: percent for levels, points where a percent
-// misleads (RSI is already 0-100, MACD hist crosses zero, scores are -1..1).
-const POINT_CHANGE = ['rsi14', 'macd_hist', 'Technical', 'Fundamental'];
+// Change from the previous row (trading day or fiscal year) under each value: percent for levels and
+// amounts, a difference where a percent misleads: [scale, unit] (RSI is already 0-100, MACD hist crosses
+// zero, scores are -1..1; ratios held as fractions change in percentage points, debtToEquity is in percent).
+const POINT_CHANGE = { rsi14: [1, ' pt'], macd_hist: [1, ' pt'], Technical: [1, ' pt'], Fundamental: [1, ' pt'],
+  returnOnEquity: [100, ' pp'], revenueGrowth: [100, ' pp'], earningsGrowth: [100, ' pp'], profitMargins: [100, ' pp'],
+  debtToEquity: [1, ' pp'], currentRatio: [1, ''] };
+const NO_CHANGE = ['Date', 'date', 'start', 'currency', 'converted_from', 'check'];
 
-function changeCells(history, columns) {
-  const prev = new Map(history.map((p, i) => [p, history[i - 1]]));
+function changeCells(rows, columns) {
+  const prev = new Map(rows.map((p, i) => [p, rows[i - 1]]));
   const cell = c => (v, r) => {
     const before = prev.get(r)?.[c];
     if (!num(v)) return dash();
-    if (!num(before)) return fmt(v, c);
-    const points = POINT_CHANGE.includes(c), d = points ? v - before : before ? v / before - 1 : NaN;
-    const text = !num(d) ? '' : d === 0 ? '0' : (d > 0 ? '+' : '') + (points ? +d.toFixed(2) + ' pt' : (d * 100).toFixed(2) + '%');
-    return h('div', {}, fmt(v, c), h('div', { class: 'cell-sub ' + sign(d) }, text));
+    if (!num(before)) return amount(v, c, r);
+    const [scale, unit] = POINT_CHANGE[c] || [];
+    const d = scale ? (v - before) * scale : before ? v / before - 1 : NaN;
+    const text = !num(d) ? '' : d === 0 ? '0' : (d > 0 ? '+' : '') + (scale ? +d.toFixed(2) + unit : (d * 100).toFixed(2) + '%');
+    return h('div', {}, amount(v, c, r), h('div', { class: 'cell-sub ' + sign(d) }, text));
   };
-  return Object.fromEntries(columns.filter(c => c !== 'Date').map(c => [c, cell(c)]));
+  return Object.fromEntries(columns.filter(c => !NO_CHANGE.includes(c)).map(c => [c, cell(c)]));
 }
 
-function historyTables(history, years) {
+// Yahoo's statements for banks, NBFCs and insurers don't match their filings (e.g. HDFCBANK equity +47% vs
+// Screener after the merger), and debt/equity means little for a lender.
+const UNRELIABLE_SECTORS = ['Financial Services'];
+const fundamentalsWarning = sector => UNRELIABLE_SECTORS.includes(sector)
+  ? h('p', { class: 'warning' }, `Fundamentals for ${sector} stocks (banks, NBFCs, insurers) are unreliable on Yahoo: `
+    + "figures such as equity and revenue can differ widely from the company's filings. Verify before relying on them.")
+  : null;
+
+function historyTables(history, years, sector) {
   const columns = Object.keys(history[0]);
+  const flagged = years.filter(y => y.check).length;
   return [
     card('Daily history: prices and technicals',
       h('p', { class: 'muted' }, 'Every trading day Yahoo has; under each value, its change from the previous trading day (points for RSI, MACD and scores). P/E, P/B, market cap and fundamental score are estimated from annual results.'),
       table(history.slice().reverse(), columns,
         { labels: DAILY_LABELS, extra: DAILY_EXTRA, pageSize: 25, cells: changeCells(history, columns) })),
     years.length ? card('Fundamentals by fiscal year',
-      h('p', { class: 'muted' }, "Amounts are in the company's reporting currency (some report in USD). Ratios take effect about 60 days after the year end."),
-      table(years.slice().reverse(), Object.keys(years[0]), { labels: YEAR_LABELS })) : null,
+      h('p', { class: 'muted' }, "Amounts are in ₹; companies reporting in USD are converted at the fiscal year's average USD/INR rate (income) or its year-end rate (balance sheet). Ratios take effect about 60 days after the year end. Under each value, its change from the previous year (percentage points for ratios)."),
+      fundamentalsWarning(sector),
+      flagged ? h('p', { class: 'warning' }, `${flagged} of ${years.length} years fail a data check (last column): verify those figures against the filings.`) : null,
+      table(years.slice().reverse(), Object.keys(years[0]), { labels: YEAR_LABELS, cells: changeCells(years, Object.keys(years[0])) })) : null,
   ];
 }
 
@@ -537,6 +572,7 @@ async function renderStock(file, rows) {
   const scores = ['combined', 'technical', 'fundamental', 'sentiment'].filter(c => file.columns.includes(c));
   return [
     h('p', { class: 'sub' }, [last.name, last.sector || last.group, last.unit && 'INR per ' + last.unit].filter(Boolean).join(' · ')),
+    fundamentalsWarning(last.sector),
     tiles([['Last action', last.action || '–', last.action === 'BUY' ? 'pos' : last.action === 'SELL' ? 'neg' : ''],
       ['Close', fmt(last.close)], ...scores.map(c => [c[0].toUpperCase() + c.slice(1), fmt(last[c])]),
       ['Sessions logged', rows.length]]),
@@ -544,7 +580,7 @@ async function renderStock(file, rows) {
       chartCard('Close', lineConfig(labels, [{ label: 'Close', data: rows.map(r => r.close), borderColor: series(0) }])),
       chartCard('Scores (−1 to 1)', lineConfig(labels, scores.map((c, i) =>
         ({ label: c, data: rows.map(r => r[c]), borderColor: series(i), backgroundColor: series(i), pointRadius: 3 })), { min: -1, max: 1 }))),
-    ...(history.length ? historyTables(history, years) : []),
+    ...(history.length ? historyTables(history, years, last.sector) : []),
     card('Logged sessions', table(rows.slice().reverse(), file.columns)),
   ];
 }
