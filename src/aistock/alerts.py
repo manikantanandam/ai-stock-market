@@ -115,8 +115,8 @@ def _hot(s: Summary) -> str:
 
 
 def _strategies(b: Stock) -> str:
-    """The strategies that say BUY: named when one or two, counted when more (keeps a line short)."""
-    return ", ".join(b.strategies) if len(b.strategies) <= 2 else f"{len(b.strategies)} strategies"
+    """Every strategy that says BUY, by name (which strategies fired matters more than a short line)."""
+    return ", ".join(b.strategies)
 
 
 def _more(items: list, limit: int) -> int:

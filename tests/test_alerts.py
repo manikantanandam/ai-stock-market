@@ -43,7 +43,7 @@ def test_plain_text(tmp_path):
         "2 BUY · 1 WATCH · 0 AVOID (67% of 3 stocks say BUY)",
         "Hot sectors: Tech 2", "",
         "New BUYs (1, 1 dropped since Wed 25 Nov)",
-        "  C · Gamma · Tech · score +0.60 · 3 strategies", "",
+        "  C · Gamma · Tech · score +0.60 · swing, trend, breakout", "",
         "Top 2 by score",
         "  C  +0.60  Tech",
         "  A  +0.50  Tech", "",
@@ -65,7 +65,7 @@ def test_telegram_card(tmp_path):
     link = '<a href="https://example.org/#journal/stocks/C.csv">M&amp;M</a>'
     # scores lead each line (fixed width), so they form a column
     assert (f"🆕 <b>NEW BUYS</b> · 1  <i>(➖ 1 dropped)</i>\n▫️ <code>+0.60</code> <b>C</b>\n"
-            f"{alerts.INDENT}{link} · <i>3 strategies</i>") in text
+            f"{alerts.INDENT}{link} · <i>swing, trend, breakout</i>") in text
     assert f"🥇 <code>+0.60</code> <b>C</b> · {link}\n🥈 <code>+0.50</code> <b>A</b>" in text
     assert "<blockquote expandable>➖ <b>No longer BUY</b> (1)\nB</blockquote>" in text
     assert lines[-1] == '👉 <a href="https://example.org/"><b>Open dashboard</b></a>'
@@ -84,7 +84,7 @@ def test_bar():
 def test_markdown_tables(tmp_path):
     text = alerts.markdown(alerts.summary(journal(tmp_path)), url="https://example.org/")
     assert text.splitlines()[1:3] == ["🟢 **2** BUY · 🟡 1 WATCH · 🔴 0 AVOID", "🔥 Tech 2"]
-    assert "| **C** | Gamma | Tech | +0.60 | 3 strategies |" in text
+    assert "| **C** | Gamma | Tech | +0.60 | swing, trend, breakout |" in text
     assert "| **A** | +0.50 | Tech |" in text
     assert text.endswith("[Open dashboard →](https://example.org/)")
 

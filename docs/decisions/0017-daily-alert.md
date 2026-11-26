@@ -14,7 +14,9 @@ the three sectors with most BUYs, each new BUY (sector icon, symbol, score, comp
 strongest BUYs with medals, the dropped BUYs folded in an expandable quote, and the dashboard link. The issue
 gets the same as markdown tables, email as plain text. Rejected along the way at the user's request: paper
 accounts in the alert (too much text; they're on the dashboard), a comma-separated wall of tickers, and
-per-stock score bars (BUY scores sit in a narrow band, so every bar looked the same). `--date` rebuilds it for any journaled session. The Daily scan workflow runs it as its last step with `continue-on-error`; the
+per-stock score bars (BUY scores sit in a narrow band, so every bar looked the same), and counting a stock's
+strategies ("5 strategies") instead of naming them: which strategies fired is the point. Scores and sector
+counts lead their lines so they form columns. `--date` rebuilds it for any journaled session. The Daily scan workflow runs it as its last step with `continue-on-error`; the
 Send alert workflow (`alert.yml`) runs it by hand for a chosen date (default: the latest session). Channels:
 - Telegram, when the `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` repo secrets exist;
 - email over SMTP (stdlib, SSL), when `SMTP_USERNAME` and `SMTP_PASSWORD` exist (Gmail app password by
