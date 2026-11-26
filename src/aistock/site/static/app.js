@@ -126,7 +126,7 @@ function table(rows, columns, opts = {}) {
   search.addEventListener('input', () => { query = search.value.toLowerCase(); page = 0; draw(); });
   const selects = filters.map(f => {
     const opts = [...new Set(rows.map(r => r[f]).filter(v => v != null && v !== ''))].sort();
-    const s = h('select', {}, h('option', { value: '' }, 'All ' + f), opts.map(o => h('option', { value: o }, o)));
+    const s = h('select', {}, h('option', { value: '' }, 'All ' + (labels[f] || f).toLowerCase()), opts.map(o => h('option', { value: o }, o)));
     s.addEventListener('change', () => { active[f] = s.value; page = 0; draw(); });
     return s;
   });
@@ -375,7 +375,8 @@ const HEADLINE_LABELS = { symbol: 'Contract', published: 'Published (UTC)', scor
   title: 'Headline', source: 'Source' };
 const HEADLINE_CELLS = {
   score: scoreCell,
-  published: v => v ? String(v).slice(0, 16).replace('T', ' ') : dash(),
+  // PapaParse's dynamicTyping turns ISO timestamps into Dates
+  published: v => v instanceof Date ? v.toISOString().slice(0, 16).replace('T', ' ') : v ? String(v) : dash(),
   // the journal keeps no links (Google News URLs are long), so search the exact title
   title: v => h('a', { href: 'https://news.google.com/search?q=' + encodeURIComponent(`"${v}"`),
     target: '_blank', rel: 'noopener' }, v),
