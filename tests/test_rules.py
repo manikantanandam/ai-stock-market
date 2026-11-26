@@ -57,3 +57,25 @@ def test_sector_trend_is_close_above_sma50():
     trend = rules.sector_trend(close)
     assert not trend.iloc[:65].any()            # flat (not above) or below the SMA
     assert trend.iloc[65:].all()
+
+
+def test_ema_cross_down_fires_only_on_the_crossing_bar():
+    ind = frame(ema100=[12, 11, 10, 9, 10, 9], ema200=[10.5, 10.5, 10.5, 10.5, 9.5, 9.5])
+    assert rules.ema_cross_down(ind).tolist() == [False, False, True, False, False, True]
+
+
+def test_channel_rules_need_the_trend_and_ignore_volume():
+    n = 25
+    high, low = [10.0] * n, [9.0] * n
+    up = frame(High=high, Low=low, Close=[9.5] * (n - 1) + [10.5], sma50=[2.0] * n, sma200=[1.0] * n, Volume=[0] * n)
+    assert rules.channel(up).iloc[-1] and not rules.channel(up.assign(sma50=0.5)).iloc[-1]
+    down = up.assign(Close=[9.5] * (n - 1) + [8.5], sma50=0.5)
+    assert rules.channel_short(down).iloc[-1] and not rules.channel_short(down.assign(sma50=2.0)).iloc[-1]
+
+
+def test_build_score_below_for_shorts():
+    from conftest import random_walk
+    ind = random_walk(300, seed=2, drift=-0.004)
+    fired = rules.build("score_below:-0.4")(ind)
+    assert fired.any() and not (fired & rules.build("score:0.4")(ind)).any()
+    assert rules.build("rally") is rules.rally

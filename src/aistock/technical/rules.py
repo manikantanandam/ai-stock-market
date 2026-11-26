@@ -1,5 +1,7 @@
 """Entry rules: each maps an add_indicators() frame to a bool Series that is
-True on bars where a long entry is allowed (filled at the next bar's open)."""
+True on bars where an entry is allowed (filled at the next bar's open).
+Long rules are used for stocks and futures; the short rules (mirror images)
+only for futures, which can be sold first."""
 from typing import Callable
 
 import pandas as pd
@@ -30,15 +32,53 @@ def ema_cross(ind: pd.DataFrame) -> pd.Series:
     return above & ~above.shift(1, fill_value=True)
 
 
-RULES = {"pullback": pullback, "breakout": breakout, "ema_cross": ema_cross}
+def _downtrend(ind: pd.DataFrame) -> pd.Series:
+    return (ind.Close < ind.sma50) & (ind.sma50 < ind.sma200)
+
+
+def rally(ind: pd.DataFrame) -> pd.Series:
+    """Short: bounce inside an established downtrend, RSI above 60."""
+    return _downtrend(ind) & (ind.rsi14 > 60)
+
+
+def breakdown(ind: pd.DataFrame) -> pd.Series:
+    """Short: close below the prior 20-day low on 1.5x volume, with SMA50 < SMA200."""
+    prior_low = ind.Low.shift(1).rolling(20).min()
+    return (ind.Close < prior_low) & (ind.sma50 < ind.sma200) & (ind.Volume > 1.5 * ind.vol_avg20)
+
+
+def ema_cross_down(ind: pd.DataFrame) -> pd.Series:
+    """Short: EMA100 crosses below EMA200 on this bar (a slow 'death cross')."""
+    below = ind.ema100 < ind.ema200
+    return below & ~below.shift(1, fill_value=True)
+
+
+def channel(ind: pd.DataFrame) -> pd.Series:
+    """Close above the prior 20-day high with SMA50 > SMA200, no volume test
+    (Yahoo's continuous-futures volume is unreliable)."""
+    return (ind.Close > ind.High.shift(1).rolling(20).max()) & (ind.sma50 > ind.sma200)
+
+
+def channel_short(ind: pd.DataFrame) -> pd.Series:
+    """Short: close below the prior 20-day low with SMA50 < SMA200, no volume test."""
+    return (ind.Close < ind.Low.shift(1).rolling(20).min()) & (ind.sma50 < ind.sma200)
+
+
+RULES = {"pullback": pullback, "breakout": breakout, "ema_cross": ema_cross, "channel": channel}
+SHORT_RULES = {"rally": rally, "breakdown": breakdown, "ema_cross_down": ema_cross_down,
+               "channel_short": channel_short}
 
 
 def build(name: str) -> Rule:
-    """'score:0.4' (technical score >= 0.4) or a name in RULES."""
+    """'score:0.4' (technical score >= 0.4), 'score_below:-0.4' (<= -0.4, for
+    shorts), or a name in RULES or SHORT_RULES."""
     if name.startswith("score:"):
         threshold = float(name.split(":", 1)[1])
         return lambda ind: score_series(ind) >= threshold
-    return RULES[name]
+    if name.startswith("score_below:"):
+        threshold = float(name.split(":", 1)[1])
+        return lambda ind: score_series(ind) <= threshold
+    return RULES.get(name) or SHORT_RULES[name]
 
 
 def market_regime(index_ind: pd.DataFrame) -> pd.Series:

@@ -44,3 +44,16 @@ def test_get_news_as_of_limits_google_to_the_window_and_cuts_at_the_session(tmp_
     got = news.get_news_as_of("INFY", "Infosys Limited", date(2026, 11, 18), days=14)
     assert asked == ['"Infosys" share after:2026-11-04 before:2026-11-19']
     assert [n["title"] for n in got] == ["Infosys wins deal"]  # 20:30 IST is after the 17:30 IST cutoff
+
+
+def test_empty_results_are_not_cached(tmp_path, monkeypatch):
+    """An empty fetch is usually a failure; the next call must try again."""
+    monkeypatch.setattr(news, "CACHE", tmp_path)
+    monkeypatch.setattr(news, "_google_news", lambda q, days: [])
+    monkeypatch.setattr(news, "_yahoo_news", lambda s, k: [])
+    monkeypatch.setattr(news, "_publisher_items", lambda: ())
+    assert news.get_news("INFY", "Infosys Limited") == []
+    assert news.get_commodity_news("GOLD", "gold price") == []
+    monkeypatch.setattr(news, "_google_news_query", lambda q: [])
+    assert news.get_news_as_of("INFY", "Infosys Limited", date(2026, 11, 18)) == []
+    assert not list(tmp_path.iterdir())

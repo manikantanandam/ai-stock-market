@@ -24,7 +24,7 @@ def market_phase(now: datetime | None = None) -> str:
 
 
 def get_prices(symbol: str, years: int = 2) -> pd.DataFrame:
-    """Daily OHLCV for an NSE symbol (e.g. RELIANCE) or a Yahoo index (e.g. ^NSEI).
+    """Daily OHLCV for an NSE symbol (e.g. RELIANCE) or a Yahoo index, future or FX ticker (^NSEI, GC=F).
 
     Cached per IST date and market phase, so a mid-session fetch (with a
     partial bar for today) is never reused after the close; live data is
@@ -60,7 +60,8 @@ def prefetch(symbols: list[str], years: int, chunk: int = 100) -> None:
 
 
 def _ticker(symbol: str) -> str:
-    return symbol if symbol.startswith("^") else f"{symbol}.NS"
+    """Yahoo tickers for indices (^NSEI), futures (GC=F) and FX (USDINR=X) pass through."""
+    return symbol if symbol.startswith("^") or "=" in symbol else f"{symbol}.NS"
 
 
 def _path(symbol: str, years: int) -> Path:

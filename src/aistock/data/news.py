@@ -110,7 +110,8 @@ def get_news_as_of(symbol: str, company: str | None, day: date, days: int = 14) 
         if n["title"].lower() not in seen:
             seen.add(n["title"].lower())
             news.append(n)
-    path.write_text(json.dumps(news))
+    if news:  # an empty result is usually a failed fetch; retry next run rather than cache it
+        path.write_text(json.dumps(news))
     return news
 
 
@@ -130,5 +131,24 @@ def get_news(symbol: str, company: str | None, days: int = 14) -> list[dict]:
         if key not in seen:
             seen.add(key)
             news.append(n)
-    path.write_text(json.dumps(news))
+    if news:  # an empty result is usually a failed fetch; retry next run rather than cache it
+        path.write_text(json.dumps(news))
+    return news
+
+
+def get_commodity_news(symbol: str, phrase: str, days: int = 7) -> list[dict]:
+    """Recent Google News headlines with an exact phrase (e.g. "gold price"),
+    newest first, deduplicated, cached per day. Publisher feeds are skipped: a
+    bare commodity word matches too many unrelated headlines (gold loans)."""
+    CACHE.mkdir(parents=True, exist_ok=True)
+    path = CACHE / f"commodity_{symbol}_{days}d_{date.today()}.json"
+    if path.exists():
+        return json.loads(path.read_text())
+    seen, news = set(), []
+    for n in sorted(_google_news(f'"{phrase}"', days), key=lambda n: n["published"], reverse=True):
+        if n["title"].lower() not in seen:
+            seen.add(n["title"].lower())
+            news.append(n)
+    if news:  # an empty result is usually a failed fetch; retry next run rather than cache it
+        path.write_text(json.dumps(news))
     return news

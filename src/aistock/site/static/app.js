@@ -231,22 +231,27 @@ function scanTable(rows, columns) {
     labels: SCAN_LABELS, cells: SCAN_CELLS, sortKeys: SCAN_SORT, extra, link: { symbol: stockHref } });
 }
 
-// LLM notes explain BUYs the rules already chose; they never pick trades.
-// days: the session's journal rows, for every strategy saying BUY and the combined score.
-function notesCard(rows, title, days) {
+// LLM notes explain verdicts the rules already reached (stock BUYs; every commodity); they never pick trades.
+// days: the session's journal rows, for every strategy entering and the combined score.
+// entries: day row -> [[strategy, action]]; href: symbol -> link.
+const stockEntries = day => day.buys ? String(day.buys).split(';').map(b => [b, 'BUY']) : [];
+
+function notesCard(rows, title, days, entries = stockEntries, href = stockHref) {
   const bySymbol = new Map(days.map(d => [d.symbol, d]));
   return card(title,
     h('p', { class: 'sub' }, 'Written by a local LLM (qwen2.5:3b) from the signal\'s numbers; the rules made the decision.'),
     rows.map(r => {
       const day = bySymbol.get(r.symbol) || {};
-      const buys = day.buys ? String(day.buys).split(';') : [r.strategy].filter(Boolean);
+      const tags = entries(day);
+      const buys = tags.length ? tags : [[r.strategy, r.action || 'BUY']].filter(t => t[0]);
       return h('div', { class: 'note' },
-        h('div', { class: 'note-head' }, h('a', { href: stockHref(r.symbol) }, r.symbol), ' ',
+        h('div', { class: 'note-head' }, h('a', { href: href(r.symbol) }, r.symbol), ' ',
           h('span', { class: 'muted' }, r.name || ''),
           num(day.combined) ? h('span', { class: 'score ' + (day.combined >= 0 ? 'pos' : 'neg') },
             'combined ' + (day.combined >= 0 ? '+' : '') + day.combined.toFixed(2)) : null,
-          buys.map(b => h('span', { class: 'badge' + (b === r.strategy ? ' BUY' : ' tag'),
-            title: b === r.strategy ? 'The strategy this note explains' : 'Also says BUY' }, b)),
+          buys.map(([b, a]) => h('span', { class: 'badge ' + (b === r.strategy ? a : 'tag'),
+            title: b === r.strategy ? 'The strategy this note explains' : 'Also says ' + a }, b)),
+          !r.strategy && r.action ? h('span', { class: 'badge ' + r.action, title: 'No strategy has a position or an entry' }, r.action) : null,
           r.source === 'backfill' ? h('span', { class: 'badge', title: 'Written later from the journal row; fundamental and news reasons were not saved for this session' }, 'backfilled') : null),
         h('p', {}, r.note));
     }));
@@ -277,6 +282,52 @@ function renderDay(file, rows) {
   ];
 }
 
+// ---------- commodity futures ----------
+
+const contractHref = sym => '#journal/commodities/contracts/' + encodeURIComponent(sym) + '.csv';
+// Every strategy with a verdict other than WATCH; exits/holds are "strategy:side" pairs.
+const tagNames = v => v ? String(v).split(';').map(t => t.split(':')[0]) : [];
+const commodityEntries = day => [['buys', 'BUY'], ['sells', 'SELL'], ['exits', 'EXIT'], ['holds', 'HOLD']]
+  .flatMap(([col, action]) => tagNames(day[col]).map(n => [n, action]));
+// exits/holds are "strategy:side" pairs
+const sideTags = (v, cls) => v ? String(v).split(';').map(t => {
+  const [name, side] = t.split(':');
+  return h('span', { class: 'badge ' + cls, title: side }, `${name} ${side === 'short' ? '▼' : '▲'}`);
+}) : dash();
+
+const COMMODITY_COLS = ['symbol', 'group', 'action', 'buys', 'sells', 'exits', 'holds', 'combined', 'technical',
+  'sentiment', 'close', 'atr', 'close_usd', 'usdinr', 'technical_reasons', 'sentiment_reasons'];
+const COMMODITY_LABELS = { symbol: 'Contract', group: 'Group', action: 'Action', buys: 'BUY (long)',
+  sells: 'SELL (short)', exits: 'EXIT', holds: 'HOLD', combined: 'Combined', technical: 'Tech', sentiment: 'News',
+  close: 'Close ₹', atr: 'ATR ₹', close_usd: 'Close USD', usdinr: 'USDINR', technical_reasons: 'Technical reasons',
+  sentiment_reasons: 'News reasons' };
+const COMMODITY_CELLS = {
+  symbol: (v, r) => h('div', {}, h('a', { href: contractHref(v) }, v), r.name ? h('div', { class: 'cell-sub' }, r.name) : null),
+  buys: v => v ? String(v).split(';').map(b => h('span', { class: 'badge BUY' }, b)) : dash(),
+  sells: v => v ? String(v).split(';').map(b => h('span', { class: 'badge SELL' }, b)) : dash(),
+  exits: v => sideTags(v, 'EXIT'), holds: v => sideTags(v, 'HOLD'),
+  combined: scoreCell, technical: scoreCell, sentiment: scoreCell,
+  close: (v, r) => num(v) ? h('div', {}, fmt(v), r.unit ? h('div', { class: 'cell-sub' }, 'per ' + r.unit) : null) : dash(),
+};
+
+// A session's commodity notes (~one per contract) are drawn under its scan table.
+async function renderCommodityDay(file, rows) {
+  const notesPath = 'journal/commodities/notes/' + file.path.split('/').pop();
+  const notes = manifest.files.some(f => f.path === notesPath) ? await load(notesPath) : [];
+  const actions = countBy(rows, 'action');
+  const main = COMMODITY_COLS.filter(c => file.columns.includes(c));
+  const extra = file.columns.filter(c => !main.includes(c));
+  return [
+    h('p', { class: 'sub' }, 'Global futures (COMEX/NYMEX) in INR per MCX unit. BUY/SELL open a long/short at the next open; ' +
+      'EXIT and HOLD follow each strategy\'s backtested position.'),
+    tiles([['Contracts', rows.length.toLocaleString()],
+      ...actions.map(([a, n]) => [a, n.toLocaleString(), a === 'BUY' ? 'pos' : a === 'SELL' ? 'neg' : ''])]),
+    table(rows, [...main, ...extra], { filters: ['action', 'group'], sort: 'combined', labels: COMMODITY_LABELS,
+      cells: COMMODITY_CELLS, extra, link: { symbol: contractHref } }),
+    notes.length ? notesCard(notes, 'LLM notes', rows, commodityEntries, contractHref) : null,
+  ];
+}
+
 function lineConfig(labels, datasets, opts = {}) {
   return {
     type: 'line',
@@ -298,9 +349,9 @@ function renderStock(file, rows) {
   const labels = rows.map(r => r.date);
   const scores = ['combined', 'technical', 'fundamental', 'sentiment'].filter(c => file.columns.includes(c));
   return [
-    h('p', { class: 'sub' }, [last.name, last.sector].filter(Boolean).join(' · ')),
-    tiles([['Last action', last.action || '–', last.action === 'BUY' ? 'pos' : ''], ['Close', fmt(last.close)],
-      ['Combined', fmt(last.combined)], ['Technical', fmt(last.technical)], ['Fundamental', fmt(last.fundamental)],
+    h('p', { class: 'sub' }, [last.name, last.sector || last.group, last.unit && 'INR per ' + last.unit].filter(Boolean).join(' · ')),
+    tiles([['Last action', last.action || '–', last.action === 'BUY' ? 'pos' : last.action === 'SELL' ? 'neg' : ''],
+      ['Close', fmt(last.close)], ...scores.map(c => [c[0].toUpperCase() + c.slice(1), fmt(last[c])]),
       ['Sessions logged', rows.length]]),
     h('div', { class: 'charts' },
       chartCard('Close', lineConfig(labels, [{ label: 'Close', data: rows.map(r => r.close), borderColor: series(0) }])),
@@ -333,7 +384,7 @@ function renderTrades(file, rows) {
       })),
       reasons.length ? chartCard('Exit reasons', barConfig(reasons.map(r => r[0]), reasons.map(r => r[1]), { horizontal: true })) : null),
     groups.length ? table(groups, [by, 'trades', 'win_rate', 'avg_ret'], { pageSize: 50 }) : null,
-    table(rows, file.columns, { filters, link: { symbol: stockHref } }),
+    table(rows, file.columns, { filters, link: { symbol: file.path.includes('commodities_') ? contractHref : stockHref } }),
   ];
 }
 
@@ -401,6 +452,7 @@ function renderAccounts() {
 }
 
 const RENDER = { day: renderDay, notes: renderNotes, stock: renderStock, trades: renderTrades, series: renderSeries,
+  cday: renderCommodityDay, contract: renderStock,
   yearly: renderYearly, table: (f, rows) => [table(rows, f.columns)] };
 
 async function show(path) {
@@ -434,7 +486,7 @@ function buildNav() {
     if (g === 'Paper accounts' && Object.keys(manifest.accounts || {}).length) {
       nav.append(h('h2', {}, g), h('a', { href: '#accounts' }, 'Account settings'));
     } else if (files.length) nav.append(h('h2', {}, g));
-    if (g === 'Signals' || g === 'LLM notes') files = files.slice().reverse();  // newest session first
+    if (['Signals', 'LLM notes', 'Commodities'].includes(g)) files = files.slice().reverse();  // newest session first
     if (g === 'Reports') files = files.slice().sort((a, b) => b.path.localeCompare(a.path) || 0);
     if (g === 'Stocks') {
       // ~500 stocks: a search box instead of a long list.
