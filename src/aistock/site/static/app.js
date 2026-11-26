@@ -92,8 +92,9 @@ const sign = v => num(v) ? (v > 0 ? 'pos' : v < 0 ? 'neg' : '') : '';
 // ---------- table ----------
 
 function table(rows, columns, opts = {}) {
-  const { filters = [], link = {}, pageSize = 200 } = opts;
-  let sortCol = opts.sort || null, asc = opts.asc ?? false, query = '', shown = pageSize;
+  // labels: header text per column; cells: custom renderer (value, row) -> node; extra: columns hidden until 'All columns'
+  const { filters = [], link = {}, pageSize = 200, labels = {}, cells = {}, extra = [] } = opts;
+  let sortCol = opts.sort || null, asc = opts.asc ?? false, query = '', shown = pageSize, showAll = false;
   const active = Object.fromEntries(filters.map(f => [f, '']));
   const numeric = Object.fromEntries(columns.map(c => [c, rows.some(r => num(r[c]))]));
 
@@ -105,13 +106,15 @@ function table(rows, columns, opts = {}) {
     s.addEventListener('change', () => { active[f] = s.value; shown = pageSize; draw(); });
     return s;
   });
+  const toggle = extra.length ? h('input', { type: 'checkbox' }) : null;
+  toggle?.addEventListener('change', () => { showAll = toggle.checked; draw(); });
   const count = h('span', { class: 'muted' });
-  const tbody = h('tbody');
-  const ths = columns.map(c => {
-    const th = h('th', { class: numeric[c] ? 'num' : '' }, c);
+  const tbody = h('tbody'), headRow = h('tr');
+  const ths = Object.fromEntries(columns.map(c => {
+    const th = h('th', { class: numeric[c] ? 'num' : '', title: c });
     th.addEventListener('click', () => { asc = sortCol === c ? !asc : !numeric[c]; sortCol = c; draw(); });
-    return th;
-  });
+    return [c, th];
+  }));
   const more = h('button', { class: 'link' }, 'Show more');
   more.addEventListener('click', () => { shown += pageSize; draw(); });
 
@@ -127,10 +130,13 @@ function table(rows, columns, opts = {}) {
         return (x < y ? -1 : x > y ? 1 : 0) * (asc ? 1 : -1);
       });
     }
-    ths.forEach((th, i) => th.textContent = columns[i] + (columns[i] === sortCol ? (asc ? ' ▲' : ' ▼') : ''));
-    tbody.replaceChildren(...out.slice(0, shown).map(r => h('tr', {}, columns.map(c => {
+    const visible = showAll ? columns : columns.filter(c => !extra.includes(c));
+    for (const c of visible) ths[c].textContent = (labels[c] || c) + (c === sortCol ? (asc ? ' ▲' : ' ▼') : '');
+    headRow.replaceChildren(...visible.map(c => ths[c]));
+    tbody.replaceChildren(...out.slice(0, shown).map(r => h('tr', {}, visible.map(c => {
       const v = r[c];
       const cls = (numeric[c] ? 'num ' : '') + (isPct(c) ? sign(v) : '');
+      if (cells[c]) return h('td', { class: cls }, cells[c](v, r));
       const content = link[c] && v ? h('a', { href: link[c](v) }, String(v))
         : c === 'action' && v ? h('span', { class: 'badge ' + v }, v) : fmt(v, c);
       const long = typeof v === 'string' && v.length > 60;
@@ -140,8 +146,9 @@ function table(rows, columns, opts = {}) {
     more.style.display = out.length > shown ? '' : 'none';
   }
   draw();
-  return card(null, h('div', { class: 'controls' }, search, selects, count),
-    h('div', { class: 'table-wrap' }, h('table', {}, h('thead', {}, h('tr', {}, ths)), tbody)),
+  return card(null, h('div', { class: 'controls' }, search, selects,
+      toggle ? h('label', {}, toggle, 'All columns') : null, count),
+    h('div', { class: 'table-wrap' }, h('table', {}, h('thead', {}, headRow), tbody)),
     h('div', { class: 'more' }, more));
 }
 
@@ -176,6 +183,38 @@ function barConfig(labels, data, opts = {}) {
       scales: { x: { grid: { display: !!opts.horizontal } }, y: { grid: { display: !opts.horizontal } } },
     },
   };
+}
+
+// Scan table: key columns first with readable cells; raw ratios and reasons behind 'All columns'.
+const SCAN_COLS = ['symbol', 'sector', 'action', 'buys', 'combined', 'technical', 'fundamental', 'sentiment',
+  'close', 'atr', 'rs_3m', 'rs_6m', 'sector_up', 'f_marketCap', 'technical_reasons'];
+const SCAN_LABELS = { symbol: 'Stock', sector: 'Sector', action: 'Action', buys: 'BUY strategies', combined: 'Combined',
+  technical: 'Tech', fundamental: 'Fund', sentiment: 'News', close: 'Close', atr: 'ATR', rs_3m: 'RS 3m', rs_6m: 'RS 6m',
+  sector_up: 'Sector trend', f_marketCap: 'Mkt cap', technical_reasons: 'Technical reasons' };
+const dash = () => h('span', { class: 'muted' }, '–');
+
+// A [-1, 1] score as a bar growing left or right of zero, plus the value.
+const scoreCell = v => num(v) ? h('span', { class: 'score-cell' },
+  h('span', { class: 'score-bar' }, h('span', { class: sign(v),
+    style: `width:${Math.min(1, Math.abs(v)) * 50}%;${v >= 0 ? 'left' : 'right'}:50%` })),
+  h('span', { class: sign(v) }, (v > 0 ? '+' : '') + v.toFixed(2))) : dash();
+
+const SCAN_CELLS = {
+  symbol: (v, r) => h('div', {}, h('a', { href: stockHref(v) }, v), r.name ? h('div', { class: 'cell-sub' }, r.name) : null),
+  buys: v => v ? String(v).split(';').map(b => h('span', { class: 'badge tag' }, b)) : dash(),
+  combined: scoreCell, technical: scoreCell, fundamental: scoreCell, sentiment: scoreCell,
+  rs_3m: v => num(v) ? h('span', { class: sign(v) }, (v > 0 ? '+' : '') + pct(v)) : dash(),
+  rs_6m: v => num(v) ? h('span', { class: sign(v) }, (v > 0 ? '+' : '') + pct(v)) : dash(),
+  sector_up: v => v == null || v === '' ? dash() : String(v).toLowerCase() === 'true'
+    ? h('span', { class: 'pos' }, '▲ Up') : h('span', { class: 'neg' }, '▼ Down'),
+  f_marketCap: v => num(v) ? '₹' + Math.round(v / 1e7).toLocaleString('en-IN') + ' Cr' : dash(),
+};
+
+function scanTable(rows, columns) {
+  const main = SCAN_COLS.filter(c => columns.includes(c));
+  const extra = columns.filter(c => !main.includes(c));
+  return table(rows, [...main, ...extra], { filters: ['action', 'sector'], sort: 'combined',
+    labels: SCAN_LABELS, cells: SCAN_CELLS, extra, link: { symbol: stockHref } });
 }
 
 // LLM notes explain BUYs the rules already chose; they never pick trades.
@@ -224,7 +263,7 @@ async function renderDay(file, rows) {
         colors: hist.edges.map(e => e < 0 ? css('--s8') : css('--s3')),
       }))),
     notes.length ? notesCard(notes, `LLM notes on ${notes.length} BUY${notes.length > 1 ? 's' : ''}`, rows) : null,
-    table(rows, file.columns, { filters: ['action', 'sector'], link: { symbol: stockHref }, sort: 'combined' }),
+    scanTable(rows, file.columns),
   ];
 }
 
