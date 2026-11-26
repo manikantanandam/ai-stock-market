@@ -21,3 +21,4 @@ Superseding a decision: write a new record and set the old one's status to "Supe
 | [0010](0010-dashboard-view-state.md) | View state in the URL hash, stars in the browser | Accepted | 2026-11-26 |
 | [0011](0011-paper-vs-backtest-verdict.md) | Paper accounts: hold benchmark and a fixed live-vs-backtest verdict | Accepted | 2026-11-26 |
 | [0012](0012-chart-levels-from-paper-positions.md) | Chart stop/target come from open paper positions | Accepted | 2026-11-26 |
+| [0014](0014-automatic-pr-screenshots.md) | Dashboard PRs get screenshots automatically | Accepted | 2026-11-26 |

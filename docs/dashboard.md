@@ -47,15 +47,15 @@ paper account files folded under Overview.
 
 ## Screenshots (for PRs)
 
-No browser extension needed; headless Chrome against a running server:
+Automatic ([0014](decisions/0014-automatic-pr-screenshots.md)): the PR screenshots workflow runs on every PR
+touching `src/aistock/site/` and rewrites the description's screenshots section. To pick pages, put a line like
+`<!-- screenshots: today accounts journal/stocks/INOXINDIA.csv?range=1M -->` in the description and push (or
+`gh workflow run pr-screenshots.yml -f pr=<N>`). Locally, after `uv run aistock site`:
 
 ```sh
-uv run aistock site --serve   # or reuse a server already on :8000 (a second one fails: address in use)
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars \
-  --window-size=1400,2000 --virtual-time-budget=40000 --user-data-dir=/tmp/shot-profile \
-  --screenshot=today.png "http://localhost:8000/#today"
+uv run aistock pr-screenshots <N> [--page today --page accounts ...]   # needs gh auth and push access
 ```
 
-Today needs the long `--virtual-time-budget` (it loads several files). Don't screenshot while a build is
-running: it deletes `site/data` first. Hash state works in the URL (e.g. `#journal/stocks/INOXINDIA.csv?range=1M`).
-PR images go on the orphan `pr-screenshots` branch (`pr-<N>/*.png`), linked via raw.githubusercontent.com.
+It serves `site/` on a free port, so a running `--serve` doesn't clash. Today needs a long virtual-time budget
+(40 s, set in `screenshots.py`). Don't capture while a build runs: it deletes `site/data` first. Images live on
+the orphan `pr-screenshots` branch (`pr-<N>/*.png`), linked by commit via raw.githubusercontent.com.
