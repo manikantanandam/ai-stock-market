@@ -23,8 +23,8 @@ ROOT = Path(__file__).resolve().parents[3]
 STATIC = Path(__file__).parent / "static"
 
 GROUPS = ["Signals", "LLM notes", "Commodities", "Paper accounts", "Reports", "Stocks", "Contracts"]
-# Commodity notes have no nav group: the page draws them on their session's Commodities page
-COMMODITY = {"days": ("cday", "Commodities"), "notes": ("cnotes", None),
+# Commodity notes and headlines have no nav group: the page draws them on their session's Commodities page
+COMMODITY = {"days": ("cday", "Commodities"), "notes": ("cnotes", None), "headlines": ("cheadlines", None),
              "contracts": ("contract", "Contracts")}  # journal/commodities/<sub>: (kind, group)
 
 

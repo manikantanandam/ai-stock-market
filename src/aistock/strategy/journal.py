@@ -12,7 +12,9 @@ LLM notes on a session's BUYs go to `notes/<date>.csv`, one row per stock.
 Day rows also keep each score's reasons and the raw fundamental ratios
 (`f_*`), since Yahoo can't serve past fundamentals snapshots.
 Commodity futures get the same layout under `commodities/`, with
-`contracts/` in place of `stocks/`.
+`contracts/` in place of `stocks/`, plus `headlines/<date>.csv`: every scored
+headline behind each contract's news score (stocks keep only the top ones in
+their reasons; all of theirs would be ~3000 rows a day).
 """
 import csv
 from collections import defaultdict
@@ -56,6 +58,28 @@ def record_notes(notes: list[tuple[Signal, str, str]], source: str = "live", roo
                                 "action": action, "note": text, "source": source})
     for day, rows in by_day.items():
         _upsert((NOTES if root is None else root / "notes") / f"{day}.csv", rows, key="symbol")
+
+
+def record_headlines(signals: list, root: Path) -> None:
+    """Save each signal's scored headlines by session; a re-run replaces a symbol's rows.
+    Links are left out: Google News redirect URLs are ~70% of the file; the
+    dashboard searches the title instead."""
+    by_day = defaultdict(list)
+    for s in signals:
+        by_day[s.as_of] += [{"date": s.as_of, "symbol": s.symbol, "published": n["published"],
+                             "score": round(n["score"], 3), "weight": round(n["weight"], 3),
+                             "title": n["title"], "source": n["source"]}
+                            for n in s.headlines]
+    for day, rows in by_day.items():
+        if not rows:
+            continue
+        path = root / "headlines" / f"{day}.csv"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        symbols = {r["symbol"] for r in rows}
+        old = pd.read_csv(path) if path.exists() else pd.DataFrame()
+        kept = [old[~old.symbol.isin(symbols)]] if len(old) else []
+        merged = pd.concat([*kept, pd.DataFrame(rows)], ignore_index=True)
+        merged.sort_values(["symbol", "published"], ascending=[True, False]).to_csv(path, index=False)
 
 
 def load(**read_csv_kw) -> pd.DataFrame:

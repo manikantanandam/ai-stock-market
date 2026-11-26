@@ -154,7 +154,7 @@ function table(rows, columns, opts = {}) {
       // reasons are a summary plus headlines, so the headlines fold away behind the summary.
       if (c.endsWith('_reasons') && typeof v === 'string') {
         const [first, ...rest] = v.split(' | ');
-        if (c === 'sentiment_reasons' && rest.length) {
+        if (c === 'sentiment_reasons' && rest.length) {  // all headlines: commodity day pages, Headlines card
           return h('td', { class: cls + ' reasons' }, h('details', {}, h('summary', {}, first),
             rest.map(w => h('div', { class: 'headline' }, w))));
         }
@@ -326,10 +326,32 @@ const COMMODITY_CELLS = {
   close: (v, r) => num(v) ? h('div', {}, fmt(v), r.unit ? h('div', { class: 'cell-sub' }, 'per ' + r.unit) : null) : dash(),
 };
 
-// A session's commodity notes (~one per contract) are drawn under its scan table.
+// Every headline behind the session's news scores, strongest first; one contract at a time via the filter.
+const HEADLINE_LABELS = { symbol: 'Contract', published: 'Published (UTC)', score: 'Score', weight: 'Weight',
+  title: 'Headline', source: 'Source' };
+const HEADLINE_CELLS = {
+  score: scoreCell,
+  published: v => v ? String(v).slice(0, 16).replace('T', ' ') : dash(),
+  // the journal keeps no links (Google News URLs are long), so search the exact title
+  title: v => h('a', { href: 'https://news.google.com/search?q=' + encodeURIComponent(`"${v}"`),
+    target: '_blank', rel: 'noopener' }, v),
+};
+
+function headlinesCard(rows) {
+  return [h('h3', { class: 'section' }, `Headlines (${rows.length})`),
+    h('p', { class: 'sub' }, 'Score = FinBERT positive − negative; weight halves every 3 days. ' +
+      'The news score is the weighted average.'),
+    table(rows, ['symbol', 'score', 'weight', 'published', 'title', 'source'], { filters: ['symbol'],
+      sort: 'score', labels: HEADLINE_LABELS, cells: HEADLINE_CELLS,
+      sortKeys: { score: v => num(v) ? Math.abs(v) : v }, pageSize: 50 })];
+}
+
+// A session's commodity notes (~one per contract) and headlines are drawn under its scan table.
 async function renderCommodityDay(file, rows) {
-  const notesPath = 'journal/commodities/notes/' + file.path.split('/').pop();
-  const notes = manifest.files.some(f => f.path === notesPath) ? await load(notesPath) : [];
+  const day = file.path.split('/').pop();
+  const optional = async path => manifest.files.some(f => f.path === path) ? await load(path) : [];
+  const notes = await optional('journal/commodities/notes/' + day);
+  const headlines = await optional('journal/commodities/headlines/' + day);
   const actions = countBy(rows, 'action');
   const main = COMMODITY_COLS.filter(c => file.columns.includes(c));
   const extra = file.columns.filter(c => !main.includes(c));
@@ -341,6 +363,7 @@ async function renderCommodityDay(file, rows) {
     table(rows, [...main, ...extra], { filters: ['action', 'group'], sort: 'combined', labels: COMMODITY_LABELS,
       cells: COMMODITY_CELLS, extra, link: { symbol: contractHref } }),
     notes.length ? notesCard(notes, 'LLM notes', rows, commodityEntries, contractHref) : null,
+    ...(headlines.length ? headlinesCard(headlines) : []),
   ];
 }
 

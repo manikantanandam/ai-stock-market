@@ -104,13 +104,18 @@ def test_position_replays_the_backtest():
     assert signal.position(PRESETS["trend-long"], ind, CFG) is None
 
 
+HEADLINE = {"title": "Gold slips", "source": "Mint", "published": "2026-11-25T10:00:00+00:00", "link": "https://x",
+            "score": -0.8, "weight": 1.0}
+
+
 @pytest.fixture
 def offline(monkeypatch):
     def setup(prices, sentiment=0.0):
         monkeypatch.setattr(commodities, "get_prices", lambda s, years=2: prices[["Open", "High", "Low", "Close", "Volume"]])
         monkeypatch.setattr(commodities, "usd_inr", lambda years=2: pd.Series(80.0, index=prices.index))
         monkeypatch.setattr(signal, "get_commodity_news", lambda s, q: [])
-        monkeypatch.setattr(signal, "sentiment_score", lambda items: (sentiment, ["stub"]))
+        monkeypatch.setattr(signal, "score_headlines", lambda items: [HEADLINE])
+        monkeypatch.setattr(signal, "summarize", lambda h: (sentiment, ["stub"]))
     return setup
 
 
@@ -171,6 +176,7 @@ def test_site_routes_commodity_journal():
     assert site.kind_of("journal/commodities/notes/2026-11-25.csv", ["date"]) == "cnotes"
     assert site.group_of("journal/commodities/contracts/GOLD.csv") == "Contracts"
     assert site.group_of("journal/commodities/notes/2026-11-25.csv") is None  # drawn on the session page
+    assert site.kind_of("journal/commodities/headlines/2026-11-25.csv", ["date"]) == "cheadlines"
     assert site.kind_of("journal/days/2026-11-25.csv", ["date"]) == "day"
 
 
@@ -189,3 +195,24 @@ def test_side_of_the_overall_action(offline):
     s.strategies = {"a": mk("WATCH", None)}
     s.action = "WATCH"
     assert s.side is None and s.row()["side"] == ""
+
+
+def test_headlines_saved_per_session_and_rerun_replaces_a_contract(offline, tmp_path):
+    offline(random_walk(400, seed=3, drift=-0.004))
+    gold, silver = signal.evaluate("GOLD"), signal.evaluate("SILVER")
+    assert gold.headlines == [HEADLINE] and "headlines" not in gold.row()
+    journal.record_headlines([gold, silver], root=tmp_path)
+    gold.headlines = [HEADLINE, {**HEADLINE, "title": "Gold rallies", "score": 0.9}]
+    journal.record_headlines([gold], root=tmp_path)
+    rows = pd.read_csv(tmp_path / "headlines" / f"{gold.as_of}.csv")
+    assert sorted(rows.symbol) == ["GOLD", "GOLD", "SILVER"]
+    assert set(rows.columns) == {"date", "symbol", "published", "score", "weight", "title", "source"}
+    assert signal.evaluate("GOLD", news="none").headlines == []
+
+
+def test_summarize_is_the_recency_weighted_mean():
+    from aistock.sentiment.finbert import summarize
+    h = [{**HEADLINE, "score": 0.8, "weight": 1.0}, {**HEADLINE, "score": -0.4, "weight": 0.5}]
+    score, why = summarize(h)
+    assert score == pytest.approx((0.8 - 0.2) / 1.5) and why[0] == "2 headlines: 1 positive, 1 negative, 0 neutral"
+    assert summarize([]) == (0.0, ["no recent headlines"])
