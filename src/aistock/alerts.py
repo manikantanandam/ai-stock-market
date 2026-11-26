@@ -189,8 +189,9 @@ def telegram_html(s: Summary, url: str | None = None) -> str:
             lines.append("<i>No new BUYs since " + _day(s.prev)[:-5] + "</i>")
         for b in s.new[:MAX_NEW]:
             # score first: fixed width, so scores form a column and symbols start at the same place
+            # company and strategies on lines of their own: a wrapped line loses the indent
             lines += [f"{_icon(b.sector)} <code>{_score(b.combined)}</code> <b>{e(b.symbol)}</b>",
-                      f"{INDENT}{_company(b, url)} · <i>{e(_strategies(b))}</i>"]
+                      f"{INDENT}{_company(b, url)}", f"{INDENT}<i>{e(' · '.join(b.strategies))}</i>"]
         if _more(s.new, MAX_NEW):
             lines.append(f"<i>+{_more(s.new, MAX_NEW)} more on the dashboard</i>")
     if s.buys:

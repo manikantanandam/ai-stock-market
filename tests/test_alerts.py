@@ -65,7 +65,7 @@ def test_telegram_card(tmp_path):
     link = '<a href="https://example.org/#journal/stocks/C.csv">M&amp;M</a>'
     # scores lead each line (fixed width), so they form a column
     assert (f"🆕 <b>NEW BUYS</b> · 1  <i>(➖ 1 dropped)</i>\n▫️ <code>+0.60</code> <b>C</b>\n"
-            f"{alerts.INDENT}{link} · <i>swing, trend, breakout</i>") in text
+            f"{alerts.INDENT}{link}\n{alerts.INDENT}<i>swing · trend · breakout</i>") in text
     assert f"🥇 <code>+0.60</code> <b>C</b> · {link}\n🥈 <code>+0.50</code> <b>A</b>" in text
     assert "<blockquote expandable>➖ <b>No longer BUY</b> (1)\nB</blockquote>" in text
     assert lines[-1] == '👉 <a href="https://example.org/"><b>Open dashboard</b></a>'
