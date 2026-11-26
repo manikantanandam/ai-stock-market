@@ -290,28 +290,59 @@ function scanTable(rows, columns) {
 }
 
 // LLM notes explain verdicts the rules already reached (stock BUYs; every commodity); they never pick trades.
-// days: the session's journal rows, for every strategy entering and the combined score.
+// days: journal rows (keyed by date and symbol), for every strategy entering and the combined score.
 // entries: day row -> [[strategy, action]]; href: symbol -> link.
 const stockEntries = day => day.buys ? String(day.buys).split(';').map(b => [b, 'BUY']) : [];
 
 const NOTES_PER_PAGE = 5;
 
-function notesCard(rows, title, days, entries = stockEntries, href = stockHref) {
-  const bySymbol = new Map(days.map(d => [d.symbol, d]));
+// A note as one bullet per sentence. Splits only after two non-dot characters, so initials
+// ("K.P.R. Mill") and decimals ("1110.96") stay whole.
+const SENTENCE = /(?<=[A-Za-z0-9)%'"]{2}[.!?])\s+(?=[A-Z'"])/;
+// Terms colored by kind so they're easy to find: figures (prices, ratios, %), technical indicators,
+// fundamental ratios, news/sentiment. Group order is the class order in NOTE_TERMS.
+const NOTE_TERMS = [['fig', 'Figures'], ['tech', 'Technical'], ['fund', 'Fundamental'], ['news', 'News']];
+const TERM = new RegExp([
+  /(\d[\d,]*\.\d+%?x?|\d+%)/,
+  /(\b\d+-(?:day|period|session|week|bar)\b|\b(?:(?:simple|exponential) )?moving averages?(?: \((?:SMA|EMA)s?\))?|\bAverage True Range(?: \(ATR\))?|\b(?:SMAs?|EMAs?|MACD(?: histogram| line)?|RSI|ATR|ADX|OBV|VWAP|Bollinger Bands?|Donchian(?: channel)?|stochastic|golden cross|crossover|relative strength|uptrend|downtrend|breakout|momentum|volume(?: spikes?)?|overbought|oversold|support|resistance)\b)/,
+  /(\b(?:ROE|ROCE|ROA|EPS|P\/E|P\/B|PEG|D\/E|Debt\/Equity|debt-to-equity|price-to-(?:earnings|book)|(?:net|operating|profit|gross) margins?|revenue(?: growth)?|earnings(?: growth)?|dividend yield|market cap(?:italization)?|book value|free cash flow|valuation)\b)/,
+  /(\b(?:news|sentiment|headlines?|(?:buy|sell|hold) rating|ratings?|upgrade[ds]?|downgrade[ds]?|analysts?)\b)/,
+].map(r => r.source).join('|'), 'gi');
+const highlight = text => {
+  const parts = [];
+  let at = 0;
+  for (const m of text.matchAll(TERM)) {
+    const kind = NOTE_TERMS[m.slice(1).findIndex(g => g !== undefined)][0];
+    parts.push(text.slice(at, m.index), h('span', { class: 'term ' + kind }, m[0]));
+    at = m.index + m[0].length;
+  }
+  return [...parts, text.slice(at)];
+};
+// A sentence about risk is drawn wholly in red (terms stay bold).
+const RISK = /\b(?:risks?|risky|downside|caution|concerns?)\b/i;
+const noteBody = text => h('ul', { class: 'note-body' },
+  String(text || '').split(SENTENCE).map(s => h('li', RISK.test(s) ? { class: 'risk' } : {}, highlight(s))));
+const noteLegend = () => h('p', { class: 'sub note-legend' },
+  NOTE_TERMS.map(([k, label]) => h('span', { class: 'term ' + k }, label)), h('span', { class: 'term risk' }, 'Risk'));
+
+function notesCard(rows, title, days, entries = stockEntries, href = stockHref, perDate = false) {
+  const key = r => r.date + ' ' + r.symbol;
+  const byKey = new Map(days.map(d => [key(d), d]));
   const list = h('div'), pages = h('div');
   const box = card(title,
     h('p', { class: 'sub' }, `Written by a local LLM (qwen2.5:3b) from the signal's numbers; the rules made the decision. ` +
-      `${rows.length} notes.`), list, pages);
+      `${rows.length} notes.`), noteLegend(), list, pages);
   const show = page => {
     list.replaceChildren(...rows.slice(page * NOTES_PER_PAGE, (page + 1) * NOTES_PER_PAGE).map(note));
     pages.replaceChildren(pager(page, Math.ceil(rows.length / NOTES_PER_PAGE), p => { show(p); keepInView(box); }) || '');
   };
   const note = r => {
-    const day = bySymbol.get(r.symbol) || {};
+    const day = byKey.get(key(r)) || {};
     const tags = entries(day);
     const buys = tags.length ? tags : [[r.strategy, r.action || 'BUY']].filter(t => t[0]);
     return h('div', { class: 'note' },
       h('div', { class: 'note-head' }, h('a', { href: href(r.symbol) }, r.symbol), ' ',
+        perDate ? h('span', { class: 'muted' }, r.date + ' · ') : null,
         h('span', { class: 'muted' }, r.name || ''),
         day.action && day.side ? h('span', {}, h('span', { class: 'badge ' + day.action }, day.action), ' ', sideBadge(day.side)) : null,
         num(day.combined) ? h('span', { class: 'score ' + (day.combined >= 0 ? 'pos' : 'neg') },
@@ -320,7 +351,7 @@ function notesCard(rows, title, days, entries = stockEntries, href = stockHref) 
           title: b === r.strategy ? 'The strategy this note explains' : 'Also says ' + a }, b)),
         !r.strategy && r.action ? h('span', { class: 'badge ' + r.action, title: 'No strategy has a position or an entry' }, r.action) : null,
         r.source === 'backfill' ? h('span', { class: 'badge', title: 'Written later from the journal row; fundamental and news reasons were not saved for this session' }, 'backfilled') : null),
-      h('p', {}, r.note));
+      noteBody(r.note));
   };
   show(0);
   return box;
@@ -572,6 +603,10 @@ async function renderStock(file, rows) {
   const years = history.length && (manifest.fundamentals || []).includes(file.title)
     ? await load('fundamentals/' + file.title + '.csv') : [];
   const scores = ['combined', 'technical', 'fundamental', 'sentiment'].filter(c => file.columns.includes(c));
+  // This stock's LLM notes from every session, newest first.
+  const notesDir = file.kind === 'stock' ? 'journal/notes/' : 'journal/commodities/notes/';
+  const notes = (await Promise.all(manifest.files.filter(f => f.path.startsWith(notesDir)).map(f => load(f.path))))
+    .flat().filter(n => n.symbol === file.title).sort((a, b) => String(b.date).localeCompare(String(a.date)));
   return [
     h('p', { class: 'sub' }, [last.name, last.sector || last.group, last.unit && 'INR per ' + last.unit].filter(Boolean).join(' · ')),
     fundamentalsWarning(last.sector),
@@ -583,6 +618,8 @@ async function renderStock(file, rows) {
       chartCard('Scores (−1 to 1)', lineConfig(labels, scores.map((c, i) =>
         ({ label: c, data: rows.map(r => r[c]), borderColor: series(i), backgroundColor: series(i), pointRadius: 3 })), { min: -1, max: 1 }))),
     ...(history.length ? historyTables(history, years, last.sector) : []),
+    notes.length ? (file.kind === 'stock' ? notesCard(notes, 'LLM notes', rows, stockEntries, stockHref, true)
+      : notesCard(notes, 'LLM notes', rows, commodityEntries, contractHref, true)) : null,
     card('Logged sessions', table(rows.slice().reverse(), file.columns)),
   ];
 }
