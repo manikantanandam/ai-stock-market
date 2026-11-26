@@ -428,8 +428,8 @@ function lineConfig(labels, datasets, opts = {}) {
   };
 }
 
-// Full close and technical score history (data/prices/, written at build time), with logged BUYs and
-// fundamental scores at their sessions (Yahoo has no fundamental history); range buttons trim both charts.
+// Full close, technical and estimated fundamental score history (data/prices/, written at build time), with
+// logged BUYs and the logged fundamental scores at their sessions; range buttons trim both charts.
 const RANGES = [['1Y', 1], ['5Y', 5], ['Max', 0]];
 
 function historyCard(history, rows) {
@@ -450,8 +450,10 @@ function historyCard(history, rows) {
       pointRadius: 4, borderColor: series(1), backgroundColor: series(1) });
     chart(priceBox, lineConfig(labels, prices));
     const scores = [{ label: 'technical', data: pts.map(p => p.Technical), borderColor: series(1), borderWidth: 1.5 }];
-    if (fund.size) scores.push({ label: 'fundamental (logged sessions)', data: pts.map(p => fund.get(p.Date) ?? null),
-      spanGaps: true, pointRadius: 3, borderColor: series(2), backgroundColor: series(2) });
+    if (pts.some(p => num(p.Fundamental))) scores.push({ label: 'fundamental (estimated from annual results)',
+      data: pts.map(p => p.Fundamental), borderColor: series(2), borderWidth: 1.5, borderDash: [5, 4] });
+    if (fund.size) scores.push({ label: 'fundamental (logged)', data: pts.map(p => fund.get(p.Date) ?? null),
+      spanGaps: true, pointRadius: 3, borderColor: series(3), backgroundColor: series(3) });
     chart(scoreBox, lineConfig(labels, scores, { min: -1, max: 1 }));
   };
   const btns = RANGES.map(([label, years]) => {

@@ -35,6 +35,15 @@ jobs:
         with:
           enable-cache: true
 
+      # Annual statements for the estimated fundamental history have a 7-day TTL;
+      # shares the daily scan's cache prefix (same .cache/fundamentals folder).
+      - name: Cache fundamentals
+        uses: actions/cache@v4
+        with:
+          path: .cache/fundamentals
+          key: fundamentals-pages-${{ github.run_id }}
+          restore-keys: fundamentals-
+
       - name: Install
         run: uv sync --locked
 

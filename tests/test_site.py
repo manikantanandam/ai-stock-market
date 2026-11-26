@@ -39,7 +39,7 @@ def test_build_copies_csvs_and_writes_manifest(tmp_path):
 def test_build_writes_full_price_history_per_stock(tmp_path, monkeypatch):
     import pandas as pd
 
-    from aistock.data import prices
+    from aistock.data import fundamentals, prices
     from aistock.technical.indicators import add_indicators, score_series
 
     root = tmp_path / "repo"
@@ -58,6 +58,8 @@ def test_build_writes_full_price_history_per_stock(tmp_path, monkeypatch):
         return frame.copy()
 
     monkeypatch.setattr(prices, "prefetch", lambda symbols, years: None)
+    monkeypatch.setattr(fundamentals, "prefetch", lambda symbols, fetch: None)
+    monkeypatch.setattr(fundamentals, "get_statements", lambda sym: [])
     monkeypatch.setattr(prices, "get_prices", fake_get)
     out = tmp_path / "site"
 
@@ -66,6 +68,6 @@ def test_build_writes_full_price_history_per_stock(tmp_path, monkeypatch):
     assert manifest["prices"] == ["INFY"]  # GONE has no data and falls back to journal closes
     assert asked == [None, None]  # full history
     lines = (out / "data" / "prices" / "INFY.csv").read_text().splitlines()
-    assert lines[:3] == ["Date,Close,Technical", "2001-01-02,1.23,", "2001-01-03,2.0,"]  # no score before SMA200
+    assert lines[:3] == ["Date,Close,Technical,Fundamental", "2001-01-02,1.23,,", "2001-01-03,2.0,,"]  # no score before SMA200
     expected = score_series(add_indicators(frame)).round(2)
     assert [float(x.split(",")[2]) for x in lines[200:]] == expected.iloc[199:].tolist()
