@@ -182,10 +182,12 @@ def test_card_html_holds_every_section(tmp_path):
 
 
 def test_score_note_follows_the_live_weights(monkeypatch):
+    from functools import partial
+
     from aistock.strategy import signal
 
-    monkeypatch.setattr(signal.Config, "w_technical", 0.6)
-    monkeypatch.setattr(signal.Config, "w_fundamental", 0.2)
+    # dataclass defaults are fixed in __init__, so swap in a Config with other ones
+    monkeypatch.setattr(signal, "Config", partial(signal.Config, w_technical=0.6, w_fundamental=0.2))
     note = alerts.score_note()
     assert "from −1 to +1: 60% technical + 20% fundamentals + 20% news sentiment" in note
     assert "need a minimum (swing +0.40)" in note
