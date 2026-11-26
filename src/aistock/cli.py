@@ -300,6 +300,24 @@ def site(
         http.server.ThreadingHTTPServer(("127.0.0.1", port), handler).serve_forever()
 
 
+@app.command("pr-screenshots")
+def pr_screenshots(
+    pr: int = typer.Argument(..., help="Pull request number"),
+    site_dir: str = typer.Option("site", "--site", help="Built site folder (aistock site)"),
+    page: list[str] = typer.Option(None, "--page", help="Page hash to capture, e.g. today (repeatable); "
+                                                        "default: the PR body's <!-- screenshots: ... --> line, else a standard set"),
+    theme: str = typer.Option("dark", help="dark or light"),
+):
+    """Screenshot dashboard pages and put them in the PR description (images on the pr-screenshots branch)."""
+    from pathlib import Path
+
+    from aistock.site import screenshots
+
+    if theme not in screenshots.THEMES:
+        raise typer.BadParameter(f"theme must be one of {', '.join(screenshots.THEMES)}")
+    print(screenshots.publish(pr, Path(site_dir), Path.cwd(), page or None, theme))
+
+
 @app.command("update-watchlists")
 def update_watchlists():
     """Refresh index constituent CSVs from niftyindices.com (NSE rebalances twice a year)."""
