@@ -92,11 +92,13 @@ const sign = v => num(v) ? (v > 0 ? 'pos' : v < 0 ? 'neg' : '') : '';
 // ---------- table ----------
 
 function table(rows, columns, opts = {}) {
-  // labels: header text per column; cells: custom renderer (value, row) -> node; extra: columns hidden until 'All columns'
-  const { filters = [], link = {}, pageSize = 200, labels = {}, cells = {}, extra = [] } = opts;
+  // labels: header text per column; cells: custom renderer (value, row) -> node; extra: columns hidden until 'All columns';
+  // sortKeys: (value, row) -> number to sort a column by instead of its raw value
+  const { filters = [], link = {}, pageSize = 200, labels = {}, cells = {}, extra = [], sortKeys = {} } = opts;
   let sortCol = opts.sort || null, asc = opts.asc ?? false, query = '', shown = pageSize, showAll = false;
   const active = Object.fromEntries(filters.map(f => [f, '']));
   const numeric = Object.fromEntries(columns.map(c => [c, rows.some(r => num(r[c]))]));
+  const descFirst = c => numeric[c] || c in sortKeys;
 
   const search = h('input', { type: 'search', placeholder: 'Search…' });
   search.addEventListener('input', () => { query = search.value.toLowerCase(); shown = pageSize; draw(); });
@@ -106,13 +108,18 @@ function table(rows, columns, opts = {}) {
     s.addEventListener('change', () => { active[f] = s.value; shown = pageSize; draw(); });
     return s;
   });
+  const sortBy = h('select', { title: 'Sort by' }, h('option', { value: '' }, 'Sort: file order'),
+    columns.map(c => h('option', { value: c }, 'Sort: ' + (labels[c] || c))));
+  sortBy.addEventListener('change', () => { sortCol = sortBy.value || null; asc = !descFirst(sortCol); draw(); });
+  const dir = h('button', { class: 'link', title: 'Flip sort direction' });
+  dir.addEventListener('click', () => { asc = !asc; draw(); });
   const toggle = extra.length ? h('input', { type: 'checkbox' }) : null;
   toggle?.addEventListener('change', () => { showAll = toggle.checked; draw(); });
   const count = h('span', { class: 'muted' });
   const tbody = h('tbody'), headRow = h('tr');
   const ths = Object.fromEntries(columns.map(c => {
     const th = h('th', { class: numeric[c] ? 'num' : '', title: c });
-    th.addEventListener('click', () => { asc = sortCol === c ? !asc : !numeric[c]; sortCol = c; draw(); });
+    th.addEventListener('click', () => { asc = sortCol === c ? !asc : !descFirst(c); sortCol = c; draw(); });
     return [c, th];
   }));
   const more = h('button', { class: 'link' }, 'Show more');
@@ -124,12 +131,16 @@ function table(rows, columns, opts = {}) {
       (!query || columns.some(c => String(r[c] ?? '').toLowerCase().includes(query))));
     if (sortCol) {
       out = out.slice().sort((a, b) => {
-        const x = a[sortCol], y = b[sortCol];
+        const key = sortKeys[sortCol] || (v => v);
+        const x = key(a[sortCol], a), y = key(b[sortCol], b);
         if (x == null || x === '') return 1;
         if (y == null || y === '') return -1;
         return (x < y ? -1 : x > y ? 1 : 0) * (asc ? 1 : -1);
       });
     }
+    sortBy.value = sortCol || '';
+    dir.textContent = asc ? '▲ Asc' : '▼ Desc';
+    dir.disabled = !sortCol;
     const visible = showAll ? columns : columns.filter(c => !extra.includes(c));
     for (const c of visible) ths[c].textContent = (labels[c] || c) + (c === sortCol ? (asc ? ' ▲' : ' ▼') : '');
     headRow.replaceChildren(...visible.map(c => ths[c]));
@@ -146,7 +157,7 @@ function table(rows, columns, opts = {}) {
     more.style.display = out.length > shown ? '' : 'none';
   }
   draw();
-  return card(null, h('div', { class: 'controls' }, search, selects,
+  return card(null, h('div', { class: 'controls' }, search, selects, sortBy, dir,
       toggle ? h('label', {}, toggle, 'All columns') : null, count),
     h('div', { class: 'table-wrap' }, h('table', {}, h('thead', {}, headRow), tbody)),
     h('div', { class: 'more' }, more));
@@ -210,16 +221,19 @@ const SCAN_CELLS = {
   f_marketCap: v => num(v) ? '₹' + Math.round(v / 1e7).toLocaleString('en-IN') + ' Cr' : dash(),
 };
 
+// Most BUY strategies first; combined/10 stays within ±0.1, so it only breaks ties.
+const SCAN_SORT = { buys: (v, r) => (v ? String(v).split(';').length : 0) + (num(r.combined) ? r.combined / 10 : 0) };
+
 function scanTable(rows, columns) {
   const main = SCAN_COLS.filter(c => columns.includes(c));
   const extra = columns.filter(c => !main.includes(c));
   return table(rows, [...main, ...extra], { filters: ['action', 'sector'], sort: 'combined',
-    labels: SCAN_LABELS, cells: SCAN_CELLS, extra, link: { symbol: stockHref } });
+    labels: SCAN_LABELS, cells: SCAN_CELLS, sortKeys: SCAN_SORT, extra, link: { symbol: stockHref } });
 }
 
 // LLM notes explain BUYs the rules already chose; they never pick trades.
 // days: the session's journal rows, for every strategy saying BUY and the combined score.
-function notesCard(rows, title, days = []) {
+function notesCard(rows, title, days) {
   const bySymbol = new Map(days.map(d => [d.symbol, d]));
   return card(title,
     h('p', { class: 'sub' }, 'Written by a local LLM (qwen2.5:3b) from the signal\'s numbers; the rules made the decision.'),
@@ -231,7 +245,7 @@ function notesCard(rows, title, days = []) {
           h('span', { class: 'muted' }, r.name || ''),
           num(day.combined) ? h('span', { class: 'score ' + (day.combined >= 0 ? 'pos' : 'neg') },
             'combined ' + (day.combined >= 0 ? '+' : '') + day.combined.toFixed(2)) : null,
-          buys.map(b => h('span', { class: 'badge' + (b === r.strategy ? ' BUY' : ''),
+          buys.map(b => h('span', { class: 'badge' + (b === r.strategy ? ' BUY' : ' tag'),
             title: b === r.strategy ? 'The strategy this note explains' : 'Also says BUY' }, b)),
           r.source === 'backfill' ? h('span', { class: 'badge', title: 'Written later from the journal row; fundamental and news reasons were not saved for this session' }, 'backfilled') : null),
         h('p', {}, r.note));
@@ -244,10 +258,7 @@ async function renderNotes(file, rows) {
   return [notesCard(rows, null, days)];
 }
 
-async function renderDay(file, rows) {
-  const date = file.path.split('/').pop();
-  const notesFile = manifest.files.find(f => f.path === 'journal/notes/' + date);
-  const notes = notesFile ? await load(notesFile.path) : [];
+function renderDay(file, rows) {
   const actions = countBy(rows, 'action');
   const buys = rows.filter(r => r.action === 'BUY');
   const sectors = countBy(buys.length ? buys : rows.filter(r => r.action === 'WATCH'), 'sector').slice(0, 15);
@@ -262,7 +273,6 @@ async function renderDay(file, rows) {
       chartCard('Combined score distribution', barConfig(hist.edges.map(e => e.toFixed(1)), hist.counts, {
         colors: hist.edges.map(e => e < 0 ? css('--s8') : css('--s3')),
       }))),
-    notes.length ? notesCard(notes, `LLM notes on ${notes.length} BUY${notes.length > 1 ? 's' : ''}`, rows) : null,
     scanTable(rows, file.columns),
   ];
 }

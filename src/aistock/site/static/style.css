@@ -130,3 +130,4 @@ button.link { background: none; border: 1px solid var(--border); color: var(--in
   main { padding: 16px; }
   .charts { grid-template-columns: 1fr; }
 }
+button.link:disabled { opacity: .5; cursor: default; }
