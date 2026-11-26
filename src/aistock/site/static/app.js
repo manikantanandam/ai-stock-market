@@ -428,16 +428,57 @@ function lineConfig(labels, datasets, opts = {}) {
   };
 }
 
-function renderStock(file, rows) {
+// Full close, technical and estimated fundamental score history (data/prices/, written at build time), with
+// logged BUYs and the logged fundamental scores at their sessions; range buttons trim both charts.
+const RANGES = [['1Y', 1], ['5Y', 5], ['Max', 0]];
+
+function historyCard(history, rows) {
+  const buys = new Map(rows.filter(r => r.action === 'BUY').map(r => [r.date, r.close]));
+  const fund = new Map(rows.filter(r => num(r.fundamental)).map(r => [r.date, r.fundamental]));
+  const priceBox = h('div', { class: 'chart-box tall' }), scoreBox = h('div', { class: 'chart-box' });
+  const draw = years => {
+    const mine = charts.filter(c => [priceBox, scoreBox].includes(c.canvas.parentNode));  // destroy() nulls c.canvas, so split first
+    charts = charts.filter(c => !mine.includes(c));
+    mine.forEach(c => c.destroy());
+    priceBox.replaceChildren(); scoreBox.replaceChildren();
+    const end = new Date(history[history.length - 1].Date);
+    const from = years ? new Date(end.getFullYear() - years, end.getMonth(), end.getDate()).toISOString().slice(0, 10) : '';
+    const pts = history.filter(p => String(p.Date) >= from);
+    const labels = pts.map(p => p.Date);
+    const prices = [{ label: 'Close', data: pts.map(p => p.Close), borderColor: series(0) }];
+    if (buys.size) prices.push({ label: 'BUY', data: pts.map(p => buys.get(p.Date) ?? null), showLine: false,
+      pointRadius: 4, borderColor: series(1), backgroundColor: series(1) });
+    chart(priceBox, lineConfig(labels, prices));
+    const scores = [{ label: 'technical', data: pts.map(p => p.Technical), borderColor: series(1), borderWidth: 1.5 }];
+    if (pts.some(p => num(p.Fundamental))) scores.push({ label: 'fundamental (estimated from annual results)',
+      data: pts.map(p => p.Fundamental), borderColor: series(2), borderWidth: 1.5, borderDash: [5, 4] });
+    if (fund.size) scores.push({ label: 'fundamental (logged)', data: pts.map(p => fund.get(p.Date) ?? null),
+      spanGaps: true, pointRadius: 3, borderColor: series(3), backgroundColor: series(3) });
+    chart(scoreBox, lineConfig(labels, scores, { min: -1, max: 1 }));
+  };
+  const btns = RANGES.map(([label, years]) => {
+    const b = h('button', { class: 'link' }, label);
+    b.addEventListener('click', () => { btns.forEach(x => x.disabled = x === b); draw(years); });
+    return b;
+  });
+  btns[btns.length - 1].disabled = true;
+  requestAnimationFrame(() => draw(0));
+  return card(`Price history (${history[0].Date} to ${history[history.length - 1].Date})`,
+    h('div', { class: 'controls' }, btns), priceBox, h('h3', {}, 'Scores (−1 to 1)'), scoreBox);
+}
+
+async function renderStock(file, rows) {
   const last = rows[rows.length - 1] || {};
   const labels = rows.map(r => r.date);
+  const history = file.kind === 'stock' && (manifest.prices || []).includes(file.title)
+    ? (await load('prices/' + file.title + '.csv')).filter(p => num(p.Close)) : [];
   const scores = ['combined', 'technical', 'fundamental', 'sentiment'].filter(c => file.columns.includes(c));
   return [
     h('p', { class: 'sub' }, [last.name, last.sector || last.group, last.unit && 'INR per ' + last.unit].filter(Boolean).join(' · ')),
     tiles([['Last action', last.action || '–', last.action === 'BUY' ? 'pos' : last.action === 'SELL' ? 'neg' : ''],
       ['Close', fmt(last.close)], ...scores.map(c => [c[0].toUpperCase() + c.slice(1), fmt(last[c])]),
       ['Sessions logged', rows.length]]),
-    h('div', { class: 'charts' },
+    history.length ? historyCard(history, rows) : h('div', { class: 'charts' },
       chartCard('Close', lineConfig(labels, [{ label: 'Close', data: rows.map(r => r.close), borderColor: series(0) }])),
       chartCard('Scores (−1 to 1)', lineConfig(labels, scores.map((c, i) =>
         ({ label: c, data: rows.map(r => r[c]), borderColor: series(i), backgroundColor: series(i), pointRadius: 3 })), { min: -1, max: 1 }))),

@@ -282,13 +282,14 @@ def site(
     out: str = typer.Option("site", help="Output folder"),
     serve: bool = typer.Option(False, "--serve", help="Serve the site on localhost after building"),
     port: int = typer.Option(8000, help="Port for --serve"),
+    prices: bool = typer.Option(True, "--prices/--no-prices", help="Download each stock's full price history"),
 ):
     """Build the dashboard (journal + reports CSVs with charts) as a static site."""
     from pathlib import Path
 
     from aistock import site as dashboard
 
-    manifest = dashboard.build(Path(out))
+    manifest = dashboard.build(Path(out), prices=prices)
     print(f"Built {out}/ with {len(manifest['files'])} CSV files")
     if serve:
         import functools

@@ -34,3 +34,40 @@ def test_build_copies_csvs_and_writes_manifest(tmp_path):
     assert (day["kind"], day["group"], day["rows"]) == ("day", "Stocks", 2)
     assert (equity["group"], equity["title"]) == ("Paper accounts", "trend · equity")
     assert manifest["accounts"] == {"trend": {"capital": 100000, "slots": 10}}
+
+
+def test_build_writes_full_price_history_per_stock(tmp_path, monkeypatch):
+    import pandas as pd
+
+    from aistock.data import fundamentals, prices
+    from aistock.technical.indicators import add_indicators, score_series
+
+    root = tmp_path / "repo"
+    (root / "journal" / "stocks").mkdir(parents=True)
+    for sym in ("INFY", "GONE"):
+        (root / "journal" / "stocks" / f"{sym}.csv").write_text(f"date,symbol,close\n2026-11-23,{sym},1\n")
+    close = [1.234, 2.0] + [100.0 + i for i in range(250)]
+    frame = pd.DataFrame({"Open": close, "High": close, "Low": close, "Close": close, "Volume": 1000.0},
+                         index=pd.bdate_range("2001-01-02", periods=len(close)))
+    asked = []
+
+    def fake_get(sym, years):
+        asked.append(years)
+        if sym == "GONE":
+            raise ValueError("no price data")
+        return frame.copy()
+
+    monkeypatch.setattr(prices, "prefetch", lambda symbols, years: None)
+    monkeypatch.setattr(fundamentals, "prefetch", lambda symbols, fetch: None)
+    monkeypatch.setattr(fundamentals, "get_statements", lambda sym: [])
+    monkeypatch.setattr(prices, "get_prices", fake_get)
+    out = tmp_path / "site"
+
+    manifest = site.build(out, root=root, prices=True)
+
+    assert manifest["prices"] == ["INFY"]  # GONE has no data and falls back to journal closes
+    assert asked == [None, None]  # full history
+    lines = (out / "data" / "prices" / "INFY.csv").read_text().splitlines()
+    assert lines[:3] == ["Date,Close,Technical,Fundamental", "2001-01-02,1.23,,", "2001-01-03,2.0,,"]  # no score before SMA200
+    expected = score_series(add_indicators(frame)).round(2)
+    assert [float(x.split(",")[2]) for x in lines[200:]] == expected.iloc[199:].tolist()

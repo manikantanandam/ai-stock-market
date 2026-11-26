@@ -23,8 +23,9 @@ def market_phase(now: datetime | None = None) -> str:
     return "pre" if now.time() < dtime(9, 15) else "live"
 
 
-def get_prices(symbol: str, years: int = 2) -> pd.DataFrame:
+def get_prices(symbol: str, years: int | None = 2) -> pd.DataFrame:
     """Daily OHLCV for an NSE symbol (e.g. RELIANCE) or a Yahoo index, future or FX ticker (^NSEI, GC=F).
+    years=None fetches the full history.
 
     Cached per IST date and market phase, so a mid-session fetch (with a
     partial bar for today) is never reused after the close; live data is
@@ -33,7 +34,7 @@ def get_prices(symbol: str, years: int = 2) -> pd.DataFrame:
     path = _path(symbol, years)
     if _fresh(path):
         return pd.read_parquet(path)
-    raw = yf.Ticker(_ticker(symbol)).history(period=f"{years}y", auto_adjust=True)
+    raw = yf.Ticker(_ticker(symbol)).history(period=_period(years), auto_adjust=True)
     df = _clean(raw) if not raw.empty else raw
     if df.empty:
         raise ValueError(f"no price data for {_ticker(symbol)}")
@@ -41,7 +42,7 @@ def get_prices(symbol: str, years: int = 2) -> pd.DataFrame:
     return df
 
 
-def prefetch(symbols: list[str], years: int, chunk: int = 100) -> None:
+def prefetch(symbols: list[str], years: int | None, chunk: int = 100) -> None:
     """Batch-download uncached symbols with yf.download (threaded), which is far
     faster than one request per symbol for large watchlists. Symbols that come
     back empty are left for get_prices to retry and report."""
@@ -49,7 +50,7 @@ def prefetch(symbols: list[str], years: int, chunk: int = 100) -> None:
     logging.getLogger("yfinance").setLevel(logging.CRITICAL)  # failures surface via get_prices
     for start in range(0, len(todo), chunk):
         batch = todo[start:start + chunk]
-        raw = yf.download([_ticker(s) for s in batch], period=f"{years}y", auto_adjust=True,
+        raw = yf.download([_ticker(s) for s in batch], period=_period(years), auto_adjust=True,
                           group_by="ticker", threads=True, progress=False)
         for sym in batch:
             if _ticker(sym) not in raw.columns.get_level_values(0):
@@ -64,9 +65,13 @@ def _ticker(symbol: str) -> str:
     return symbol if symbol.startswith("^") or "=" in symbol else f"{symbol}.NS"
 
 
-def _path(symbol: str, years: int) -> Path:
+def _period(years: int | None) -> str:
+    return "max" if years is None else f"{years}y"
+
+
+def _path(symbol: str, years: int | None) -> Path:
     CACHE.mkdir(parents=True, exist_ok=True)
-    return CACHE / f"{symbol}_{years}y_{datetime.now(IST).date()}_{market_phase()}.parquet"
+    return CACHE / f"{symbol}_{_period(years)}_{datetime.now(IST).date()}_{market_phase()}.parquet"
 
 
 def _fresh(path: Path) -> bool:
