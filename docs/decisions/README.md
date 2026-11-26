@@ -25,3 +25,4 @@ Superseding a decision: write a new record and set the old one's status to "Supe
 | [0014](0014-automatic-pr-screenshots.md) | Dashboard PRs get screenshots automatically | Accepted | 2026-11-26 |
 | [0015](0015-paper-account-decisions.md) | Paper accounts record what they did with every BUY | Accepted | 2026-11-26 |
 | [0016](0016-point-in-time-constituents-parked.md) | Point-in-time index constituents | Rejected (parked) | 2026-11-26 |
+| [0017](0017-daily-alert.md) | Daily alert to Telegram, email and a GitHub issue | Accepted | 2026-11-26 |
