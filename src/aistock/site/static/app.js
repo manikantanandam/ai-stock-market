@@ -360,10 +360,10 @@ function barConfig(labels, data, opts = {}) {
 }
 
 // Scan table: key columns first with readable cells; raw ratios and reasons behind 'All columns'.
-const SCAN_COLS = ['symbol', 'sector', 'action', 'buys', 'combined', 'change', 'technical', 'fundamental', 'sentiment',
+const SCAN_COLS = ['symbol', 'sector', 'action', 'buys', 'taken', 'combined', 'change', 'technical', 'fundamental', 'sentiment',
   'close', 'atr', 'rs_3m', 'rs_6m', 'sector_up', 'f_marketCap', 'technical_reasons'];
 const SCAN_LABELS = { symbol: 'Stock', sector: 'Sector', action: 'Action', buys: 'BUY strategies', combined: 'Combined',
-  change: 'Δ prev',
+  change: 'Δ prev', taken: 'Paper accounts',
   technical: 'Tech', fundamental: 'Fund', sentiment: 'News', close: 'Close', atr: 'ATR', rs_3m: 'RS 3m', rs_6m: 'RS 6m',
   sector_up: 'Sector trend', f_marketCap: 'Mkt cap', technical_reasons: 'Technical reasons' };
 const dash = () => h('span', { class: 'muted' }, '–');
@@ -382,6 +382,11 @@ const SCAN_CELLS = {
   action: (v, r) => v ? h('span', {}, h('span', { class: 'badge ' + v }, v),
     r.fresh ? h('span', { class: 'badge new', title: 'Not a BUY in the previous session' }, 'NEW') : null) : dash(),
   change: signed,
+  // taken: what each paper account did with this BUY at the next open (withDecisions)
+  taken: v => v?.length ? h('div', { class: 'chips' }, v.map(d => h('span', {
+    class: 'chip ' + (d.outcome === 'entered' ? 'pos' : d.outcome === 'entered + stopped' ? 'neg' : ''),
+    title: `${d.strategy}: ${d.outcome}${d.rank ? ` (ranked ${d.rank})` : ''}` },
+    d.outcome === 'entered' ? `${d.strategy} ✓` : `${d.strategy}: ${d.outcome}`))) : dash(),
   buys: v => v ? String(v).split(';').map(b => h('span', { class: 'badge tag' }, b)) : dash(),
   combined: scoreCell, technical: scoreCell, fundamental: scoreCell, sentiment: scoreCell,
   rs_3m: v => num(v) ? h('span', { class: sign(v) }, (v > 0 ? '+' : '') + pct(v)) : dash(),
@@ -550,11 +555,49 @@ async function renderNotes(file, rows) {
 }
 
 // A session's LLM notes (also under the LLM notes group) are drawn under its scan table.
+// ---------- paper account decisions ----------
+
+// What each paper account did with a session's BUYs (decisions.csv, written by strategy/account.py): symbol ->
+// [{ strategy, outcome, rank }]. Entries happen at the next session's open, so the latest session has none yet.
+function decisionsFor(accounts, date) {
+  const by = new Map();
+  for (const a of accounts) for (const d of a.decisions || []) {
+    if (String(d.signal_date) !== date) continue;
+    by.set(d.symbol, [...(by.get(d.symbol) || []), { strategy: a.name, outcome: d.outcome, rank: d.rank }]);
+  }
+  return by;
+}
+
+const withDecisions = (rows, by) => by.size ? rows.map(r => ({ ...r, taken: by.get(r.symbol) })) : rows;
+
+const DECISION_LABELS = { strategy: 'Strategy', offered: 'BUYs offered', entered: 'Entered', no_slot: 'No free slot',
+  held: 'Already held', other: 'No data / cash', symbols: 'Entered stocks' };
+
+// Per strategy: how many of a session's BUYs it entered and why it skipped the rest.
+function decisionsCard(accounts, date, entryDate) {
+  const rows = accounts.map(a => {
+    const ds = (a.decisions || []).filter(d => String(d.signal_date) === date);
+    const n = outcome => ds.filter(d => d.outcome === outcome).length;
+    const entered = ds.filter(d => String(d.outcome).startsWith('entered'));
+    return { strategy: a.name, offered: ds.length, entered: entered.length, no_slot: n('no slot'), held: n('held'),
+      other: n('no data') + n('no cash'), symbols: entered.map(d => d.symbol).join(' ') };
+  }).filter(r => r.offered);
+  if (!rows.length) return null;
+  return [h('h3', { class: 'section' }, `Paper accounts on the ${date} BUYs`),
+    h('p', { class: 'sub' }, `Entered at the ${entryDate || 'next'} open, best rank first into each account's free slots; ` +
+      'the rest were skipped.'),
+    table(rows, Object.keys(DECISION_LABELS), { pageSize: 25, labels: DECISION_LABELS, cells: {
+      symbols: v => v ? h('div', { class: 'chips' }, String(v).split(' ').map(s => h('a', { class: 'chip pos', href: stockHref(s) }, s))) : dash(),
+    } })];
+}
+
 async function renderDay(file, rows) {
   const notes = await optional('journal/notes/' + file.path.split('/').pop());
   const prevFile = previousDay(file.path);
   const prevRows = prevFile ? await load(prevFile.path) : null;
-  rows = withChanges(rows, prevRows);
+  const accounts = await loadAccounts(), decided = decisionsFor(accounts, file.title);
+  rows = withDecisions(withChanges(rows, prevRows), decided);
+  const entryDate = accounts.flatMap(a => a.decisions || []).find(d => String(d.signal_date) === file.title)?.entry_date;
   const actions = countBy(rows, 'action');
   const buys = rows.filter(r => r.action === 'BUY');
   const sectors = countBy(buys.length ? buys : rows.filter(r => r.action === 'WATCH'), 'sector').slice(0, 15);
@@ -570,7 +613,8 @@ async function renderDay(file, rows) {
         colors: hist.edges.map(e => e < 0 ? css('--s8') : css('--s3')),
       }))),
     prevRows ? changesCard(rows, prevRows, prevFile.title) : null,
-    scanTable(rows, prevRows ? [...file.columns, 'change'] : file.columns),
+    scanTable(rows, [...file.columns, ...(prevRows ? ['change'] : []), ...(decided.size ? ['taken'] : [])]),
+    decided.size ? decisionsCard(accounts, file.title, entryDate) : null,
     notes.length ? notesCard(notes, 'LLM notes', rows) : null,
   ];
 }
@@ -604,6 +648,8 @@ async function renderToday() {
     prevRows ? changesCard(rows, prevRows, prevFile.title) : null,
     h('h3', { class: 'section' }, `BUY signals (${buys.length})`),
     buys.length ? scanTable(buys, columns) : h('p', { class: 'muted' }, 'No BUY signals in this session.'),
+    // this session's BUYs enter at the next open; show what the accounts did with the previous session's
+    prevFile ? decisionsCard(accounts, prevFile.title, file.title) : null,
     accounts.length ? [h('h3', { class: 'section' }, 'Paper accounts'),
       h('p', { class: 'sub' }, h('a', { href: '#accounts' }, 'Equity curves, open positions and trades')),
       accountsTable(accounts), accountsChart(accounts)] : null,
@@ -1050,9 +1096,9 @@ function renderYearly(file, rows) {
 // Each saved account (manifest.accounts: settings per strategy) with its equity, positions and trades files.
 async function loadAccounts() {
   return Promise.all(Object.entries(manifest.accounts || {}).map(async ([name, cfg]) => {
-    const [equity, positions, trades] = await Promise.all(['equity', 'positions', 'trades']
+    const [equity, positions, trades, decisions] = await Promise.all(['equity', 'positions', 'trades', 'decisions']
       .map(k => optional(`journal/paper/${name}/${k}.csv`)));
-    return { name, cfg, equity, positions, trades };
+    return { name, cfg, equity, positions, trades, decisions };
   }));
 }
 

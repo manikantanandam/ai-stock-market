@@ -23,3 +23,4 @@ Superseding a decision: write a new record and set the old one's status to "Supe
 | [0012](0012-chart-levels-from-paper-positions.md) | Chart stop/target come from open paper positions | Accepted | 2026-11-26 |
 | [0013](0013-journal-records-planned-levels.md) | The journal records each BUY strategy's planned stop and target | Accepted | 2026-11-26 |
 | [0014](0014-automatic-pr-screenshots.md) | Dashboard PRs get screenshots automatically | Accepted | 2026-11-26 |
+| [0015](0015-paper-account-decisions.md) | Paper accounts record what they did with every BUY | Accepted | 2026-11-26 |

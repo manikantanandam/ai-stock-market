@@ -19,7 +19,8 @@ inverse), so stops keep their place relative to the price and the value is
 unchanged. A split or bonus shows up as a large ratio, a dividend as a small one.
 
 Files per strategy in journal/paper/<strategy>/: account.json (capital,
-slots), positions.csv (open), trades.csv (closed), equity.csv (per session).
+slots), positions.csv (open), trades.csv (closed), equity.csv (per session),
+decisions.csv (what happened to each BUY it was offered: see DECISIONS).
 """
 import json
 from dataclasses import asdict, dataclass, field, fields
@@ -36,6 +37,11 @@ from aistock.strategy.strategies import PRESETS
 
 ROOT = journal.ROOT / "paper"
 TRADE_COLS = ["symbol", "entry_date", "exit_date", "entry", "exit", "bars", "reason", "pnl", "ret"]
+# One row per BUY signal offered to the account: the signal session, the session it could enter (next open),
+# its rank among the candidates (blank if not a candidate) and the outcome: entered, entered + stopped (stopped
+# out on the entry bar), no slot (ranked below the free slots), held (already open), no data (no bar or ATR to
+# enter on), no cash (not even one share). Recorded only; entries follow the same rules as before.
+DECISION_COLS = ["signal_date", "entry_date", "symbol", "rank", "outcome"]
 EQUITY_COLS = ["date", "cash", "invested", "equity"]
 
 
@@ -49,6 +55,7 @@ class Account:
     trades: list[dict] = field(default_factory=list)
     equity: list[dict] = field(default_factory=list)  # date, cash, invested, equity
     refs: dict[str, tuple[str, float]] = field(default_factory=dict)  # symbol -> (date, close) at last mark
+    decisions: list[dict] = field(default_factory=list)  # DECISION_COLS rows
     notes: list[str] = field(default_factory=list)  # adjustments made this run
 
     @property
@@ -89,23 +96,32 @@ def advance(acct: Account, dates: pd.DatetimeIndex, frames: dict[str, pd.DataFra
         d = dates[i]
         # 1. entries at today's open from the previous session's BUYs
         free = acct.max_positions - len(acct.positions)
-        if i > 0 and free > 0:
+        if i > 0 and signals.get(dates[i - 1]):
             prev = dates[i - 1]
-            cand = [s for s in signals.get(prev, []) if s in frames and s not in acct.positions
+            offered = signals[prev]
+            cand = [s for s in offered if s in frames and s not in acct.positions
                     and bar(s, d) is not None and bar(s, prev) is not None
                     and not np.isnan(bar(s, d).Open) and not np.isnan(bar(s, prev).atr14)]
             cand.sort(key=lambda s: portfolio.rank(score[s].get(prev, np.nan), mom[s].get(prev, np.nan)), reverse=True)
+            outcome = {s: "held" if s in acct.positions else "no data" for s in offered}
+            outcome.update({s: "no slot" for s in cand[max(free, 0):]})
             mark = acct.cash + sum(pos.shares * last_close(s, prev) for s, pos in acct.positions.items())
-            for s in cand[:free]:
+            for s in cand[:max(free, 0)]:
                 today = bar(s, d)
                 pos = portfolio.buy(s, i, today.Open, today.High, frames[s].atr14.loc[prev], mark, acct.cash,
                                     p, acct.max_positions)
                 if pos is None:
+                    outcome[s] = "no cash"
                     continue
                 acct.cash -= pos.cost_basis
                 acct.positions[s] = pos
+                outcome[s] = "entered"
                 if today.Low <= pos.stop:  # stopped out on the entry bar
                     close(s, i, pos.stop, "stop")
+                    outcome[s] = "entered + stopped"
+            acct.decisions += [{"signal_date": f"{prev:%Y-%m-%d}", "entry_date": f"{d:%Y-%m-%d}", "symbol": s,
+                                "rank": cand.index(s) + 1 if s in cand else None, "outcome": outcome[s]}
+                               for s in offered]
 
         # 2. exits on today's bar for positions opened before today
         for s in [s for s, pos in acct.positions.items() if pos.entry_i < i]:
@@ -159,7 +175,7 @@ def load(strategy: str, dates: pd.DatetimeIndex) -> Account | None:
         return None
     cfg = json.loads((path / "account.json").read_text())
     read = lambda name: pd.read_csv(path / name).to_dict("records") if (path / name).exists() else []
-    equity, trades = read("equity.csv"), read("trades.csv")
+    equity, trades, decisions = read("equity.csv"), read("trades.csv"), read("decisions.csv")
     positions = {}
     refs = {}
     for r in read("positions.csv"):
@@ -170,7 +186,8 @@ def load(strategy: str, dates: pd.DatetimeIndex) -> Account | None:
         r["shares"] = float(r["shares"])  # fractional after a dividend re-adjustment
         positions[r["sym"]] = portfolio.Position(**r)
     cash = equity[-1]["cash"] if equity else cfg["capital"]
-    return Account(strategy, cfg["capital"], cfg["max_positions"], cash, positions, trades, equity, refs)
+    return Account(strategy, cfg["capital"], cfg["max_positions"], cash, positions, trades, equity, refs,
+                   decisions=decisions)
 
 
 def save(acct: Account, dates: pd.DatetimeIndex) -> Path:
@@ -188,6 +205,7 @@ def save(acct: Account, dates: pd.DatetimeIndex) -> Path:
     pd.DataFrame(rows, columns=cols).to_csv(path / "positions.csv", index=False)
     pd.DataFrame(acct.trades, columns=TRADE_COLS).to_csv(path / "trades.csv", index=False)
     pd.DataFrame(acct.equity, columns=EQUITY_COLS).to_csv(path / "equity.csv", index=False)
+    pd.DataFrame(acct.decisions, columns=DECISION_COLS).astype({"rank": "Int64"}).to_csv(path / "decisions.csv", index=False)
     return path
 
 
