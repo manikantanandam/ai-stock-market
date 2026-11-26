@@ -33,3 +33,14 @@ def test_scan_started_mid_session_is_not_logged_even_if_it_ends_after_the_close(
 def test_scan_started_after_the_close_is_logged(monkeypatch):
     logged, _ = run_scan(monkeypatch, "close", "close")
     assert len(logged) == 1
+
+
+def test_compare_stats_has_one_row_per_strategy_and_segment():
+    runs = {"trend": {"In-sample (2017-09 to 2023-12)": {"win_rate": 0.4, "avg_trade": 0.02},
+                      "Out-of-sample (2024-01 to 2026-11)": {"win_rate": 0.5, "avg_trade": 0.01}}}
+
+    df = cli.compare_stats(runs)
+
+    assert df.to_dict("records") == [
+        {"strategy": "trend", "segment": "In-sample", "period": "2017-09 to 2023-12", "win_rate": 0.4, "avg_trade": 0.02},
+        {"strategy": "trend", "segment": "Out-of-sample", "period": "2024-01 to 2026-11", "win_rate": 0.5, "avg_trade": 0.01}]

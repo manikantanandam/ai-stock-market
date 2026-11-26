@@ -727,27 +727,12 @@ function bucketed(pts, key) {
   });
 }
 
-// Stop and target of the latest logged BUY per trading day, from its session until a close crosses either or the
-// next BUY. Closes only, so it approximates the intraday exits of the backtest; an unbounded target (inf) is left out.
-function tradeLevels(history, rows) {
-  const buys = new Map(rows.filter(r => r.action === 'BUY' && num(r.stop)).map(r => [String(r.date), r]));
-  const out = new Map();
-  let open = null;
-  for (const b of history) {
-    const d = String(b.Date);
-    if (buys.has(d)) open = buys.get(d);
-    if (!open) continue;
-    out.set(d, { stop: open.stop, target: num(open.target) ? open.target : null });
-    if (b.Close <= open.stop || (num(open.target) && b.Close >= open.target)) open = null;
-  }
-  return out;
-}
-
 // paper: this symbol's closed paper-account trades (with `strategy`), marked at their exits.
-function historyCard(history, rows, paper = []) {
+// held: its open paper positions (positionRows), whose stop and target are drawn from their entry. The journal
+// doesn't keep levels, and an account keeps only a position's current stop (trailing stops move up).
+function historyCard(history, rows, paper = [], held = []) {
   const buys = new Map(rows.filter(r => r.action === 'BUY').map(r => [r.date, r.close]));
   const fund = new Map(rows.filter(r => num(r.fundamental)).map(r => [r.date, r.fundamental]));
-  const levels = tradeLevels(history, rows);
   const priceBox = h('div', { class: 'chart-box tall' }), scoreBox = h('div', { class: 'chart-box' });
   const draw = (n, unit, bucket) => {
     const mine = charts.filter(c => [priceBox, scoreBox].includes(c.canvas.parentNode));  // destroy() nulls c.canvas, so split first
@@ -765,11 +750,13 @@ function historyCard(history, rows, paper = []) {
     const prices = [{ label: 'Close', data: pts.map(p => p.Close), borderColor: series(0) }];
     if (buys.size) prices.push({ label: 'BUY', data: pts.map(p => buysAt.get(key(p.Date)) ?? null), showLine: false,
       pointRadius: 4, borderColor: series(1), backgroundColor: series(1) });
-    // A bucket's point is its last day, so the levels in force at the end of the bucket.
-    const level = side => pts.map(p => levels.get(String(p.Date))?.[side] ?? null);
-    if (levels.size) prices.push(
-      { label: 'Stop', data: level('stop'), stepped: true, borderWidth: 1.5, borderDash: [5, 4], borderColor: css('--critical') },
-      { label: 'Target', data: level('target'), stepped: true, borderWidth: 1.5, borderDash: [5, 4], borderColor: css('--good') });
+    const level = (p, v) => pts.map(pt => key(pt.Date) >= key(String(p.entry_date)) ? v : null);
+    for (const p of held) {
+      prices.push({ label: `Stop · ${p.strategy}`, data: level(p, p.stop), borderWidth: 1.5, borderDash: [5, 4],
+        borderColor: css('--critical'), backgroundColor: css('--critical') });
+      if (num(p.target)) prices.push({ label: `Target · ${p.strategy}`, data: level(p, p.target), borderWidth: 1.5,
+        borderDash: [5, 4], borderColor: css('--good'), backgroundColor: css('--good') });
+    }
     if (paper.length) {
       const exits = new Map();
       for (const t of paper) {
@@ -885,7 +872,7 @@ async function renderStock(file, rows) {
     tiles([['Last action', last.action || '–', last.action === 'BUY' ? 'pos' : last.action === 'SELL' ? 'neg' : ''],
       ['Close', fmt(last.close)], ...scores.map(c => [c[0].toUpperCase() + c.slice(1), fmt(last[c])]),
       ['Sessions logged', rows.length]]),
-    history.length ? historyCard(history, rows, paper) : h('div', { class: 'charts' },
+    history.length ? historyCard(history, rows, paper, held) : h('div', { class: 'charts' },
       chartCard('Close', lineConfig(labels, [{ label: 'Close', data: rows.map(r => r.close), borderColor: series(0) }])),
       chartCard('Scores (−1 to 1)', lineConfig(labels, scores.map((c, i) =>
         ({ label: c, data: rows.map(r => r[c]), borderColor: series(i), backgroundColor: series(i), pointRadius: 3 })), { min: -1, max: 1 }))),
@@ -1084,6 +1071,75 @@ function accountsChart(accounts) {
   return chartCard('Return since start', lineConfig(dates, curves, { pct: true }));
 }
 
+// ---------- live vs backtest ----------
+
+// The latest `compare` statistics (reports/compare_<watchlist>_<date>_stats.csv), nifty500 first: the
+// watchlist the daily scan feeds the paper accounts from.
+function latestCompareStats() {
+  const found = manifest.files.map(f => [f, f.path.match(/^reports\/compare_(.+)_(\d{4}-\d{2}-\d{2})_stats\.csv$/)])
+    .filter(([, m]) => m)
+    .sort(([, a], [, b]) => (a[1] === 'nifty500') - (b[1] === 'nifty500') || a[2].localeCompare(b[2]));
+  return found.length ? found[found.length - 1][0] : null;
+}
+
+// Closed-trade statistics as portfolio.stats computes them (per-trade returns after costs), plus the
+// standard error of the average trade.
+function tradeStats(trades) {
+  const rets = values(trades, 'ret'), n = rets.length, avg = mean(rets);
+  const gain = rets.filter(r => r > 0).reduce((s, x) => s + x, 0), loss = -rets.filter(r => r <= 0).reduce((s, x) => s + x, 0);
+  const sd = n > 1 ? Math.sqrt(rets.reduce((s, x) => s + (x - avg) ** 2, 0) / (n - 1)) : NaN;
+  return { trades: n, win_rate: n ? rets.filter(r => r > 0).length / n : null, avg_trade: n ? avg : null,
+    profit_factor: !n ? null : loss ? gain / loss : Infinity, avg_bars: n ? mean(values(trades, 'bars')) : null,
+    se: sd / Math.sqrt(n) };
+}
+
+// A fixed rule, not a judgement call: below/above when the live average trade is more than two standard
+// errors from the out-of-sample backtest's, and nothing until MIN_TRADES trades have closed.
+const MIN_TRADES = 10;
+function liveVerdict(live, bt) {
+  if (live.trades < MIN_TRADES) return ['Too few trades', 'muted'];
+  if (!num(bt?.avg_trade)) return ['No backtest', 'muted'];
+  const z = (live.avg_trade - bt.avg_trade) / live.se;
+  return z < -2 ? ['Below backtest', 'neg'] : z > 2 ? ['Above backtest', 'pos'] : ['In line', ''];
+}
+
+const LIVE_LABELS = { strategy: 'Strategy', trades: 'Closed trades', win_rate: 'Win rate', avg_trade: 'Avg trade',
+  profit_factor: 'Profit factor', avg_bars: 'Avg bars held', verdict: 'Verdict' };
+
+async function liveVsBacktest(accounts) {
+  const file = latestCompareStats();
+  const oos = file ? (await load(file.path)).filter(r => r.segment === 'Out-of-sample') : [];
+  // pandas writes an unbounded profit factor as "inf"
+  const bt = new Map(oos.map(r => [r.strategy, { ...r, profit_factor: r.profit_factor === 'inf' ? Infinity : r.profit_factor }]));
+  const tones = {};
+  const rows = accounts.map(a => {
+    const live = tradeStats(a.trades), [verdict, tone] = liveVerdict(live, bt.get(a.name));
+    tones[a.name] = tone;
+    return { strategy: a.name, ...live, verdict };
+  });
+  const known = v => num(v) || v === Infinity;
+  const ratio = v => v === Infinity ? '∞' : v.toFixed(2);
+  const paired = (col, show) => (v, r) => {
+    const b = bt.get(r.strategy)?.[col];
+    return h('div', {}, known(v) ? show(v) : dash(), h('div', { class: 'cell-sub' }, 'backtest ' + (known(b) ? show(b) : '–')));
+  };
+  const period = oos[0]?.period;
+  return [
+    h('h3', { class: 'section' }, 'Live vs backtest'),
+    h('p', { class: 'sub' }, file
+      ? `Closed paper trades against each strategy's out-of-sample backtest (${period}, ${file.title}). ` +
+        `The verdict needs ${MIN_TRADES} closed trades; it flags an average trade more than two standard errors off the backtest's.`
+      : 'No backtest statistics yet: they come from `uv run aistock compare --watchlist nifty500` (the weekly workflow runs it).'),
+    table(rows, Object.keys(LIVE_LABELS), { pageSize: 25, labels: LIVE_LABELS, cells: {
+      trades: (v, r) => h('div', {}, String(v), h('div', { class: 'cell-sub' },
+        'backtest ' + (num(bt.get(r.strategy)?.trades_per_year) ? Math.round(bt.get(r.strategy).trades_per_year) + '/yr' : '–'))),
+      win_rate: paired('win_rate', pct), avg_trade: paired('avg_trade', pct),
+      profit_factor: paired('profit_factor', ratio), avg_bars: paired('avg_bars', v => v.toFixed(1)),
+      verdict: (v, r) => h('span', { class: 'badge ' + (tones[r.strategy] === 'neg' ? 'SELL' : tones[r.strategy] === 'pos' ? 'BUY' : '') }, v),
+    } }),
+  ];
+}
+
 async function renderAccounts() {
   const accounts = await loadAccounts();
   if (!accounts.length) return [h('p', { class: 'muted' }, 'No paper accounts yet.')];
@@ -1096,6 +1152,7 @@ async function renderAccounts() {
       'rebalanced daily without costs; it shares the watchlist\'s survivorship bias, so beating it is the fair test.'),
     accountsTable(accounts),
     accountsChart(accounts),
+    await liveVsBacktest(accounts),
     h('h3', { class: 'section' }, `Open positions (${positions.length})`),
     positions.length ? positionsTable(positions) : h('p', { class: 'muted' }, 'No open positions.'),
     h('h3', { class: 'section' }, `Closed trades (${trades.length})`),
