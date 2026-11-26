@@ -85,7 +85,8 @@ def shoot(site: Path, pages: list[str], out: Path, theme: str = "dark") -> list[
     threading.Thread(target=server.serve_forever, daemon=True).start()
     shots = []
     try:
-        with tempfile.TemporaryDirectory() as profile, _Chrome(chrome(), profile) as browser:
+        # Chrome's helper processes can still be writing to the profile as it's deleted
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as profile, _Chrome(chrome(), profile) as browser:
             for page in pages:
                 png = out / file_name(page)
                 try:
@@ -124,8 +125,12 @@ class _Chrome:
         return self
 
     def __exit__(self, *exc):
-        self.proc.kill()
-        self.proc.wait()
+        try:  # a clean exit stops the helper processes too, before the profile is deleted
+            self.call("Browser.close")
+            self.proc.wait(timeout=10)
+        except Exception:
+            self.proc.kill()
+            self.proc.wait()
         os.close(self._send)
         os.close(self._recv)
 
