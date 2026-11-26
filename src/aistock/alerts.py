@@ -316,6 +316,9 @@ h2 { font-size: 12px; letter-spacing: .1em; color: var(--ink-3); font-weight: 70
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px 12px; }
 .dropped { margin-top: 10px; font-size: 12px; color: var(--ink-3); }
 .dropped b { color: var(--ink-2); }
+.hot { color: #fb923c; font-weight: 700; }
+.hot::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #fb923c;
+  margin-right: 5px; vertical-align: 1px; }
 .note { margin-top: 10px; padding: 8px 12px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line);
   font-size: 12px; line-height: 1.5; color: var(--ink-2); }
 .note b { color: var(--ink); }
@@ -356,10 +359,16 @@ def score_note() -> str:
             + (f" ({', '.join(m.replace(' +', ' needs ≥ +') for m in mins)})" if mins else "") + ".")
 
 
+def _sector(sector: str, hot: set[str]) -> str:
+    """A row's sector, in the hot colour when it is one of the session's hot sectors (most BUYs)."""
+    return f'<span class="hot">{html.escape(sector)}</span>' if sector in hot else html.escape(sector)
+
+
 def card_html(s: Summary) -> str:
     """The alert as a self-contained HTML card (rendered to an image for Telegram, see card_png): breadth with
     its change and a BUY/WATCH/AVOID split bar, hot sectors as tiles, new BUYs grouped under colour-coded
-    strategy pills, the strongest BUYs ranked, and a note on what the score means. Kept to about 1 : 1.5 so it
+    strategy pills, the strongest BUYs ranked (a row's sector in orange when it is a hot sector), and a note
+    on what the score means. Kept to about 1 : 1.5 so it
     fills Telegram's preview (taller images get shrunk with bars at the sides); dropped BUYs go in the caption."""
     e = html.escape
     total = sum(s.actions.values()) or 1
@@ -374,18 +383,19 @@ def card_html(s: Summary) -> str:
            f'<div class="split">{split}</div>',
            '<div class="legend">' + "".join(f'<span><span class="dot" style="background:var(--{k})"></span><b>{n}</b> {k.upper()}</span>'
                                             for k, n in (("buy", buy), ("watch", watch), ("avoid", avoid))) + "</div>"]
+    hot = {k for k, _ in s.sectors[:3]}
     if s.sectors:
         tiles = "".join(f'<div class="sector"><span class="n">{n}</span>'
                         + (_chip(n, s.prev_sectors.get(k)) if s.prev is not None else "")
                         + f'<span class="name">{e(SHORT_SECTOR.get(k, k))}</span></div>' for k, n in s.sectors[:3])
-        out.append(f'<section><h2><span>HOT SECTORS</span><span>BUYs</span></h2><div class="sectors">{tiles}</div></section>')
+        out.append(f'<section><h2><span class="hot">HOT SECTORS</span><span>BUYs</span></h2><div class="sectors">{tiles}</div></section>')
     if s.prev is not None:
         groups = []
         for strategies, group in _groups(s.new[:MAX_NEW]):
             pills = "".join(f'<span class="pill" style="background:{STRATEGY_COLOURS.get(x, "#4b5563")}">{e(x)}</span>'
                             for x in strategies)
             rows = "".join(f'<div class="row"><div class="line"><span class="sym">{e(b.symbol)}</span>'
-                           f'<span class="meta">{e(b.name)} · {e(b.sector)}</span></div>'
+                           f'<span class="meta">{e(b.name)} · {_sector(b.sector, hot)}</span></div>'
                            f'<span class="score">{_score(b.combined)}</span></div>' for b in group)
             groups.append(f'<div class="group"><div class="pills">{pills}<span class="count">×{len(group)}</span></div>{rows}</div>')
         more = f'<div class="sub">+{_more(s.new, MAX_NEW)} more on the dashboard</div>' if _more(s.new, MAX_NEW) else ""
@@ -396,7 +406,7 @@ def card_html(s: Summary) -> str:
         ranks = "".join(f'<div class="rank"><span class="medal m{k + 1}">{k + 1}</span>'
                         f'<div class="line"><span class="sym">{e(b.symbol)}</span>'
                         + ('<span class="chip new">NEW</span>' if b.symbol in fresh else "")
-                        + f'<span class="meta">{e(b.name)} · {e(b.sector)}</span></div>'
+                        + f'<span class="meta">{e(b.name)} · {_sector(b.sector, hot)}</span></div>'
                         f'<span class="score">{_score(b.combined)}</span></div>' for k, b in enumerate(s.buys[:TOP]))
         out.append(f'<section><h2><span>STRONGEST BUYS</span><span>score</span></h2><div class="panel">{ranks}</div></section>')
     out.append(f'<div class="note">{score_note()}<div class="scale"></div>'

@@ -176,7 +176,7 @@ def test_card_html_holds_every_section(tmp_path):
     page = alerts.card_html(s)
     assert 'of 3 stocks say BUY</span><span class="chip flat">0%</span>' in page
     assert 'style="background:#3b82f6">swing</span>' in page and '<span class="count">×1</span>' in page
-    assert '<span class="meta">M&amp;M · Tech</span>' in page  # escaped
+    assert '<span class="meta">M&amp;M · <span class="hot">Tech</span></span>' in page  # Tech is a hot sector  # escaped
     assert '<span class="medal m1">1</span>' in page and '<span class="chip new">NEW</span>' in page
     assert "No longer BUY" not in page  # in the caption, so the image stays short
     assert "document.body.dataset.shown" in page  # the renderer waits for it
@@ -193,3 +193,8 @@ def test_score_note_follows_the_live_weights(monkeypatch):
     assert "−1 to +1 = 60% technical + 20% fundamentals + 20% news sentiment" in note
     assert "(swing needs ≥ +0.40)" in note
     assert '<div class="note">' in alerts.card_html(alerts.Summary("2026-11-26", None, [], [], [], {}, []))
+
+
+def test_sector_is_highlighted_only_when_hot():
+    assert alerts._sector("Healthcare", {"Healthcare"}) == '<span class="hot">Healthcare</span>'
+    assert alerts._sector("Energy", {"Healthcare"}) == "Energy"
