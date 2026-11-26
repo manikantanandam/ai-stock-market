@@ -318,6 +318,27 @@ def pr_screenshots(
     print(screenshots.publish(pr, Path(site_dir), Path.cwd(), page or None, theme))
 
 
+@app.command()
+def alert(
+    telegram: bool = typer.Option(True, "--telegram/--no-telegram", help="Send via the Telegram bot "
+                                                                         "(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)"),
+    issue: bool = typer.Option(True, "--issue/--no-issue", help="Comment on the 'Daily alerts' GitHub issue"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Print the message only"),
+    url: str = typer.Option("", help="Dashboard link to end the message with"),
+):
+    """Summary of the latest session (BUYs, paper accounts) to Telegram and a GitHub issue."""
+    from aistock import alerts
+
+    text = alerts.message(url=url or None)
+    if not text:
+        print("No journaled session yet")
+        return
+    typer.echo(text)
+    if not dry_run:
+        for line in alerts.send(text, telegram, issue):
+            typer.echo(line)
+
+
 @app.command("update-watchlists")
 def update_watchlists():
     """Refresh index constituent CSVs from niftyindices.com (NSE rebalances twice a year)."""

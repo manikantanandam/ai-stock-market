@@ -20,6 +20,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: write  # the Daily alerts issue (aistock alert)
   actions: write  # to dispatch the Tests workflow on the PR branch
 
 concurrency:
@@ -223,3 +224,13 @@ jobs:
             --body "Automated journal update from [run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
           gh workflow run tests.yml --ref "$branch"
           gh pr merge "$branch" --auto --squash --delete-branch
+
+      # Summary of the session to Telegram (when the bot secrets are set) and the "Daily alerts" issue.
+      # Last, and allowed to fail: an alert problem must never cost a scan.
+      - name: Daily alert
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: uv run aistock alert --url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
