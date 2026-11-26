@@ -497,11 +497,30 @@ const YEAR_LABELS = { date: 'Fiscal year end', start: 'In effect from', revenue:
   shares: 'Shares', returnOnEquity: 'ROE', debtToEquity: 'Debt/Equity (%)', revenueGrowth: 'Revenue growth',
   earningsGrowth: 'Earnings growth', profitMargins: 'Net margin', currentRatio: 'Current ratio' };
 
+// Change from the previous trading day under each value: percent for levels, points where a percent
+// misleads (RSI is already 0-100, MACD hist crosses zero, scores are -1..1).
+const POINT_CHANGE = ['rsi14', 'macd_hist', 'Technical', 'Fundamental'];
+
+function changeCells(history, columns) {
+  const prev = new Map(history.map((p, i) => [p, history[i - 1]]));
+  const cell = c => (v, r) => {
+    const before = prev.get(r)?.[c];
+    if (!num(v)) return dash();
+    if (!num(before)) return fmt(v, c);
+    const points = POINT_CHANGE.includes(c), d = points ? v - before : before ? v / before - 1 : NaN;
+    const text = !num(d) ? '' : d === 0 ? '0' : (d > 0 ? '+' : '') + (points ? +d.toFixed(2) + ' pt' : (d * 100).toFixed(2) + '%');
+    return h('div', {}, fmt(v, c), h('div', { class: 'cell-sub ' + sign(d) }, text));
+  };
+  return Object.fromEntries(columns.filter(c => c !== 'Date').map(c => [c, cell(c)]));
+}
+
 function historyTables(history, years) {
+  const columns = Object.keys(history[0]);
   return [
     card('Daily history: prices and technicals',
-      h('p', { class: 'muted' }, 'Every trading day Yahoo has. P/E, P/B, market cap and fundamental score are estimated from annual results.'),
-      table(history.slice().reverse(), Object.keys(history[0]), { labels: DAILY_LABELS, extra: DAILY_EXTRA, pageSize: 25 })),
+      h('p', { class: 'muted' }, 'Every trading day Yahoo has; under each value, its change from the previous trading day (points for RSI, MACD and scores). P/E, P/B, market cap and fundamental score are estimated from annual results.'),
+      table(history.slice().reverse(), columns,
+        { labels: DAILY_LABELS, extra: DAILY_EXTRA, pageSize: 25, cells: changeCells(history, columns) })),
     years.length ? card('Fundamentals by fiscal year',
       h('p', { class: 'muted' }, "Amounts are in the company's reporting currency (some report in USD). Ratios take effect about 60 days after the year end."),
       table(years.slice().reverse(), Object.keys(years[0]), { labels: YEAR_LABELS })) : null,
