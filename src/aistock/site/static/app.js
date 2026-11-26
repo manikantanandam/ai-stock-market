@@ -606,7 +606,7 @@ async function renderToday() {
     buys.length ? scanTable(buys, columns) : h('p', { class: 'muted' }, 'No BUY signals in this session.'),
     accounts.length ? [h('h3', { class: 'section' }, 'Paper accounts'),
       h('p', { class: 'sub' }, h('a', { href: '#accounts' }, 'Equity curves, open positions and trades')),
-      accountsTable(accounts)] : null,
+      accountsTable(accounts), accountsChart(accounts)] : null,
     h('h3', { class: 'section' }, `Starred (${starred.length})`),
     starred.length ? scanTable(starred, columns)
       : h('p', { class: 'muted' }, 'Star stocks (☆) in a scan table or on their page to follow them here. Stars are kept in this browser.'),
@@ -1070,9 +1070,8 @@ const tradesTable = rows => table(rows, ['strategy', 'symbol', 'entry_date', 'ex
     labels: { strategy: 'Strategy', symbol: 'Stock', entry_date: 'Entry date', exit_date: 'Exit date', entry: 'Entry', exit: 'Exit',
       bars: 'Bars', reason: 'Reason', pnl: 'P&L ₹', ret: 'Return' } });
 
-async function renderAccounts() {
-  const accounts = await loadAccounts();
-  if (!accounts.length) return [h('p', { class: 'muted' }, 'No paper accounts yet.')];
+// Each account's return since its start, with the equal-weight hold dashed from the first account date.
+function accountsChart(accounts) {
   const dates = [...new Set(accounts.flatMap(a => a.equity.map(e => String(e.date))))].sort();
   const curves = accounts.map((a, i) => {
     const by = new Map(a.equity.map(e => [String(e.date), e.equity / a.cfg.capital - 1]));
@@ -1082,6 +1081,12 @@ async function renderAccounts() {
   const hold = dates.map(d => holdReturn(dates[0], d));
   if (hold.some(num)) curves.push({ label: 'Equal-weight hold', data: hold, borderColor: css('--ink-3'),
     backgroundColor: css('--ink-3'), borderDash: [6, 4], borderWidth: 2, pointRadius: 0 });
+  return chartCard('Return since start', lineConfig(dates, curves, { pct: true }));
+}
+
+async function renderAccounts() {
+  const accounts = await loadAccounts();
+  if (!accounts.length) return [h('p', { class: 'muted' }, 'No paper accounts yet.')];
   const positions = positionRows(accounts);
   const trades = accounts.flatMap(a => a.trades.map(t => ({ strategy: a.name, ...t })));
   const settings = Object.keys(manifest.accounts);
@@ -1090,7 +1095,7 @@ async function renderAccounts() {
       'stepped through every session by the daily run. The benchmark is an equal-weight hold of the scanned stocks, ' +
       'rebalanced daily without costs; it shares the watchlist\'s survivorship bias, so beating it is the fair test.'),
     accountsTable(accounts),
-    chartCard('Return since start', lineConfig(dates, curves, { pct: true })),
+    accountsChart(accounts),
     h('h3', { class: 'section' }, `Open positions (${positions.length})`),
     positions.length ? positionsTable(positions) : h('p', { class: 'muted' }, 'No open positions.'),
     h('h3', { class: 'section' }, `Closed trades (${trades.length})`),
