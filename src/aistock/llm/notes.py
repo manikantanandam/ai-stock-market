@@ -25,10 +25,11 @@ SYSTEM = ("You write short notes for a swing trader about a decision that rule-b
           "percentages, and do not give advice or say whether to buy. Write 3 or 4 plain sentences: "
           "why the strategy fired, what supports it, the main risk, and where the stop is.")
 COMMODITY_SYSTEM = ("You write short notes for a futures trader about a decision that rule-based code already made. "
-                    "Use only the facts given. Do not add any number that is not in the facts, do not compute "
-                    "percentages, and do not give advice or say whether to trade. Write 3 or 4 plain sentences: "
-                    "why the strategy fired and in which direction, what supports it, the main risk, and where "
-                    "the stop is.")
+                    "Use only the facts given. Do not add any number that is not in the facts, do not do any "
+                    "arithmetic, copy every number exactly as written (no rounding), and do not give advice "
+                    "or say whether to trade. Write 3 or 4 plain sentences: "
+                    "what the rules decided and in which direction, what supports or weakens it, the main risk, "
+                    "and where the stop is when there is a position.")
 NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?")
 
 
@@ -53,21 +54,37 @@ def facts(s: Signal, strategy: str) -> str:
     return "\n".join(lines)
 
 
-def commodity_facts(s: commodity_signal.Signal, strategy: str) -> str:
-    """Everything a commodity note may say, as plain lines."""
-    r = s.strategies[strategy]
+def commodity_facts(s: commodity_signal.Signal, strategy: str | None) -> str:
+    """Everything a commodity note may say, as plain lines. strategy: the one
+    whose verdict the note explains (Signal.focus); None when all say WATCH."""
     news = "not fetched" if s.sentiment is None else f"{s.sentiment:+.2f}"
-    target = "none (exit by stop or time)" if r.target is None else f"{r.target:.2f}"
-    side = {"long": "long (BUY: profits if the price rises)", "short": "short (SELL: profits if the price falls)"}
     lines = [
         f"Commodity future: {s.symbol} ({s.name}), {s.group}, data as of {s.as_of}",
         f"Prices in INR per {s.unit}, converted from the global contract (USD {s.close_usd:.2f}) at USDINR {s.usdinr:.2f}",
-        f"Rules verdict: {r.action}, {side[r.side]}, by strategy '{strategy}': {COMMODITY_PRESETS[strategy].describe()}",
-        f"Close {s.close:.2f}, ATR {s.atr:.2f}, stop {r.stop:.2f}, target {target}, quantity {r.qty:g} units",
-        "The stop is " + ("below the close: a fall to it" if r.side == "long" else "above the close: a rise to it")
-        + " closes the trade at a loss",
-        f"Scores from -1 to +1: technical {s.technical:+.2f}, news {news}, combined {s.combined:+.2f}",
     ]
+    if strategy is None:
+        lines += ["Rules verdict: WATCH: no strategy has a position or an entry signal",
+                  f"Close {s.close:,.2f}"]  # no ATR: with no stop to place, the model computes its own
+    else:
+        r = s.strategies[strategy]
+        profits = {"long": "a long profits if the price rises", "short": "a short profits if the price falls"}[r.side]
+        verdict = {"BUY": "BUY, open a long at the next open", "SELL": "SELL, open a short at the next open",
+                   "EXIT": f"EXIT, the strategy's {r.side} position closed today",
+                   "HOLD": f"HOLD, the strategy keeps its {r.side} position"}[r.action]
+        lines.append(f"Rules verdict: {verdict} ({profits}), by strategy '{strategy}': "
+                     f"{COMMODITY_PRESETS[strategy].describe()}")
+        target = "none (exit by stop or time)" if r.target is None else f"{r.target:,.2f}"
+        if r.action == "EXIT":
+            lines.append(f"Close {s.close:,.2f}")  # no ATR, as for WATCH: nothing left to place a stop for
+        else:
+            qty = f", quantity {r.qty:g} units" if r.action in ("BUY", "SELL") else ""
+            lines += [f"Close {s.close:,.2f}, ATR {s.atr:,.2f}, stop {r.stop:,.2f}, target {target}{qty}",
+                      "The stop is " + ("below the close: a fall to it" if r.side == "long"
+                                        else "above the close: a rise to it") + " closes the trade at a loss"]
+        lines += [f"{strategy} detail: {w}" for w in r.why]
+    lines.append(f"Scores from -1 to +1: technical {s.technical:+.2f}, news {news}, combined {s.combined:+.2f}")
+    lines += [f"other strategy '{n}': {o.action}" + (f" {o.side}" if o.side else "")
+              for n, o in s.strategies.items() if n != strategy]
     lines += [f"{part} reason: {w}" for part in ("technical", "sentiment") for w in s.reasons.get(part, [])]
     return "\n".join(lines)
 
@@ -99,8 +116,8 @@ def note(s: Signal, strategy: str, model: str = MODEL) -> str:
     return write(facts(s, strategy), SYSTEM, model)
 
 
-def commodity_note(s: commodity_signal.Signal, strategy: str, model: str = MODEL) -> str:
-    """note() for a commodity BUY or SELL."""
+def commodity_note(s: commodity_signal.Signal, strategy: str | None, model: str = MODEL) -> str:
+    """note() for a commodity: any verdict, or the contract as a whole when strategy is None."""
     return write(commodity_facts(s, strategy), COMMODITY_SYSTEM, model)
 
 

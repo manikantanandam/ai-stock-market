@@ -73,5 +73,5 @@ def test_notes_saved_per_session_and_rerun_replaces(tmp_journal):
     journal.record_notes([(sig("A", "2026-11-18", buy=True), "swing", "second")])
     rows = read(tmp_journal / "notes" / "2026-11-18.csv")
     assert sorted((r["symbol"], r["note"]) for r in rows) == [("A", "second"), ("B", "other")]
-    assert rows[0].keys() == {"date", "symbol", "name", "strategy", "note", "source"}
+    assert rows[0].keys() == {"date", "symbol", "name", "strategy", "action", "note", "source"}
     assert rows[0]["source"] == "live"

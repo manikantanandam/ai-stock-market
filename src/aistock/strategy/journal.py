@@ -47,11 +47,13 @@ def record(signals: list[Signal], root: Path | None = None, per_symbol: str = "s
 
 def record_notes(notes: list[tuple[Signal, str, str]], source: str = "live", root: Path | None = None) -> None:
     """Save (signal, strategy, note) triples by session; a re-run replaces a stock's note.
-    source: "live" (written by the scan) or "backfill" (rebuilt later from the journal)."""
+    source: "live" (written by the scan) or "backfill" (rebuilt later from the journal).
+    strategy may be None for a commodity note on the whole contract (all WATCH)."""
     by_day = defaultdict(list)
     for s, strategy, text in notes:
-        by_day[s.as_of].append({"date": s.as_of, "symbol": s.symbol, "name": s.name,
-                                "strategy": strategy, "note": text, "source": source})
+        action = s.strategies[strategy].action if strategy in s.strategies else s.action
+        by_day[s.as_of].append({"date": s.as_of, "symbol": s.symbol, "name": s.name, "strategy": strategy or "",
+                                "action": action, "note": text, "source": source})
     for day, rows in by_day.items():
         _upsert((NOTES if root is None else root / "notes") / f"{day}.csv", rows, key="symbol")
 

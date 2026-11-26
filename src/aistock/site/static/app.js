@@ -231,7 +231,7 @@ function scanTable(rows, columns) {
     labels: SCAN_LABELS, cells: SCAN_CELLS, sortKeys: SCAN_SORT, extra, link: { symbol: stockHref } });
 }
 
-// LLM notes explain BUYs (and commodity SELLs) the rules already chose; they never pick trades.
+// LLM notes explain verdicts the rules already reached (stock BUYs; every commodity); they never pick trades.
 // days: the session's journal rows, for every strategy entering and the combined score.
 // entries: day row -> [[strategy, action]]; href: symbol -> link.
 const stockEntries = day => day.buys ? String(day.buys).split(';').map(b => [b, 'BUY']) : [];
@@ -243,7 +243,7 @@ function notesCard(rows, title, days, entries = stockEntries, href = stockHref) 
     rows.map(r => {
       const day = bySymbol.get(r.symbol) || {};
       const tags = entries(day);
-      const buys = tags.length ? tags : [[r.strategy, 'BUY']].filter(t => t[0]);
+      const buys = tags.length ? tags : [[r.strategy, r.action || 'BUY']].filter(t => t[0]);
       return h('div', { class: 'note' },
         h('div', { class: 'note-head' }, h('a', { href: href(r.symbol) }, r.symbol), ' ',
           h('span', { class: 'muted' }, r.name || ''),
@@ -251,6 +251,7 @@ function notesCard(rows, title, days, entries = stockEntries, href = stockHref) 
             'combined ' + (day.combined >= 0 ? '+' : '') + day.combined.toFixed(2)) : null,
           buys.map(([b, a]) => h('span', { class: 'badge ' + (b === r.strategy ? a : 'tag'),
             title: b === r.strategy ? 'The strategy this note explains' : 'Also says ' + a }, b)),
+          !r.strategy && r.action ? h('span', { class: 'badge ' + r.action, title: 'No strategy has a position or an entry' }, r.action) : null,
           r.source === 'backfill' ? h('span', { class: 'badge', title: 'Written later from the journal row; fundamental and news reasons were not saved for this session' }, 'backfilled') : null),
         h('p', {}, r.note));
     }));
@@ -284,9 +285,10 @@ function renderDay(file, rows) {
 // ---------- commodity futures ----------
 
 const contractHref = sym => '#journal/commodities/contracts/' + encodeURIComponent(sym) + '.csv';
-const commodityEntries = day => [
-  ...(day.buys ? String(day.buys).split(';').map(b => [b, 'BUY']) : []),
-  ...(day.sells ? String(day.sells).split(';').map(b => [b, 'SELL']) : [])];
+// Every strategy with a verdict other than WATCH; exits/holds are "strategy:side" pairs.
+const tagNames = v => v ? String(v).split(';').map(t => t.split(':')[0]) : [];
+const commodityEntries = day => [['buys', 'BUY'], ['sells', 'SELL'], ['exits', 'EXIT'], ['holds', 'HOLD']]
+  .flatMap(([col, action]) => tagNames(day[col]).map(n => [n, action]));
 // exits/holds are "strategy:side" pairs
 const sideTags = (v, cls) => v ? String(v).split(';').map(t => {
   const [name, side] = t.split(':');

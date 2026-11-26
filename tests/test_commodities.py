@@ -140,7 +140,21 @@ def test_commodity_facts_name_direction_unit_and_stop_side(offline):
     s = signal.evaluate("GOLD", news="none")
     s.strategies["trend"] = signal.StrategySignal("trend", "SELL", "short", 123.45, None, 1.5, [])
     text = notes.commodity_facts(s, "trend")
-    assert "SELL, short" in text and "INR per 10 g" in text and "123.45" in text and "above the close" in text
+    assert "SELL, open a short" in text and "INR per 10 g" in text and "123.45" in text and "above the close" in text
+    assert "other strategy 'trend-long': WATCH" in text
+
+
+def test_note_focus_and_facts_cover_hold_exit_and_watch(offline):
+    offline(random_walk(400, seed=3, drift=-0.004))
+    s = signal.evaluate("GOLD", news="none")
+    mk = lambda a, side: signal.StrategySignal("x", a, side, 120.0, None, 0.0, ["holding short from 2026-11-01 at 130.0"])
+    s.strategies = {"trend": mk("WATCH", None), "channel": mk("HOLD", "short"), "ema-cross": mk("EXIT", "long")}
+    assert s.focus == "ema-cross"  # an exit outranks a hold
+    assert "EXIT, the strategy's long position closed today" in notes.commodity_facts(s, "ema-cross")
+    hold = notes.commodity_facts(s, "channel")
+    assert "HOLD" in hold and "stop 120.00" in hold and "quantity" not in hold
+    s.strategies = {"trend": mk("WATCH", None)}
+    assert s.focus is None and "no strategy has a position" in notes.commodity_facts(s, None)
 
 
 def test_backtest_pools_long_and_short_trades():

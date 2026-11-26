@@ -74,9 +74,6 @@ def _verdicts(s: signal.Signal) -> Table:
 
 def _notes(items: list[tuple]) -> list[tuple]:
     """LLM notes for (signal, strategy) pairs; stops at the first sign Ollama is unavailable."""
-    if not items:
-        print("No BUY or SELL to explain.")
-        return []
     written = []
     for s, name in track(items, description="Writing notes", transient=True):
         try:
@@ -85,7 +82,8 @@ def _notes(items: list[tuple]) -> list[tuple]:
             print(f"[yellow]Notes skipped: {e}. Run `brew services start ollama` and "
                   f"`ollama pull {llm_notes.MODEL}`.[/yellow]")
             break
-        print(f"\n[bold]{s.symbol} · {name} · {s.strategies[name].action}[/bold]: {text}")
+        action = s.strategies[name].action if name else "WATCH"
+        print(f"\n[bold]{s.symbol} · {name or 'all strategies'} · {action}[/bold]: {text}")
         written.append((s, name, text))
     return written
 
@@ -96,7 +94,7 @@ def analyze(
     capital: float = typer.Option(100_000, help="Account size in INR, for position sizing"),
     no_news: bool = typer.Option(False, "--no-news", help="Skip news/FinBERT"),
     strategy: str = STRATEGY,
-    notes: bool = typer.Option(False, "--notes", help="Add a local-LLM (Ollama) note for each BUY/SELL"),
+    notes: bool = typer.Option(False, "--notes", help="Add a local-LLM (Ollama) note on the verdict"),
 ):
     """Scores and each strategy's verdict for one commodity (e.g. GOLD)."""
     try:
@@ -112,7 +110,7 @@ def analyze(
             print(f" - {w}")
     print(_verdicts(s))
     if notes:
-        _notes([(s, name) for name in s.entries])
+        _notes([(s, s.focus)])
 
 
 @app.command()
@@ -121,7 +119,7 @@ def scan(
     strategy: str = STRATEGY,
     capital: float = typer.Option(100_000),
     news: str = typer.Option("all", help=f"One of {NEWS_MODES}"),
-    notes: bool = typer.Option(False, "--notes", help="Add a local-LLM (Ollama) note for each BUY/SELL"),
+    notes: bool = typer.Option(False, "--notes", help="Add a local-LLM (Ollama) note per contract"),
 ):
     """Run every commodity strategy over the contracts and log to journal/commodities/."""
     if news not in NEWS_MODES:
@@ -156,7 +154,8 @@ def scan(
     counts = "  ".join(f"{a} {sum(s.action == a for s in results)}" for a in COLORS)
     print(f"Contracts: {counts} · logged to {root}")
     if notes:
-        written = _notes([(s, name) for s in results for name in s.entries])
+        # One note per contract: its entry, else its exit or held position, else a WATCH summary
+        written = _notes([(s, s.focus) for s in results])
         if written:
             journal.record_notes(written, root=journal.COMMODITIES)
             print(f"Notes logged to {journal.COMMODITIES / 'notes'}")

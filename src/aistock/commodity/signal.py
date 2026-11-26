@@ -92,6 +92,12 @@ class Signal:
         """Strategies opening a position (BUY or SELL), the ones notes explain."""
         return self.named("BUY") + self.named("SELL")
 
+    @property
+    def focus(self) -> str | None:
+        """The strategy a note explains: the first entering, else exiting, else
+        holding; None when every strategy says WATCH."""
+        return next((names[0] for a in ("BUY", "SELL", "EXIT", "HOLD") if (names := self.named(a))), None)
+
     def row(self) -> dict:
         tagged = lambda a: ";".join(f"{n}:{s.side}" for n, s in self.strategies.items() if s.action == a)
         return {"symbol": self.symbol, "name": self.name, "group": self.group, "unit": self.unit,
@@ -142,16 +148,16 @@ def decide(st: Strategy, long: bool, short: bool, pos: Position | None, sentimen
         else:
             stop, target, qty = levels(st, side, close, atr, c)
             rule = st.rule if side == "long" else st.short_rule
-            closed = [f"previous {pos.side} closed today by {pos.reason} at {pos.exit:.2f}"] if pos else []
+            closed = [f"previous {pos.side} closed today by {pos.reason} at {pos.exit:,.2f}"] if pos else []
             return StrategySignal(st.name, "BUY" if side == "long" else "SELL", side, stop, target, qty,
                                   [f"{rule} fired; enter {side} at the next open"] + closed)
     if pos and not pos.open:
         return StrategySignal(st.name, "EXIT", pos.side, pos.stop, pos.target, 0.0,
-                              [f"{pos.side} from {pos.entry_date} at {pos.entry:.2f} closed by {pos.reason} "
-                               f"at {pos.exit:.2f}"] + why)
+                              [f"{pos.side} from {pos.entry_date} at {pos.entry:,.2f} closed by {pos.reason} "
+                               f"at {pos.exit:,.2f}"] + why)
     if pos:
         return StrategySignal(st.name, "HOLD", pos.side, pos.stop, pos.target, 0.0,
-                              [f"holding {pos.side} from {pos.entry_date} at {pos.entry:.2f}"])
+                              [f"holding {pos.side} from {pos.entry_date} at {pos.entry:,.2f}"])
     rules_off = f"{st.rule}" + (f" / {st.short_rule}" if st.short_rule else "") + " not triggered"
     return StrategySignal(st.name, "WATCH", None, None, None, 0.0, why or [rules_off])
 
