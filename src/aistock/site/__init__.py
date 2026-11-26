@@ -22,8 +22,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 STATIC = Path(__file__).parent / "static"
 
-GROUPS = ["Signals", "LLM notes", "Commodities", "Paper accounts", "Reports", "Stocks", "Contracts"]
-# Commodity notes and headlines have no nav group: the page draws them on their session's Commodities page
+# Nav sections. Files whose group isn't listed get no nav entry: LLM notes and headlines are
+# drawn on their session's page, and the ~500 per-stock pages are reached through the
+# search box at the top of Stocks.
+GROUPS = ["Stocks", "Commodities", "Paper accounts", "Reports", "Contracts"]
 COMMODITY = {"days": ("cday", "Commodities"), "notes": ("cnotes", None), "headlines": ("cheadlines", None),
              "contracts": ("contract", "Contracts")}  # journal/commodities/<sub>: (kind, group)
 
@@ -54,11 +56,11 @@ def group_of(rel: str) -> str | None:
     if parts[:2] == ["journal", "commodities"] and len(parts) == 4 and parts[2] in COMMODITY:
         return COMMODITY[parts[2]][1]
     if parts[:2] == ["journal", "days"]:
-        return "Signals"
-    if parts[:2] == ["journal", "stocks"]:
         return "Stocks"
+    if parts[:2] == ["journal", "stocks"]:
+        return "Stock history"
     if parts[:2] == ["journal", "notes"]:
-        return "LLM notes"
+        return None
     if parts[:2] == ["journal", "paper"]:
         return "Paper accounts"
     return "Reports"

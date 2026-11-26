@@ -570,18 +570,18 @@ function buildNav() {
     if (g === 'Paper accounts' && Object.keys(manifest.accounts || {}).length) {
       nav.append(h('h2', {}, g), h('a', { href: '#accounts' }, 'Account settings'));
     } else if (files.length) nav.append(h('h2', {}, g));
-    if (['Signals', 'LLM notes', 'Commodities'].includes(g)) files = files.slice().reverse();  // newest session first
+    if (['Stocks', 'Commodities'].includes(g)) files = files.slice().reverse();  // newest session first
     if (g === 'Reports') files = files.slice().sort((a, b) => b.path.localeCompare(a.path) || 0);
     if (g === 'Stocks') {
-      // ~500 stocks: a search box instead of a long list.
-      const list = h('datalist', { id: 'stock-list' }, files.map(f => h('option', { value: f.title })));
-      const input = h('input', { type: 'search', placeholder: `Find a stock (${files.length})`, list: 'stock-list' });
+      // ~500 per-stock pages: a search box above the sessions instead of a long list.
+      const stocks = byGroup('Stock history');
+      const list = h('datalist', { id: 'stock-list' }, stocks.map(f => h('option', { value: f.title })));
+      const input = h('input', { type: 'search', placeholder: `Find a stock (${stocks.length})`, list: 'stock-list' });
       input.addEventListener('change', () => {
-        const f = files.find(x => x.title.toUpperCase() === input.value.trim().toUpperCase());
+        const f = stocks.find(x => x.title.toUpperCase() === input.value.trim().toUpperCase());
         if (f) location.hash = f.path;
       });
-      nav.append(input, list);
-      continue;
+      if (stocks.length) nav.append(input, list);
     }
     for (const f of files) nav.append(h('a', { href: '#' + f.path, title: f.path }, f.title));
   }
