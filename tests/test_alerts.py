@@ -179,3 +179,14 @@ def test_card_html_holds_every_section(tmp_path):
     assert '<span class="medal m1">1</span>' in page and '<span class="chip new">NEW</span>' in page
     assert "No longer BUY (1):</b> B" in page
     assert "document.body.dataset.shown" in page  # the renderer waits for it
+
+
+def test_score_note_follows_the_live_weights(monkeypatch):
+    from aistock.strategy import signal
+
+    monkeypatch.setattr(signal.Config, "w_technical", 0.6)
+    monkeypatch.setattr(signal.Config, "w_fundamental", 0.2)
+    note = alerts.score_note()
+    assert "from −1 to +1: 60% technical + 20% fundamentals + 20% news sentiment" in note
+    assert "need a minimum (swing +0.40)" in note
+    assert '<div class="note">' in alerts.card_html(alerts.Summary("2026-11-26", None, [], [], [], {}, []))

@@ -313,6 +313,12 @@ h2 { font-size: 12px; letter-spacing: .1em; color: var(--ink-3); font-weight: 70
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px 12px; }
 .dropped { margin-top: 16px; font-size: 12px; color: var(--ink-3); }
 .dropped b { color: var(--ink-2); }
+.note { margin-top: 14px; padding: 10px 12px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line);
+  font-size: 12px; line-height: 1.5; color: var(--ink-2); }
+.note b { color: var(--ink); }
+.scale { display: flex; height: 6px; border-radius: 999px; margin: 8px 0 4px;
+  background: linear-gradient(90deg, var(--avoid), var(--watch) 50%, var(--buy)); }
+.ticks { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); }
 .foot { margin-top: 14px; font-size: 11px; color: var(--ink-3); text-align: right; }
 """
 
@@ -328,10 +334,25 @@ def _chip(now: float, before: float | None, pct: bool = False) -> str:
     return f'<span class="chip {"up" if d > 0 else "down"}">{"▲" if d > 0 else "▼"}{abs(d)}{unit}</span>'
 
 
+def score_note() -> str:
+    """How the score is made, from the live weights and strategy minimums (so the card can't drift from them)."""
+    from aistock.strategy.signal import Config
+    from aistock.strategy.strategies import PRESETS
+
+    c = Config()
+    parts = [(c.w_technical, "technical"), (c.w_fundamental, "fundamentals"), (c.w_sentiment, "news sentiment")]
+    mins = [f"{name} +{st.min_combined:.2f}" for name, st in PRESETS.items() if st.min_combined is not None]
+    return ("<b>Score</b> is the combined score, from −1 to +1: "
+            + " + ".join(f"{w:.0%} {label}" for w, label in parts)
+            + ", each also from −1 to +1 (news counts 0 when it wasn't fetched). Higher means more of the evidence "
+            "agrees. A BUY comes from a strategy's entry rules; the score only ranks BUYs"
+            + (f", though some strategies also need a minimum ({', '.join(mins)})" if mins else "") + ".")
+
+
 def card_html(s: Summary) -> str:
     """The alert as a self-contained HTML card (rendered to an image for Telegram, see card_png): breadth with
     its change and a BUY/WATCH/AVOID split bar, hot sectors as tiles, new BUYs grouped under colour-coded
-    strategy pills, the strongest BUYs ranked, dropped BUYs in a muted line."""
+    strategy pills, the strongest BUYs ranked, dropped BUYs in a muted line, and a note on what the score means."""
     e = html.escape
     total = sum(s.actions.values()) or 1
     buy, watch, avoid = (s.actions.get(a, 0) for a in ("BUY", "WATCH", "AVOID"))
@@ -372,6 +393,8 @@ def card_html(s: Summary) -> str:
         out.append(f'<section><h2><span>STRONGEST BUYS</span><span>score</span></h2><div class="panel">{ranks}</div></section>')
     if s.dropped:
         out.append(f'<div class="dropped"><b>No longer BUY ({len(s.dropped)}):</b> {e(", ".join(s.dropped))}</div>')
+    out.append(f'<div class="note">{score_note()}<div class="scale"></div>'
+               '<div class="ticks"><span>−1 bearish</span><span>0 neutral</span><span>+1 bullish</span></div></div>')
     out.append('<div class="foot">aistock · rules decide, scores rank</div>')
     return ('<!doctype html><html><head><meta charset="utf-8">'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap">'
