@@ -179,18 +179,30 @@ function barConfig(labels, data, opts = {}) {
 }
 
 // LLM notes explain BUYs the rules already chose; they never pick trades.
-function notesCard(rows, title) {
+// days: the session's journal rows, for every strategy saying BUY and the combined score.
+function notesCard(rows, title, days = []) {
+  const bySymbol = new Map(days.map(d => [d.symbol, d]));
   return card(title,
     h('p', { class: 'sub' }, 'Written by a local LLM (qwen2.5:3b) from the signal\'s numbers; the rules made the decision.'),
-    rows.map(r => h('div', { class: 'note' },
-      h('div', { class: 'note-head' }, h('a', { href: stockHref(r.symbol) }, r.symbol), ' ',
-        h('span', { class: 'muted' }, [r.name, r.strategy].filter(Boolean).join(' · ')),
-        r.source === 'backfill' ? h('span', { class: 'badge', title: 'Written later from the journal row; fundamental and news reasons were not saved for this session' }, 'backfilled') : null),
-      h('p', {}, r.note))));
+    rows.map(r => {
+      const day = bySymbol.get(r.symbol) || {};
+      const buys = day.buys ? String(day.buys).split(';') : [r.strategy].filter(Boolean);
+      return h('div', { class: 'note' },
+        h('div', { class: 'note-head' }, h('a', { href: stockHref(r.symbol) }, r.symbol), ' ',
+          h('span', { class: 'muted' }, r.name || ''),
+          num(day.combined) ? h('span', { class: 'score ' + (day.combined >= 0 ? 'pos' : 'neg') },
+            'combined ' + (day.combined >= 0 ? '+' : '') + day.combined.toFixed(2)) : null,
+          buys.map(b => h('span', { class: 'badge' + (b === r.strategy ? ' BUY' : ''),
+            title: b === r.strategy ? 'The strategy this note explains' : 'Also says BUY' }, b)),
+          r.source === 'backfill' ? h('span', { class: 'badge', title: 'Written later from the journal row; fundamental and news reasons were not saved for this session' }, 'backfilled') : null),
+        h('p', {}, r.note));
+    }));
 }
 
-function renderNotes(file, rows) {
-  return [notesCard(rows, null)];
+async function renderNotes(file, rows) {
+  const dayPath = 'journal/days/' + file.path.split('/').pop();
+  const days = manifest.files.some(f => f.path === dayPath) ? await load(dayPath) : [];
+  return [notesCard(rows, null, days)];
 }
 
 async function renderDay(file, rows) {
@@ -211,7 +223,7 @@ async function renderDay(file, rows) {
       chartCard('Combined score distribution', barConfig(hist.edges.map(e => e.toFixed(1)), hist.counts, {
         colors: hist.edges.map(e => e < 0 ? css('--s8') : css('--s3')),
       }))),
-    notes.length ? notesCard(notes, `LLM notes on ${notes.length} BUY${notes.length > 1 ? 's' : ''}`) : null,
+    notes.length ? notesCard(notes, `LLM notes on ${notes.length} BUY${notes.length > 1 ? 's' : ''}`, rows) : null,
     table(rows, file.columns, { filters: ['action', 'sector'], link: { symbol: stockHref }, sort: 'combined' }),
   ];
 }
