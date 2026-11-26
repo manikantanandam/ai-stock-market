@@ -170,4 +170,5 @@ def test_site_routes_commodity_journal():
     assert site.kind_of("journal/commodities/days/2026-11-25.csv", ["date"]) == "cday"
     assert site.kind_of("journal/commodities/notes/2026-11-25.csv", ["date"]) == "cnotes"
     assert site.group_of("journal/commodities/contracts/GOLD.csv") == "Contracts"
+    assert site.group_of("journal/commodities/notes/2026-11-25.csv") is None  # drawn on the session page
     assert site.kind_of("journal/days/2026-11-25.csv", ["date"]) == "day"

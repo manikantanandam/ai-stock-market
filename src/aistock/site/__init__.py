@@ -8,7 +8,8 @@ hence the manifest.
 
 Kinds: "day" (one scan session), "notes" (LLM notes on a session's BUYs),
 "stock" (one stock's signal history), "cday" / "cnotes" / "contract" (the
-same for commodity futures, under journal/commodities/), "trades" (entry/exit rows), "series"
+same for commodity futures, under journal/commodities/; a session's cnotes
+are drawn on its cday page), "trades" (entry/exit rows), "series"
 (Date column + numeric columns, e.g. equity curves), "yearly" (returns per
 calendar year), "table" (anything else).
 """
@@ -21,8 +22,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 STATIC = Path(__file__).parent / "static"
 
-GROUPS = ["Signals", "LLM notes", "Commodities", "Commodity notes", "Paper accounts", "Reports", "Stocks", "Contracts"]
-COMMODITY = {"days": ("cday", "Commodities"), "notes": ("cnotes", "Commodity notes"),
+GROUPS = ["Signals", "LLM notes", "Commodities", "Paper accounts", "Reports", "Stocks", "Contracts"]
+# Commodity notes have no nav group: the page draws them on their session's Commodities page
+COMMODITY = {"days": ("cday", "Commodities"), "notes": ("cnotes", None),
              "contracts": ("contract", "Contracts")}  # journal/commodities/<sub>: (kind, group)
 
 
@@ -47,7 +49,7 @@ def kind_of(rel: str, columns: list[str]) -> str:
     return "table"
 
 
-def group_of(rel: str) -> str:
+def group_of(rel: str) -> str | None:
     parts = rel.split("/")
     if parts[:2] == ["journal", "commodities"] and len(parts) == 4 and parts[2] in COMMODITY:
         return COMMODITY[parts[2]][1]

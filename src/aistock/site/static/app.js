@@ -310,7 +310,10 @@ const COMMODITY_CELLS = {
   close: (v, r) => num(v) ? h('div', {}, fmt(v), r.unit ? h('div', { class: 'cell-sub' }, 'per ' + r.unit) : null) : dash(),
 };
 
-function renderCommodityDay(file, rows) {
+// A session's commodity notes (~one per contract) are drawn under its scan table.
+async function renderCommodityDay(file, rows) {
+  const notesPath = 'journal/commodities/notes/' + file.path.split('/').pop();
+  const notes = manifest.files.some(f => f.path === notesPath) ? await load(notesPath) : [];
   const actions = countBy(rows, 'action');
   const main = COMMODITY_COLS.filter(c => file.columns.includes(c));
   const extra = file.columns.filter(c => !main.includes(c));
@@ -321,13 +324,8 @@ function renderCommodityDay(file, rows) {
       ...actions.map(([a, n]) => [a, n.toLocaleString(), a === 'BUY' ? 'pos' : a === 'SELL' ? 'neg' : ''])]),
     table(rows, [...main, ...extra], { filters: ['action', 'group'], sort: 'combined', labels: COMMODITY_LABELS,
       cells: COMMODITY_CELLS, extra, link: { symbol: contractHref } }),
+    notes.length ? notesCard(notes, 'LLM notes', rows, commodityEntries, contractHref) : null,
   ];
-}
-
-async function renderCommodityNotes(file, rows) {
-  const dayPath = 'journal/commodities/days/' + file.path.split('/').pop();
-  const days = manifest.files.some(f => f.path === dayPath) ? await load(dayPath) : [];
-  return [notesCard(rows, null, days, commodityEntries, contractHref)];
 }
 
 function lineConfig(labels, datasets, opts = {}) {
@@ -454,7 +452,7 @@ function renderAccounts() {
 }
 
 const RENDER = { day: renderDay, notes: renderNotes, stock: renderStock, trades: renderTrades, series: renderSeries,
-  cday: renderCommodityDay, cnotes: renderCommodityNotes, contract: renderStock,
+  cday: renderCommodityDay, contract: renderStock,
   yearly: renderYearly, table: (f, rows) => [table(rows, f.columns)] };
 
 async function show(path) {
@@ -488,7 +486,7 @@ function buildNav() {
     if (g === 'Paper accounts' && Object.keys(manifest.accounts || {}).length) {
       nav.append(h('h2', {}, g), h('a', { href: '#accounts' }, 'Account settings'));
     } else if (files.length) nav.append(h('h2', {}, g));
-    if (['Signals', 'LLM notes', 'Commodities', 'Commodity notes'].includes(g)) files = files.slice().reverse();  // newest session first
+    if (['Signals', 'LLM notes', 'Commodities'].includes(g)) files = files.slice().reverse();  // newest session first
     if (g === 'Reports') files = files.slice().sort((a, b) => b.path.localeCompare(a.path) || 0);
     if (g === 'Stocks') {
       // ~500 stocks: a search box instead of a long list.
