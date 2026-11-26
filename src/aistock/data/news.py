@@ -130,7 +130,8 @@ def get_news(symbol: str, company: str | None, days: int = 14) -> list[dict]:
         if key not in seen:
             seen.add(key)
             news.append(n)
-    path.write_text(json.dumps(news))
+    if news:  # an empty result is usually a failed fetch; retry next run rather than cache it
+        path.write_text(json.dumps(news))
     return news
 
 
