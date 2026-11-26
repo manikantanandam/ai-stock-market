@@ -157,3 +157,26 @@ def test_matches_portfolio_backtest_with_slope_rank():
     got = pd.DataFrame(acct.trades)
     assert list(got.symbol) == list(closed.symbol) and len(got) > 5
     assert got.ret.to_numpy() == pytest.approx(closed.ret.to_numpy())
+
+
+def test_decisions_record_every_offered_buy(tmp_path, monkeypatch):
+    """One slot, three BUYs: the best-ranked enters, the rest get 'no slot'; a repeat BUY of the open
+    position is 'held'; an unknown symbol is 'no data'. Saved and loaded back unchanged."""
+    monkeypatch.setattr(account, "ROOT", tmp_path)
+    flat = lambda macd: bars([(100, 101, 99, 100)] * 6).assign(atr14=1.0, sma50=90.0, sma200=80.0, rsi14=50.0,
+                                                               macd_hist=macd)
+    data = {"A": flat(-1.0), "B": flat(1.0), "C": flat(-1.0)}  # B's positive MACD ranks it first
+    dates = data["A"].index
+    signals = {dates[0]: ["A", "B", "C"], dates[1]: ["B", "X"]}
+    acct = account.Account("t", 100_000.0, 1, 100_000.0)
+    account.advance(acct, dates, data, signals, Params(stop_atr=50.0, target_atr=None, max_hold=90))
+
+    got = {(r["signal_date"], r["symbol"]): (r["rank"], r["outcome"]) for r in acct.decisions}
+    d0, d1 = f"{dates[0]:%Y-%m-%d}", f"{dates[1]:%Y-%m-%d}"
+    assert got == {(d0, "B"): (1, "entered"), (d0, "A"): (2, "no slot"), (d0, "C"): (3, "no slot"),
+                   (d1, "B"): (None, "held"), (d1, "X"): (None, "no data")}
+    assert list(acct.positions) == ["B"]
+
+    account.save(acct, dates)
+    again = account.load("t", dates)
+    assert [(r["symbol"], r["outcome"]) for r in again.decisions] == [(r["symbol"], r["outcome"]) for r in acct.decisions]
