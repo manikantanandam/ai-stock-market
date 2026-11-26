@@ -428,24 +428,31 @@ function lineConfig(labels, datasets, opts = {}) {
   };
 }
 
-// Full close history (data/prices/, written at build time) with logged BUYs marked; range buttons trim the window.
+// Full close and technical score history (data/prices/, written at build time), with logged BUYs and
+// fundamental scores at their sessions (Yahoo has no fundamental history); range buttons trim both charts.
 const RANGES = [['1Y', 1], ['5Y', 5], ['Max', 0]];
 
 function historyCard(history, rows) {
   const buys = new Map(rows.filter(r => r.action === 'BUY').map(r => [r.date, r.close]));
-  const box = h('div', { class: 'chart-box tall' });
+  const fund = new Map(rows.filter(r => num(r.fundamental)).map(r => [r.date, r.fundamental]));
+  const priceBox = h('div', { class: 'chart-box tall' }), scoreBox = h('div', { class: 'chart-box' });
   const draw = years => {
-    const mine = charts.filter(c => c.canvas.parentNode === box);  // destroy() nulls c.canvas, so split first
+    const mine = charts.filter(c => [priceBox, scoreBox].includes(c.canvas.parentNode));  // destroy() nulls c.canvas, so split first
     charts = charts.filter(c => !mine.includes(c));
     mine.forEach(c => c.destroy());
-    box.replaceChildren();
+    priceBox.replaceChildren(); scoreBox.replaceChildren();
     const end = new Date(history[history.length - 1].Date);
     const from = years ? new Date(end.getFullYear() - years, end.getMonth(), end.getDate()).toISOString().slice(0, 10) : '';
     const pts = history.filter(p => String(p.Date) >= from);
-    const datasets = [{ label: 'Close', data: pts.map(p => p.Close), borderColor: series(0) }];
-    if (buys.size) datasets.push({ label: 'BUY', data: pts.map(p => buys.get(p.Date) ?? null), showLine: false,
+    const labels = pts.map(p => p.Date);
+    const prices = [{ label: 'Close', data: pts.map(p => p.Close), borderColor: series(0) }];
+    if (buys.size) prices.push({ label: 'BUY', data: pts.map(p => buys.get(p.Date) ?? null), showLine: false,
       pointRadius: 4, borderColor: series(1), backgroundColor: series(1) });
-    chart(box, lineConfig(pts.map(p => p.Date), datasets));
+    chart(priceBox, lineConfig(labels, prices));
+    const scores = [{ label: 'technical', data: pts.map(p => p.Technical), borderColor: series(1), borderWidth: 1.5 }];
+    if (fund.size) scores.push({ label: 'fundamental (logged sessions)', data: pts.map(p => fund.get(p.Date) ?? null),
+      spanGaps: true, pointRadius: 3, borderColor: series(2), backgroundColor: series(2) });
+    chart(scoreBox, lineConfig(labels, scores, { min: -1, max: 1 }));
   };
   const btns = RANGES.map(([label, years]) => {
     const b = h('button', { class: 'link' }, label);
@@ -454,7 +461,8 @@ function historyCard(history, rows) {
   });
   btns[btns.length - 1].disabled = true;
   requestAnimationFrame(() => draw(0));
-  return card(`Price history (${history[0].Date} to ${history[history.length - 1].Date})`, h('div', { class: 'controls' }, btns), box);
+  return card(`Price history (${history[0].Date} to ${history[history.length - 1].Date})`,
+    h('div', { class: 'controls' }, btns), priceBox, h('h3', {}, 'Scores (−1 to 1)'), scoreBox);
 }
 
 async function renderStock(file, rows) {
@@ -468,9 +476,8 @@ async function renderStock(file, rows) {
     tiles([['Last action', last.action || '–', last.action === 'BUY' ? 'pos' : last.action === 'SELL' ? 'neg' : ''],
       ['Close', fmt(last.close)], ...scores.map(c => [c[0].toUpperCase() + c.slice(1), fmt(last[c])]),
       ['Sessions logged', rows.length]]),
-    history.length ? historyCard(history, rows) : null,
-    h('div', { class: 'charts' },
-      history.length ? null : chartCard('Close', lineConfig(labels, [{ label: 'Close', data: rows.map(r => r.close), borderColor: series(0) }])),
+    history.length ? historyCard(history, rows) : h('div', { class: 'charts' },
+      chartCard('Close', lineConfig(labels, [{ label: 'Close', data: rows.map(r => r.close), borderColor: series(0) }])),
       chartCard('Scores (−1 to 1)', lineConfig(labels, scores.map((c, i) =>
         ({ label: c, data: rows.map(r => r[c]), borderColor: series(i), backgroundColor: series(i), pointRadius: 3 })), { min: -1, max: 1 }))),
     table(rows.slice().reverse(), file.columns),

@@ -14,8 +14,10 @@ are drawn on its cday page), "trades" (entry/exit rows), "series"
 calendar year), "table" (anything else).
 
 With prices=True, `build` also writes each journaled stock's full Yahoo
-history (Date,Close) to data/prices/<SYMBOL>.csv and lists those symbols
-in the manifest, so a stock page charts more than the logged sessions.
+history (Date,Close,Technical: the per-bar technical score, blank until
+SMA200 exists) to data/prices/<SYMBOL>.csv and lists those symbols in the
+manifest, so a stock page charts more than the logged sessions. There is no
+fundamental or news history to add: Yahoo only serves today's values.
 """
 import csv
 import json
@@ -88,8 +90,10 @@ def _describe(path: Path, rel: str) -> dict:
 
 
 def write_prices(out: Path, symbols: list[str]) -> list[str]:
-    """Full daily close history per symbol into <out>/data/prices/; returns the symbols written."""
+    """Full daily close and technical score history per symbol into <out>/data/prices/;
+    returns the symbols written."""
     from aistock.data import prices
+    from aistock.technical.indicators import add_indicators, score_series
 
     (out / "data" / "prices").mkdir(parents=True, exist_ok=True)
     prices.prefetch(symbols, None)
@@ -100,7 +104,9 @@ def write_prices(out: Path, symbols: list[str]) -> list[str]:
         except Exception as e:  # delisted or renamed symbols: the page falls back to journal closes
             print(f"prices: skipped {sym}: {e}")
             continue
-        df[["Close"]].round(2).to_csv(out / "data" / "prices" / f"{sym}.csv", index_label="Date", date_format="%Y-%m-%d")
+        # pandas-ta returns None on series shorter than its window; the score needs SMA200 anyway
+        df = df.assign(Technical=score_series(add_indicators(df)) if len(df) >= 200 else float("nan"))
+        df[["Close", "Technical"]].round(2).to_csv(out / "data" / "prices" / f"{sym}.csv", index_label="Date", date_format="%Y-%m-%d")
         written.append(sym)
     return written
 

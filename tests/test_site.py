@@ -40,12 +40,15 @@ def test_build_writes_full_price_history_per_stock(tmp_path, monkeypatch):
     import pandas as pd
 
     from aistock.data import prices
+    from aistock.technical.indicators import add_indicators, score_series
 
     root = tmp_path / "repo"
     (root / "journal" / "stocks").mkdir(parents=True)
     for sym in ("INFY", "GONE"):
         (root / "journal" / "stocks" / f"{sym}.csv").write_text(f"date,symbol,close\n2026-11-23,{sym},1\n")
-    frame = pd.DataFrame({"Close": [1.234, 2.0]}, index=pd.to_datetime(["2001-01-02", "2026-11-23"]))
+    close = [1.234, 2.0] + [100.0 + i for i in range(250)]
+    frame = pd.DataFrame({"Open": close, "High": close, "Low": close, "Close": close, "Volume": 1000.0},
+                         index=pd.bdate_range("2001-01-02", periods=len(close)))
     asked = []
 
     def fake_get(sym, years):
@@ -62,4 +65,7 @@ def test_build_writes_full_price_history_per_stock(tmp_path, monkeypatch):
 
     assert manifest["prices"] == ["INFY"]  # GONE has no data and falls back to journal closes
     assert asked == [None, None]  # full history
-    assert (out / "data" / "prices" / "INFY.csv").read_text().splitlines() == ["Date,Close", "2001-01-02,1.23", "2026-11-23,2.0"]
+    lines = (out / "data" / "prices" / "INFY.csv").read_text().splitlines()
+    assert lines[:3] == ["Date,Close,Technical", "2001-01-02,1.23,", "2001-01-03,2.0,"]  # no score before SMA200
+    expected = score_series(add_indicators(frame)).round(2)
+    assert [float(x.split(",")[2]) for x in lines[200:]] == expected.iloc[199:].tolist()
