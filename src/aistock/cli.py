@@ -488,7 +488,20 @@ def compare(watchlist: str = WATCHLIST, strategy: str = typer.Option("all", "--s
     path = universe.REPORTS / f"compare_{watchlist}_{date.today()}.csv"
     pd.concat(curves, axis=1).to_csv(path)
     print(f"Equity curves saved to {path}")
+    stats_path = path.with_name(f"{path.stem}_stats.csv")
+    compare_stats(runs).to_csv(stats_path, index=False)
+    print(f"Statistics saved to {stats_path} (the dashboard sets paper accounts against them)")
     _print_skipped(skipped)
+
+
+def compare_stats(runs: dict[str, dict[str, dict]]) -> pd.DataFrame:
+    """One row per (strategy, segment) from `compare`'s runs ({strategy: {"<segment> (<period>)": stats}})."""
+    rows = []
+    for name, cols in runs.items():
+        for label, stats in cols.items():
+            seg, period = label.split(" (", 1)
+            rows.append({"strategy": name, "segment": seg, "period": period.rstrip(")"), **stats})
+    return pd.DataFrame(rows)
 
 
 def _sweep_walk_forward(data, watchlist, years, grid, rank_by, min_trades, min_train_years):
