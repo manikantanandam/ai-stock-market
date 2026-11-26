@@ -117,6 +117,8 @@ td a, .sub a { color: var(--accent); text-decoration: none; }
 .badge.EXIT { border-color: var(--s7); color: var(--s7); }
 .badge.HOLD { border-color: var(--accent); color: var(--accent); }
 .badge.MIXED { border-color: var(--s4); color: var(--s4); }
+.badge.long { border-color: var(--good); color: var(--good); background: color-mix(in srgb, var(--good) 12%, transparent); }
+.badge.short { border-color: var(--critical); color: var(--critical); background: color-mix(in srgb, var(--critical) 12%, transparent); }
 .more { margin-top: 10px; }
 .note { padding: 10px 0; border-top: 1px solid var(--border); }
 .note:first-of-type { border-top: none; }
