@@ -59,12 +59,14 @@ def test_telegram_card(tmp_path):
     assert lines[:9] == ["📈 <b>AI STOCK DAILY</b>", "<i>Thu 26 Nov 2026 · NSE close</i>", alerts.RULE,
                          "🟢 <b>2</b> BUY   🟡 <b>1</b> WATCH   🔴 <b>0</b> AVOID",
                          "<code>▰▰▰▰▰▰▰▱▱▱</code> 67% of 3 stocks say BUY", "",
-                         "🔥 <b>HOT SECTORS</b>", "▫️ Tech · <b>2</b> BUYs", ""]  # unknown sector: plain marker
+                         "🔥 <b>HOT SECTORS</b> <i>(BUYs)</i>", "▫️ <code>  2</code> Tech", ""]  # unknown sector: plain marker
     text = "\n".join(lines)
     # company names link to their dashboard page (escaped), so they show in the link colour
     link = '<a href="https://example.org/#journal/stocks/C.csv">M&amp;M</a>'
-    assert f"🆕 <b>NEW BUYS</b> · 1  <i>(➖ 1 dropped)</i>\n▫️ <b>C</b>  <code>+0.60</code>\n      {link} · <i>3 strategies</i>" in text
-    assert f"🥇 <b>C</b> <code>+0.60</code> ▫️ {link}\n🥈 <b>A</b>" in text
+    # scores lead each line (fixed width), so they form a column
+    assert (f"🆕 <b>NEW BUYS</b> · 1  <i>(➖ 1 dropped)</i>\n▫️ <code>+0.60</code> <b>C</b>\n"
+            f"{alerts.INDENT}{link} · <i>3 strategies</i>") in text
+    assert f"🥇 <code>+0.60</code> <b>C</b> · {link}\n🥈 <code>+0.50</code> <b>A</b>" in text
     assert "<blockquote expandable>➖ <b>No longer BUY</b> (1)\nB</blockquote>" in text
     assert lines[-1] == '👉 <a href="https://example.org/"><b>Open dashboard</b></a>'
 

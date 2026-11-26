@@ -148,6 +148,7 @@ SECTOR_ICON = {"Technology": "💻", "Financial Services": "🏦", "Healthcare":
                "Communication Services": "📡", "Utilities": "⚡", "Energy": "🛢"}
 MEDALS = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
 RULE = "━━━━━━━━━━━━━━━━━━"
+INDENT = "\u2003\u2003\u2003\u2003"  # em spaces (Telegram keeps them): a second line starts under the symbol
 
 
 def _icon(sector: str) -> str:
@@ -181,19 +182,20 @@ def telegram_html(s: Summary, url: str | None = None) -> str:
              f"🟢 <b>{buy}</b> BUY   🟡 <b>{watch}</b> WATCH   🔴 <b>{avoid}</b> AVOID",
              f"<code>{_bar(buy / total, 10)}</code> {buy / total:.0%} of {total} stocks say BUY"]
     if s.sectors:
-        lines += ["", "🔥 <b>HOT SECTORS</b>"] + [f"{_icon(k)} {e(k)} · <b>{n}</b> BUYs" for k, n in s.sectors[:3]]
+        lines += ["", "🔥 <b>HOT SECTORS</b> <i>(BUYs)</i>"] + [f"{_icon(k)} <code>{n:>3}</code> {e(k)}" for k, n in s.sectors[:3]]
     if s.prev is not None:
         lines += ["", f"🆕 <b>NEW BUYS</b> · {len(s.new)}" + (f"  <i>(➖ {len(s.dropped)} dropped)</i>" if s.dropped else "")]
         if not s.new:
             lines.append("<i>No new BUYs since " + _day(s.prev)[:-5] + "</i>")
         for b in s.new[:MAX_NEW]:
-            lines += [f"{_icon(b.sector)} <b>{e(b.symbol)}</b>  <code>{_score(b.combined)}</code>",
-                      f"      {_company(b, url)} · <i>{e(_strategies(b))}</i>"]
+            # score first: fixed width, so scores form a column and symbols start at the same place
+            lines += [f"{_icon(b.sector)} <code>{_score(b.combined)}</code> <b>{e(b.symbol)}</b>",
+                      f"{INDENT}{_company(b, url)} · <i>{e(_strategies(b))}</i>"]
         if _more(s.new, MAX_NEW):
             lines.append(f"<i>+{_more(s.new, MAX_NEW)} more on the dashboard</i>")
     if s.buys:
         lines += ["", "🏆 <b>STRONGEST BUYS</b>"]
-        lines += [f"{MEDALS[k]} <b>{e(b.symbol)}</b> <code>{_score(b.combined)}</code> {_icon(b.sector)} {_company(b, url)}"
+        lines += [f"{MEDALS[k]} <code>{_score(b.combined)}</code> <b>{e(b.symbol)}</b> · {_company(b, url)}"
                   for k, b in enumerate(s.buys[:TOP])]
     if s.dropped:
         lines += ["", f"<blockquote expandable>➖ <b>No longer BUY</b> ({len(s.dropped)})\n{e(', '.join(s.dropped))}</blockquote>"]
