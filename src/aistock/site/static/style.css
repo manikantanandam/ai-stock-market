@@ -97,6 +97,17 @@ th, td { padding: 6px 10px; border-bottom: 1px solid var(--border); text-align: 
 th { position: sticky; top: 0; background: var(--surface); cursor: pointer; user-select: none; color: var(--ink-2); font-weight: 600; }
 th.num, td.num { text-align: right; }
 tbody tr:hover { background: var(--page); }
+.table-wrap { max-height: 75vh; overflow: auto; border: 1px solid var(--border); border-radius: 8px; }
+thead th { z-index: 1; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; border-bottom: 2px solid var(--border); }
+tbody tr:nth-child(even) { background: color-mix(in srgb, var(--page) 45%, transparent); }
+tbody td { vertical-align: middle; }
+.cell-sub { font-size: 12px; color: var(--ink-3); max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.badge.tag { margin-right: 4px; border-color: var(--accent); color: var(--accent); }
+.score-cell { display: inline-flex; align-items: center; gap: 8px; }
+.score-bar { position: relative; width: 44px; height: 6px; border-radius: 3px; background: var(--grid); }
+.score-bar::after { content: ''; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--ink-3); }
+.score-bar span { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: currentColor; }
+.score-cell > span:last-child { min-width: 40px; text-align: right; }
 td a, .sub a { color: var(--accent); text-decoration: none; }
 .pos { color: var(--good); }
 .neg { color: var(--critical); }
@@ -119,3 +130,4 @@ button.link { background: none; border: 1px solid var(--border); color: var(--in
   main { padding: 16px; }
   .charts { grid-template-columns: 1fr; }
 }
+button.link:disabled { opacity: .5; cursor: default; }
