@@ -91,39 +91,64 @@ const sign = v => num(v) ? (v > 0 ? 'pos' : v < 0 ? 'neg' : '') : '';
 
 // ---------- table ----------
 
+// Numbered pages (0-based `page`): ‹ Prev 1 … 4 5 6 … 20 Next ›; go(p) shows page p.
+function pager(page, pages, go) {
+  if (pages <= 1) return null;
+  const btn = (label, p, cls = '') => {
+    const b = h('button', { class: 'page ' + cls }, label);
+    if (p === page || p < 0 || p >= pages) b.disabled = true;
+    else b.addEventListener('click', () => go(p));
+    return b;
+  };
+  const nums = [...new Set([0, page - 1, page, page + 1, pages - 1])].filter(p => p >= 0 && p < pages).sort((a, b) => a - b);
+  return h('div', { class: 'pager' }, btn('‹ Prev', page - 1),
+    nums.flatMap((p, i) => [i && p - nums[i - 1] > 1 ? h('span', { class: 'muted' }, '…') : null,
+      btn(String(p + 1), p, p === page ? 'current' : '')]),
+    btn('Next ›', page + 1));
+}
+
+// Bring a paged box's top back into view when a new page is shorter or it scrolled out above.
+const keepInView = el => { if (el.getBoundingClientRect().top < 0) el.scrollIntoView({ block: 'start' }); };
+
+const PAGE_SIZES = [10, 25, 50, 100];
+
 function table(rows, columns, opts = {}) {
   // labels: header text per column; cells: custom renderer (value, row) -> node; extra: columns hidden until 'All columns';
   // sortKeys: (value, row) -> number to sort a column by instead of its raw value
-  const { filters = [], link = {}, pageSize = 200, labels = {}, cells = {}, extra = [], sortKeys = {} } = opts;
-  let sortCol = opts.sort || null, asc = opts.asc ?? false, query = '', shown = pageSize, showAll = false;
+  // pageSize: rows per page (the viewer can change it)
+  const { filters = [], link = {}, pageSize = 10, labels = {}, cells = {}, extra = [], sortKeys = {} } = opts;
+  let sortCol = opts.sort || null, asc = opts.asc ?? false, query = '', page = 0, size = pageSize, showAll = false;
   const active = Object.fromEntries(filters.map(f => [f, '']));
   const numeric = Object.fromEntries(columns.map(c => [c, rows.some(r => num(r[c]))]));
   const descFirst = c => numeric[c] || c in sortKeys;
 
   const search = h('input', { type: 'search', placeholder: 'Search…' });
-  search.addEventListener('input', () => { query = search.value.toLowerCase(); shown = pageSize; draw(); });
+  search.addEventListener('input', () => { query = search.value.toLowerCase(); page = 0; draw(); });
   const selects = filters.map(f => {
     const opts = [...new Set(rows.map(r => r[f]).filter(v => v != null && v !== ''))].sort();
-    const s = h('select', {}, h('option', { value: '' }, 'All ' + f), opts.map(o => h('option', { value: o }, o)));
-    s.addEventListener('change', () => { active[f] = s.value; shown = pageSize; draw(); });
+    const s = h('select', {}, h('option', { value: '' }, 'All ' + (labels[f] || f).toLowerCase()), opts.map(o => h('option', { value: o }, o)));
+    s.addEventListener('change', () => { active[f] = s.value; page = 0; draw(); });
     return s;
   });
   const sortBy = h('select', { title: 'Sort by' }, h('option', { value: '' }, 'Sort: file order'),
     columns.map(c => h('option', { value: c }, 'Sort: ' + (labels[c] || c))));
-  sortBy.addEventListener('change', () => { sortCol = sortBy.value || null; asc = !descFirst(sortCol); draw(); });
+  sortBy.addEventListener('change', () => { sortCol = sortBy.value || null; asc = !descFirst(sortCol); page = 0; draw(); });
   const dir = h('button', { class: 'link', title: 'Flip sort direction' });
-  dir.addEventListener('click', () => { asc = !asc; draw(); });
+  dir.addEventListener('click', () => { asc = !asc; page = 0; draw(); });
   const toggle = extra.length ? h('input', { type: 'checkbox' }) : null;
   toggle?.addEventListener('change', () => { showAll = toggle.checked; draw(); });
   const count = h('span', { class: 'muted' });
   const tbody = h('tbody'), headRow = h('tr');
   const ths = Object.fromEntries(columns.map(c => {
     const th = h('th', { class: numeric[c] ? 'num' : '', title: c });
-    th.addEventListener('click', () => { asc = sortCol === c ? !asc : !descFirst(c); sortCol = c; draw(); });
+    th.addEventListener('click', () => { asc = sortCol === c ? !asc : !descFirst(c); sortCol = c; page = 0; draw(); });
     return [c, th];
   }));
-  const more = h('button', { class: 'link' }, 'Show more');
-  more.addEventListener('click', () => { shown += pageSize; draw(); });
+  const sizes = h('select', { title: 'Rows per page' },
+    [...new Set([...PAGE_SIZES, pageSize])].sort((a, b) => a - b).map(n => h('option', { value: n }, n + ' / page')));
+  sizes.value = size;
+  sizes.addEventListener('change', () => { size = +sizes.value; page = 0; draw(); });
+  const pages = h('div');
 
   function draw() {
     let out = rows.filter(r =>
@@ -144,7 +169,9 @@ function table(rows, columns, opts = {}) {
     const visible = showAll ? columns : columns.filter(c => !extra.includes(c));
     for (const c of visible) ths[c].textContent = (labels[c] || c) + (c === sortCol ? (asc ? ' ▲' : ' ▼') : '');
     headRow.replaceChildren(...visible.map(c => ths[c]));
-    tbody.replaceChildren(...out.slice(0, shown).map(r => h('tr', {}, visible.map(c => {
+    const last = Math.max(0, Math.ceil(out.length / size) - 1);
+    page = Math.min(page, last);
+    tbody.replaceChildren(...out.slice(page * size, (page + 1) * size).map(r => h('tr', {}, visible.map(c => {
       const v = r[c];
       const cls = (numeric[c] ? 'num ' : '') + (isPct(c) ? sign(v) : '');
       if (cells[c]) return h('td', { class: cls }, cells[c](v, r));
@@ -163,14 +190,17 @@ function table(rows, columns, opts = {}) {
       const long = typeof v === 'string' && v.length > 60;
       return h('td', long ? { class: cls + ' clip', title: v } : { class: cls }, content);
     }))));
-    count.textContent = `${out.length.toLocaleString()} of ${rows.length.toLocaleString()} rows`;
-    more.style.display = out.length > shown ? '' : 'none';
+    const from = out.length ? page * size + 1 : 0, to = Math.min(out.length, (page + 1) * size);
+    count.textContent = `${from.toLocaleString()}–${to.toLocaleString()} of ${out.length.toLocaleString()}` +
+      (out.length < rows.length ? ` (filtered from ${rows.length.toLocaleString()})` : '') + ' rows';
+    pages.replaceChildren(pager(page, last + 1, p => { page = p; draw(); keepInView(box); }) || '');
   }
-  draw();
-  return card(null, h('div', { class: 'controls' }, search, selects, sortBy, dir,
-      toggle ? h('label', {}, toggle, 'All columns') : null, count),
+  const box = card(null, h('div', { class: 'controls' }, search, selects, sortBy, dir,
+      toggle ? h('label', {}, toggle, 'All columns') : null, sizes, count),
     h('div', { class: 'table-wrap' }, h('table', {}, h('thead', {}, headRow), tbody)),
-    h('div', { class: 'more' }, more));
+    pages);
+  draw();
+  return box;
 }
 
 // ---------- views ----------
@@ -246,26 +276,36 @@ function scanTable(rows, columns) {
 // entries: day row -> [[strategy, action]]; href: symbol -> link.
 const stockEntries = day => day.buys ? String(day.buys).split(';').map(b => [b, 'BUY']) : [];
 
+const NOTES_PER_PAGE = 5;
+
 function notesCard(rows, title, days, entries = stockEntries, href = stockHref) {
   const bySymbol = new Map(days.map(d => [d.symbol, d]));
-  return card(title,
-    h('p', { class: 'sub' }, 'Written by a local LLM (qwen2.5:3b) from the signal\'s numbers; the rules made the decision.'),
-    rows.map(r => {
-      const day = bySymbol.get(r.symbol) || {};
-      const tags = entries(day);
-      const buys = tags.length ? tags : [[r.strategy, r.action || 'BUY']].filter(t => t[0]);
-      return h('div', { class: 'note' },
-        h('div', { class: 'note-head' }, h('a', { href: href(r.symbol) }, r.symbol), ' ',
-          h('span', { class: 'muted' }, r.name || ''),
-          day.action && day.side ? h('span', {}, h('span', { class: 'badge ' + day.action }, day.action), ' ', sideBadge(day.side)) : null,
-          num(day.combined) ? h('span', { class: 'score ' + (day.combined >= 0 ? 'pos' : 'neg') },
-            'combined ' + (day.combined >= 0 ? '+' : '') + day.combined.toFixed(2)) : null,
-          buys.map(([b, a]) => h('span', { class: 'badge ' + (b === r.strategy ? a : 'tag'),
-            title: b === r.strategy ? 'The strategy this note explains' : 'Also says ' + a }, b)),
-          !r.strategy && r.action ? h('span', { class: 'badge ' + r.action, title: 'No strategy has a position or an entry' }, r.action) : null,
-          r.source === 'backfill' ? h('span', { class: 'badge', title: 'Written later from the journal row; fundamental and news reasons were not saved for this session' }, 'backfilled') : null),
-        h('p', {}, r.note));
-    }));
+  const list = h('div'), pages = h('div');
+  const box = card(title,
+    h('p', { class: 'sub' }, `Written by a local LLM (qwen2.5:3b) from the signal's numbers; the rules made the decision. ` +
+      `${rows.length} notes.`), list, pages);
+  const show = page => {
+    list.replaceChildren(...rows.slice(page * NOTES_PER_PAGE, (page + 1) * NOTES_PER_PAGE).map(note));
+    pages.replaceChildren(pager(page, Math.ceil(rows.length / NOTES_PER_PAGE), p => { show(p); keepInView(box); }) || '');
+  };
+  const note = r => {
+    const day = bySymbol.get(r.symbol) || {};
+    const tags = entries(day);
+    const buys = tags.length ? tags : [[r.strategy, r.action || 'BUY']].filter(t => t[0]);
+    return h('div', { class: 'note' },
+      h('div', { class: 'note-head' }, h('a', { href: href(r.symbol) }, r.symbol), ' ',
+        h('span', { class: 'muted' }, r.name || ''),
+        day.action && day.side ? h('span', {}, h('span', { class: 'badge ' + day.action }, day.action), ' ', sideBadge(day.side)) : null,
+        num(day.combined) ? h('span', { class: 'score ' + (day.combined >= 0 ? 'pos' : 'neg') },
+          'combined ' + (day.combined >= 0 ? '+' : '') + day.combined.toFixed(2)) : null,
+        buys.map(([b, a]) => h('span', { class: 'badge ' + (b === r.strategy ? a : 'tag'),
+          title: b === r.strategy ? 'The strategy this note explains' : 'Also says ' + a }, b)),
+        !r.strategy && r.action ? h('span', { class: 'badge ' + r.action, title: 'No strategy has a position or an entry' }, r.action) : null,
+        r.source === 'backfill' ? h('span', { class: 'badge', title: 'Written later from the journal row; fundamental and news reasons were not saved for this session' }, 'backfilled') : null),
+      h('p', {}, r.note));
+  };
+  show(0);
+  return box;
 }
 
 async function renderNotes(file, rows) {
@@ -274,7 +314,10 @@ async function renderNotes(file, rows) {
   return [notesCard(rows, null, days)];
 }
 
-function renderDay(file, rows) {
+// A session's LLM notes (also under the LLM notes group) are drawn under its scan table.
+async function renderDay(file, rows) {
+  const notesPath = 'journal/notes/' + file.path.split('/').pop();
+  const notes = manifest.files.some(f => f.path === notesPath) ? await load(notesPath) : [];
   const actions = countBy(rows, 'action');
   const buys = rows.filter(r => r.action === 'BUY');
   const sectors = countBy(buys.length ? buys : rows.filter(r => r.action === 'WATCH'), 'sector').slice(0, 15);
@@ -290,6 +333,7 @@ function renderDay(file, rows) {
         colors: hist.edges.map(e => e < 0 ? css('--s8') : css('--s3')),
       }))),
     scanTable(rows, file.columns),
+    notes.length ? notesCard(notes, 'LLM notes', rows) : null,
   ];
 }
 
@@ -331,7 +375,8 @@ const HEADLINE_LABELS = { symbol: 'Contract', published: 'Published (UTC)', scor
   title: 'Headline', source: 'Source' };
 const HEADLINE_CELLS = {
   score: scoreCell,
-  published: v => v ? String(v).slice(0, 16).replace('T', ' ') : dash(),
+  // PapaParse's dynamicTyping turns ISO timestamps into Dates
+  published: v => v instanceof Date ? v.toISOString().slice(0, 16).replace('T', ' ') : v ? String(v) : dash(),
   // the journal keeps no links (Google News URLs are long), so search the exact title
   title: v => h('a', { href: 'https://news.google.com/search?q=' + encodeURIComponent(`"${v}"`),
     target: '_blank', rel: 'noopener' }, v),
@@ -343,7 +388,7 @@ function headlinesCard(rows) {
       'The news score is the weighted average.'),
     table(rows, ['symbol', 'score', 'weight', 'published', 'title', 'source'], { filters: ['symbol'],
       sort: 'score', labels: HEADLINE_LABELS, cells: HEADLINE_CELLS,
-      sortKeys: { score: v => num(v) ? Math.abs(v) : v }, pageSize: 50 })];
+      sortKeys: { score: v => num(v) ? Math.abs(v) : v } })];
 }
 
 // A session's commodity notes (~one per contract) and headlines are drawn under its scan table.
@@ -525,18 +570,18 @@ function buildNav() {
     if (g === 'Paper accounts' && Object.keys(manifest.accounts || {}).length) {
       nav.append(h('h2', {}, g), h('a', { href: '#accounts' }, 'Account settings'));
     } else if (files.length) nav.append(h('h2', {}, g));
-    if (['Signals', 'LLM notes', 'Commodities'].includes(g)) files = files.slice().reverse();  // newest session first
+    if (['Stocks', 'Commodities'].includes(g)) files = files.slice().reverse();  // newest session first
     if (g === 'Reports') files = files.slice().sort((a, b) => b.path.localeCompare(a.path) || 0);
     if (g === 'Stocks') {
-      // ~500 stocks: a search box instead of a long list.
-      const list = h('datalist', { id: 'stock-list' }, files.map(f => h('option', { value: f.title })));
-      const input = h('input', { type: 'search', placeholder: `Find a stock (${files.length})`, list: 'stock-list' });
+      // ~500 per-stock pages: a search box above the sessions instead of a long list.
+      const stocks = byGroup('Stock history');
+      const list = h('datalist', { id: 'stock-list' }, stocks.map(f => h('option', { value: f.title })));
+      const input = h('input', { type: 'search', placeholder: `Find a stock (${stocks.length})`, list: 'stock-list' });
       input.addEventListener('change', () => {
-        const f = files.find(x => x.title.toUpperCase() === input.value.trim().toUpperCase());
+        const f = stocks.find(x => x.title.toUpperCase() === input.value.trim().toUpperCase());
         if (f) location.hash = f.path;
       });
-      nav.append(input, list);
-      continue;
+      if (stocks.length) nav.append(input, list);
     }
     for (const f of files) nav.append(h('a', { href: '#' + f.path, title: f.path }, f.title));
   }

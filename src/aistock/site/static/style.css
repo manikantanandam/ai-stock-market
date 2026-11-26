@@ -119,7 +119,10 @@ td a, .sub a { color: var(--accent); text-decoration: none; }
 .badge.MIXED { border-color: var(--s4); color: var(--s4); }
 .badge.long { border-color: var(--good); color: var(--good); background: color-mix(in srgb, var(--good) 12%, transparent); }
 .badge.short { border-color: var(--critical); color: var(--critical); background: color-mix(in srgb, var(--critical) 12%, transparent); }
-.more { margin-top: 10px; }
+.pager { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-top: 10px; }
+button.page { background: none; border: 1px solid var(--border); color: var(--ink); border-radius: 6px; padding: 4px 10px; min-width: 34px; cursor: pointer; font: inherit; }
+button.page.current { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.page:disabled:not(.current) { opacity: .4; cursor: default; }
 .note { padding: 10px 0; border-top: 1px solid var(--border); }
 .note:first-of-type { border-top: none; }
 td.clip { max-width: 360px; overflow: hidden; text-overflow: ellipsis; }

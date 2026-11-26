@@ -7,7 +7,7 @@ def test_kind_of_routes_by_path_and_header():
     assert site.kind_of("journal/days/2026-11-23.csv", ["date", "symbol"]) == "day"
     assert site.kind_of("journal/stocks/INFY.csv", ["date", "symbol"]) == "stock"
     assert site.kind_of("journal/notes/2026-11-23.csv", ["date", "symbol", "note"]) == "notes"
-    assert site.group_of("journal/notes/2026-11-23.csv") == "LLM notes"
+    assert site.group_of("journal/notes/2026-11-23.csv") is None  # drawn on the session page
     assert site.kind_of("reports/paper_trades.csv", ["strategy", "entry_date", "ret"]) == "trades"
     assert site.kind_of("journal/paper/trend/trades.csv", ["symbol", "entry_date", "ret"]) == "trades"
     assert site.kind_of("reports/yearly_nifty500_2026-11-25.csv", ["Date", "breakout"]) == "yearly"
@@ -31,6 +31,6 @@ def test_build_copies_csvs_and_writes_manifest(tmp_path):
     assert (out / "data" / "journal" / "days" / "2026-11-23.csv").exists()
     assert json.loads((out / "data" / "manifest.json").read_text()) == manifest
     day, equity = manifest["files"]
-    assert (day["kind"], day["group"], day["rows"]) == ("day", "Signals", 2)
+    assert (day["kind"], day["group"], day["rows"]) == ("day", "Stocks", 2)
     assert (equity["group"], equity["title"]) == ("Paper accounts", "trend · equity")
     assert manifest["accounts"] == {"trend": {"capital": 100000, "slots": 10}}
