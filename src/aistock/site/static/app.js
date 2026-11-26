@@ -430,39 +430,59 @@ function lineConfig(labels, datasets, opts = {}) {
 
 // Full close, technical and estimated fundamental score history (data/prices/, written at build time), with
 // logged BUYs and the logged fundamental scores at their sessions; range buttons trim both charts.
-const RANGES = [['1Y', 1], ['5Y', 5], ['Max', 0]];
+// [label, years (0 = all), bucket]: longer ranges plot one point per week or month, or the daily
+// technical score (which flips between a few levels) is unreadable. Close and fundamental take the
+// bucket's last value, technical its average.
+const RANGES = [['1Y', 1, 'day'], ['5Y', 5, 'week'], ['Max', 0, 'month']];
+const BUCKET = {
+  day: d => d,
+  week: d => { const t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() - (t.getUTCDay() + 6) % 7); return t.toISOString().slice(0, 10); },
+  month: d => d.slice(0, 7),
+};
+
+function bucketed(pts, key) {
+  const groups = new Map();
+  pts.forEach(p => { const k = key(p.Date); groups.has(k) ? groups.get(k).push(p) : groups.set(k, [p]); });
+  return [...groups.values()].map(g => {
+    const tech = g.map(p => p.Technical).filter(num);
+    return { ...g[g.length - 1], Technical: tech.length ? mean(tech) : null };
+  });
+}
 
 function historyCard(history, rows) {
   const buys = new Map(rows.filter(r => r.action === 'BUY').map(r => [r.date, r.close]));
   const fund = new Map(rows.filter(r => num(r.fundamental)).map(r => [r.date, r.fundamental]));
   const priceBox = h('div', { class: 'chart-box tall' }), scoreBox = h('div', { class: 'chart-box' });
-  const draw = years => {
+  const draw = (years, bucket) => {
     const mine = charts.filter(c => [priceBox, scoreBox].includes(c.canvas.parentNode));  // destroy() nulls c.canvas, so split first
     charts = charts.filter(c => !mine.includes(c));
     mine.forEach(c => c.destroy());
     priceBox.replaceChildren(); scoreBox.replaceChildren();
     const end = new Date(history[history.length - 1].Date);
     const from = years ? new Date(end.getFullYear() - years, end.getMonth(), end.getDate()).toISOString().slice(0, 10) : '';
-    const pts = history.filter(p => String(p.Date) >= from);
+    const key = BUCKET[bucket];
+    const pts = bucketed(history.filter(p => String(p.Date) >= from), key);
     const labels = pts.map(p => p.Date);
+    const inBucket = m => new Map([...m].map(([d, v]) => [key(d), v]));  // a BUY or logged score shows on its bucket's point
+    const buysAt = inBucket(buys), fundAt = inBucket(fund);
     const prices = [{ label: 'Close', data: pts.map(p => p.Close), borderColor: series(0) }];
-    if (buys.size) prices.push({ label: 'BUY', data: pts.map(p => buys.get(p.Date) ?? null), showLine: false,
+    if (buys.size) prices.push({ label: 'BUY', data: pts.map(p => buysAt.get(key(p.Date)) ?? null), showLine: false,
       pointRadius: 4, borderColor: series(1), backgroundColor: series(1) });
     chart(priceBox, lineConfig(labels, prices));
-    const scores = [{ label: 'technical', data: pts.map(p => p.Technical), borderColor: series(1), borderWidth: 1.5 }];
+    const scores = [{ label: bucket === 'day' ? 'technical' : `technical (${bucket}ly average)`, data: pts.map(p => p.Technical), borderColor: series(1), borderWidth: 1.5 }];
     if (pts.some(p => num(p.Fundamental))) scores.push({ label: 'fundamental (estimated from annual results)',
       data: pts.map(p => p.Fundamental), borderColor: series(2), borderWidth: 1.5, borderDash: [5, 4] });
-    if (fund.size) scores.push({ label: 'fundamental (logged)', data: pts.map(p => fund.get(p.Date) ?? null),
+    if (fund.size) scores.push({ label: 'fundamental (logged)', data: pts.map(p => fundAt.get(key(p.Date)) ?? null),
       spanGaps: true, pointRadius: 3, borderColor: series(3), backgroundColor: series(3) });
     chart(scoreBox, lineConfig(labels, scores, { min: -1, max: 1 }));
   };
-  const btns = RANGES.map(([label, years]) => {
+  const btns = RANGES.map(([label, years, bucket]) => {
     const b = h('button', { class: 'link' }, label);
-    b.addEventListener('click', () => { btns.forEach(x => x.disabled = x === b); draw(years); });
+    b.addEventListener('click', () => { btns.forEach(x => x.disabled = x === b); draw(years, bucket); });
     return b;
   });
   btns[btns.length - 1].disabled = true;
-  requestAnimationFrame(() => draw(0));
+  requestAnimationFrame(() => draw(0, 'month'));
   return card(`Price history (${history[0].Date} to ${history[history.length - 1].Date})`,
     h('div', { class: 'controls' }, btns), priceBox, h('h3', {}, 'Scores (−1 to 1)'), scoreBox);
 }
