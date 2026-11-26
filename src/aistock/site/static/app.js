@@ -47,11 +47,10 @@ function fmt(v, col = '') {
 }
 const pct = v => num(v) ? (v * 100).toFixed(1) + '%' : '–';
 
-// Large numbers in Indian units (Cr = 1e7, L = 1e5), or K/M/B for amounts reported in another currency.
-function compact(v, intl = false) {
-  const units = intl ? [[1e9, 'B'], [1e6, 'M'], [1e3, 'K']] : [[1e7, 'Cr'], [1e5, 'L'], [1e3, 'K']];
-  const [n, u] = units.find(([n]) => Math.abs(v) >= n) || [1, ''];
-  return (v / n).toLocaleString(intl ? 'en-US' : 'en-IN', { maximumFractionDigits: 2 }) + (u ? ' ' + u : '');
+// Large numbers in Indian units: Cr = 1e7, L = 1e5, K = 1e3 (also for amounts reported in USD).
+function compact(v) {
+  const [n, u] = [[1e7, 'Cr'], [1e5, 'L'], [1e3, 'K']].find(([n]) => Math.abs(v) >= n) || [1, ''];
+  return (v / n).toLocaleString('en-IN', { maximumFractionDigits: 2 }) + (u ? ' ' + u : '');
 }
 
 // History columns shown compact: 'count' (no currency) or 'money' (in the row's `currency`, else INR).
@@ -63,7 +62,7 @@ function amount(v, c, r) {
   if (!AMOUNTS[c] || !num(v)) return fmt(v, c);
   if (AMOUNTS[c] === 'count') return compact(v);
   const cur = r.currency || 'INR';
-  return (v < 0 ? '-' : '') + (SYMBOL[cur] ?? cur + ' ') + compact(Math.abs(v), cur !== 'INR');
+  return (v < 0 ? '-' : '') + (SYMBOL[cur] ?? cur + ' ') + compact(Math.abs(v));
 }
 
 // ---------- theme & charts ----------
