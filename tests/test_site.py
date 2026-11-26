@@ -59,15 +59,21 @@ def test_build_writes_full_price_history_per_stock(tmp_path, monkeypatch):
 
     monkeypatch.setattr(prices, "prefetch", lambda symbols, years: None)
     monkeypatch.setattr(fundamentals, "prefetch", lambda symbols, fetch: None)
-    monkeypatch.setattr(fundamentals, "get_statements", lambda sym: [])
+    statements = [{"date": "2001-03-31", "revenue": 10.0, "net_income": 1.0, "eps": 1.0, "equity": 5.0, "debt": 1.0,
+                   "current_assets": None, "current_liabilities": None, "shares": 2.0}]
+    monkeypatch.setattr(fundamentals, "get_statements", lambda sym: statements)
     monkeypatch.setattr(prices, "get_prices", fake_get)
     out = tmp_path / "site"
 
     manifest = site.build(out, root=root, prices=True)
 
-    assert manifest["prices"] == ["INFY"]  # GONE has no data and falls back to journal closes
+    assert manifest["prices"] == manifest["fundamentals"] == ["INFY"]  # GONE: no prices, falls back to journal closes
     assert asked == [None, None]  # full history
-    lines = (out / "data" / "prices" / "INFY.csv").read_text().splitlines()
-    assert lines[:3] == ["Date,Close,Technical,Fundamental", "2001-01-02,1.23,,", "2001-01-03,2.0,,"]  # no score before SMA200
-    expected = score_series(add_indicators(frame)).round(2)
-    assert [float(x.split(",")[2]) for x in lines[200:]] == expected.iloc[199:].tolist()
+    daily = pd.read_csv(out / "data" / "prices" / "INFY.csv", index_col="Date", parse_dates=True)
+    assert list(daily.columns) == site.DAILY
+    assert daily.Close.iloc[:2].tolist() == [1.23, 2.0]
+    assert daily.Technical.iloc[:199].isna().all()  # no score before SMA200
+    assert daily.Technical.iloc[199:].tolist() == score_series(add_indicators(frame)).round(2).iloc[199:].tolist()
+    assert daily.marketCap.iloc[-1] == 2.0 * close[-1]  # shares x close from the fiscal year in effect
+    yearly = pd.read_csv(out / "data" / "fundamentals" / "INFY.csv")
+    assert yearly.loc[0, ["date", "profitMargins", "returnOnEquity"]].tolist() == ["2001-03-31", 0.1, 0.2]

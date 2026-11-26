@@ -32,7 +32,9 @@ def get_fundamentals(symbol: str) -> dict:
 # Annual statement rows per figure: (statement, Yahoo row label)
 STATEMENT_ROWS = {"revenue": ("income_stmt", "Total Revenue"), "net_income": ("income_stmt", "Net Income"),
                   "eps": ("income_stmt", "Diluted EPS"), "equity": ("balance_sheet", "Stockholders Equity"),
-                  "debt": ("balance_sheet", "Total Debt")}
+                  "debt": ("balance_sheet", "Total Debt"), "current_assets": ("balance_sheet", "Current Assets"),
+                  "current_liabilities": ("balance_sheet", "Current Liabilities"),
+                  "shares": ("balance_sheet", "Ordinary Shares Number")}
 
 
 def get_statements(symbol: str) -> list[dict]:
@@ -42,7 +44,9 @@ def get_statements(symbol: str) -> list[dict]:
     path = CACHE / "statements" / f"{symbol}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists() and time.time() - path.stat().st_mtime < TTL_SECONDS:
-        return json.loads(path.read_text())
+        years = json.loads(path.read_text())
+        if all(k in y for y in years for k in STATEMENT_ROWS):  # else cached before a figure was added
+            return years
     ticker = yf.Ticker(f"{symbol}.NS")
     frames = {name: getattr(ticker, name) for name in ("income_stmt", "balance_sheet")}
 
