@@ -128,8 +128,10 @@ button.page:disabled:not(.current) { opacity: .4; cursor: default; }
 .note:first-of-type { border-top: none; }
 td.clip { max-width: 360px; overflow: hidden; text-overflow: ellipsis; }
 td.reasons { white-space: normal; min-width: 260px; max-width: 480px; }
-td.reasons summary { cursor: pointer; }
-td.reasons summary .chips { display: inline-flex; }
+td.reasons summary { cursor: pointer; list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+td.reasons summary::-webkit-details-marker { display: none; }
+td.reasons summary::before { content: '▸'; color: var(--ink-3); width: 10px; }
+td.reasons details[open] summary::before { content: '▾'; }
 h3.section { margin: 24px 0 4px; }
 .chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .chip { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; white-space: nowrap;
