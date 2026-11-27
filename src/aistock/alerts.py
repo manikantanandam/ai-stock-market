@@ -357,6 +357,10 @@ h2 { font-size: 12px; letter-spacing: .1em; color: var(--ink-3); font-weight: 70
 .points { margin: 1px 0 5px; padding-left: 16px; font-size: 11.5px; line-height: 1.4; color: var(--ink-3); }
 .points li { margin-top: 1px; }
 .points li::marker { color: var(--ink-3); }
+.points li.risk { color: #fca5a5; }
+.points li.risk::marker { color: var(--avoid); }
+.points li.target { color: #86efac; }
+.points li.target::marker { color: var(--buy); }
 .rank + .points { margin-left: 32px; }
 .foot { margin-top: 8px; font-size: 11px; color: var(--ink-3); text-align: right; }
 """
@@ -658,8 +662,19 @@ def points(note: str) -> list[str]:
     return [x for x in SENTENCE.split(note.strip()) if x]
 
 
+RISK = re.compile(r"\b(risks?|risky|loss)\b", re.I)
+TARGET = re.compile(r"\btargets?\b", re.I)
+
+
+def tone(point: str) -> str:
+    """A bullet's colour on the cards: red for a risk (or loss) sentence, green for the target (upside), else
+    none; a sentence naming both is a risk."""
+    return "risk" if RISK.search(point) else "target" if TARGET.search(point) else ""
+
+
 def points_html(note: str) -> str:
-    return '<ul class="points">' + "".join(f"<li>{html.escape(x)}</li>" for x in points(note)) + "</ul>"
+    return '<ul class="points">' + "".join((f'<li class="{tone(x)}">' if tone(x) else "<li>")
+                                           + html.escape(x) + "</li>" for x in points(note)) + "</ul>"
 
 
 

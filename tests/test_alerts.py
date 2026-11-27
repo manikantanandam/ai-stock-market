@@ -297,3 +297,9 @@ def test_notes_are_split_to_fit_telegram():
     messages = alerts.notes_html("Notes", [(f"S{i}", "x" * 900) for i in range(10)])
     assert len(messages) == 3 and all(len(m) <= alerts.TELEGRAM_LIMIT for m in messages)
     assert messages[1].startswith("🤖 <b>Notes</b> (cont.)") and alerts.notes_html("Notes", []) == []
+
+
+def test_risk_points_are_red_and_target_points_green():
+    note = "Uptrend above the SMA200. The main risk is a reversal. The target is 120. A stop at 90 limits the loss."
+    assert [alerts.tone(x) for x in alerts.points(note)] == ["", "risk", "target", "risk"]
+    assert alerts.points_html("Risky. Fine.") == '<ul class="points"><li class="risk">Risky.</li><li>Fine.</li></ul>'
