@@ -8,11 +8,25 @@ The daily scan and paper accounts run in CI; seeing the result meant opening the
 push summary and chose both channels.
 
 ## Decision
-`aistock alert` (`src/aistock/alerts.py`) builds a short plain-text summary from the journal only (no LLM, 0001):
-BUY count with new and dropped BUYs since the previous session, then per paper account its return, the
-equal-weight hold since its start, open positions, and that session's entries and exits; ends with the
-dashboard link. `--date` rebuilds it for any journaled session (open positions as of that date come from
-positions plus closed trades). The Daily scan workflow runs it as its last step with `continue-on-error`; the
+`aistock alert` (`src/aistock/alerts.py`) builds a short summary from the session's journal day file only
+(no LLM, 0001). Telegram gets it as an image card (`card_html`, dark theme, Inter font, rendered by the
+same headless Chrome as the PR screenshots via `site.screenshots.render`, sent with sendPhoto); its caption
+holds the tappable links. The card ends with a note on what the score means (weights and per-strategy minimums
+read from `signal.Config` and the presets, so it can't drift) over a −1 to +1 colour scale. Commodities get a second Telegram message with their own card (`commodity_card_html`): a row per contract with its verdict and side (EXIT LONG, HOLD SHORT), the strategies behind it, the close with its change, the score, and "was WATCH" when the verdict changed; actionable contracts first. A separate message keeps the stock card short enough to fill the preview, and futures sessions follow New York, so the latest one on or before the stock date is used. The saved LLM notes (journal/notes, journal/commodities/notes) of the stocks and contracts shown go inside each card, under each stock or contract row, as bullet points, one per sentence, with nothing cut (a new BUY among the strongest gets its note once). A two-line gist hid information, and separate notes images split what belongs together. The cards grow tall (the stock card about 1 : 4 with 11 notes), so Telegram shows a small preview that opens full size; a wall of text messages read poorly. Without Chrome they go as text in expandable quotes; the issue folds them in `<details>`, email lists them. The alert still calls no LLM: `scan --notes` explains exactly the card's stocks (new and strongest BUYs) rather than the top-ranked BUYs, and `backfill-notes --alerted` fills any it missed. Sectors among the day's top 3 hot sectors show in orange on the BUY rows, so a BUY riding a strong sector stands out. Text-card iterations in Telegram HTML never satisfied the user (no text colour,
+fixed fonts, little control over spacing), so the image is the design. If no image can be made, the text
+card below goes out instead. The text card: Telegram can't colour text, so colour comes from what it tints: emoji (green-square breadth
+bar, 🟢/🔴 change markers), links (symbols) and quote blocks (each strategy group of new BUYs is its own
+tinted card). Telegram gets a card: verdict counts with a breadth bar (share of scanned stocks saying BUY,
+with its change on the previous session), the three sectors with most BUYs (with their change), the new BUYs grouped under a header per strategy set with its count (broadest agreement
+first; each stock: sector icon, score, symbol, company), the
+five strongest BUYs with medals, the dropped BUYs folded in an expandable quote, and links to the session page and the dashboard. The issue
+gets the same as markdown tables, email as plain text. Rejected along the way at the user's request: paper
+accounts in the alert (too much text; they're on the dashboard), a comma-separated wall of tickers, and
+per-stock score bars (BUY scores sit in a narrow band, so every bar looked the same), and counting a stock's
+strategies ("5 strategies") instead of naming them: which strategies fired is the point. Scores and sector
+counts lead their lines so they form columns. Also rejected: a close/stop line per stock (the user reads
+levels on the dashboard) and "➕ extra strategies" lines (strategy-set headers read better and separate groups). Symbols are bold links to their dashboard page (Telegram can't
+colour text; links show in the accent colour), with the company name after them in plain italics. `--date` rebuilds it for any journaled session. The Daily scan workflow runs it as its last step with `continue-on-error`; the
 Send alert workflow (`alert.yml`) runs it by hand for a chosen date (default: the latest session). Channels:
 - Telegram, when the `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` repo secrets exist;
 - email over SMTP (stdlib, SSL), when `SMTP_USERNAME` and `SMTP_PASSWORD` exist (Gmail app password by

@@ -149,7 +149,8 @@ def scan(
     news: str = typer.Option("auto", help="all, candidates (only stocks a strategy could BUY), none; "
                                           "auto = all for <= 60 stocks, else candidates"),
     top: int = typer.Option(15, help="Rows to show"),
-    notes: bool = typer.Option(False, "--notes", help="Add a local-LLM (Ollama) note for each BUY shown"),
+    notes: bool = typer.Option(False, "--notes", help="Add a local-LLM (Ollama) note for each BUY on the alert card "
+                                                     "(new and strongest BUYs; the top BUYs shown while live)"),
     notes_max: int = typer.Option(15, help="Most BUYs to explain with --notes (each takes ~30s on CPU)"),
 ):
     """Run every strategy over a watchlist, list BUYs first, and log to journal/ (day and stock files)."""
@@ -198,7 +199,13 @@ def scan(
     print(f"Stocks: BUY {counts['BUY']}  WATCH {counts['WATCH']}  AVOID {counts['AVOID']}  · "
           f"news for {with_news}/{len(results)} · {logged}")
     if notes:
-        written = _print_notes([(s, s.buys[0]) for s in results[:top] if s.buys][:notes_max])
+        picked = [s for s in results[:top] if s.buys]
+        if phase != "live":  # a logged session: explain the stocks its alert card shows (new and strongest BUYs)
+            from aistock import alerts
+
+            by_symbol = {s.symbol: s for s in results if s.buys}
+            picked = [by_symbol[b.symbol] for b in alerts.summary().mentioned() if b.symbol in by_symbol]
+        written = _print_notes([(s, s.buys[0]) for s in picked][:notes_max])
         if written and phase != "live":
             journal.record_notes(written)
             print(f"Notes logged to {journal.NOTES}")
@@ -210,8 +217,24 @@ def backfill_notes(
     date_: str = typer.Option(None, "--date", help="One session (YYYY-MM-DD); default: every session without notes"),
     sessions: int = typer.Option(None, help="Most sessions to fill this run, newest first"),
     notes_max: int = typer.Option(25, help="Most BUYs to explain per session"),
+    alerted: bool = typer.Option(False, "--alerted", help="Only the stocks the alert card shows that have no "
+                                                          "note yet (session: --date, default the latest)"),
 ):
     """Write LLM notes for journaled sessions that have none, from their journal rows."""
+    if alerted:
+        from aistock import alerts
+
+        s = alerts.summary(date=date_ or None)
+        missing = [b.symbol for b in s.mentioned() if b.symbol not in s.notes] if s else []
+        if not missing:
+            print("Every stock on the alert card has a note.")
+            return
+        print(f"[bold]{s.date}[/bold] alert card: {', '.join(missing)}")
+        written = _print_notes([(x, x.buys[0]) for x in backfill.session_signals(s.date, len(missing), missing)])
+        if written:
+            journal.record_notes(written, source="backfill")
+            print(f"{len(written)} notes logged to {journal.NOTES / f'{s.date}.csv'}")
+        return
     days = [date_] if date_ else backfill.sessions_without_notes()[:sessions]
     if not days:
         print("Every journaled session has notes.")
@@ -326,24 +349,27 @@ def alert(
     email: bool = typer.Option(True, "--email/--no-email", help="Send by email (SMTP_USERNAME, SMTP_PASSWORD; "
                                                                "optional ALERT_EMAIL_TO, SMTP_SERVER, SMTP_PORT)"),
     issue: bool = typer.Option(True, "--issue/--no-issue", help="Comment on the 'Daily alerts' GitHub issue"),
+    commodities: bool = typer.Option(True, "--commodities/--no-commodities",
+                                     help="Also send the commodity session (on or before --date) to Telegram"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Print the message only"),
     url: str = typer.Option("", help="Dashboard link to end the message with"),
 ):
-    """Summary of a session (BUYs, paper accounts) to Telegram, email and a GitHub issue; channels whose
-    secrets aren't set are skipped. Exits non-zero if a configured channel fails."""
+    """Summary of a session (BUY signals, new and dropped) to Telegram, email and a GitHub issue, plus the
+    commodity card as a second Telegram message; channels whose secrets aren't set are skipped. Exits non-zero if a configured channel fails."""
     from aistock import alerts
 
     try:
-        text = alerts.message(url=url or None, date=date or None)
+        s = alerts.summary(date=date or None)
     except ValueError as e:
         raise typer.BadParameter(str(e), param_hint="--date")
-    if not text:
+    if s is None:
         print("No journaled session yet")
         return
-    typer.echo(text)
+    typer.echo(alerts.plain(s, url or None))
     if dry_run:
         return
-    results = alerts.send(text, telegram, issue, email)
+    c = alerts.commodity_summary(date=s.date) if commodities else None
+    results = alerts.send(s, url or None, telegram, issue, email, c)
     for line in results:
         typer.echo(line)
     if any(": failed (" in line for line in results):

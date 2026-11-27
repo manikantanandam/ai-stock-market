@@ -13,6 +13,7 @@ its own with a `<!-- screenshots: <page> <page> ... -->` line anywhere in its de
 `default_pages` takes Today, Paper accounts, the latest session and a stock a paper account holds.
 """
 import csv
+import fcntl
 import json
 import os
 import base64
@@ -108,8 +109,11 @@ class _Chrome:
         self._recv, from_chrome = os.pipe()
 
         def fds():  # runs in the child before exec: put the pipe ends where Chrome expects them
-            os.dup2(to_chrome, 3)
-            os.dup2(from_chrome, 4)
+            # move both ends above 4 first: if a pipe end already is fd 3 or 4, placing the other one
+            # there directly would overwrite it
+            read, write = fcntl.fcntl(to_chrome, fcntl.F_DUPFD, 10), fcntl.fcntl(from_chrome, fcntl.F_DUPFD, 10)
+            os.dup2(read, 3)
+            os.dup2(write, 4)
 
         cmd = [binary, "--headless=new", "--remote-debugging-pipe", "--disable-gpu", "--hide-scrollbars",
                f"--user-data-dir={profile}", "about:blank"]
@@ -151,12 +155,38 @@ class _Chrome:
                     raise RuntimeError(f"{method}: {reply['error']}")
                 return reply.get("result", {})
 
-    def screenshot(self, url: str, theme: str) -> bytes:
-        """PNG of `url` once the dashboard has drawn it; a fresh tab per page."""
+    def screenshot(self, url: str, theme: str, width: int = WIDTH, height: int = HEIGHT, scale: int = 1,
+                   full: bool = False) -> bytes:
+        """PNG of `url` once the page has set body[data-shown]; a fresh tab per page. full: the whole page
+        height rather than the viewport (the page decides how tall it is)."""
+        target, s = self._open(url, theme, width, height, scale)
+        try:
+            if full:
+                self._full(s, width, scale)
+            return base64.b64decode(self.call("Page.captureScreenshot", s, format="png")["data"])
+        finally:
+            self.call("Target.closeTarget", targetId=target)
+
+    def slices(self, url: str, theme: str, width: int, scale: int, tallest: int | None, breaks: str) -> list[bytes]:
+        """The whole page as PNGs of at most `tallest` image pixels each (one when None), see render."""
+        target, s = self._open(url, theme, width, 200, scale)
+        try:
+            tall = self._full(s, width, scale)
+            tops = self._eval(s, f"[...document.querySelectorAll({json.dumps(breaks)})].map("
+                                 "e => Math.floor(e.getBoundingClientRect().top))") if breaks else []
+            parts = cuts(tall, tops, tallest // scale) if tallest else [(0, tall)]
+            return [base64.b64decode(self.call("Page.captureScreenshot", s, format="png", clip={
+                "x": 0, "y": a, "width": width, "height": b - a, "scale": 1})["data"]) for a, b in parts]
+        finally:
+            self.call("Target.closeTarget", targetId=target)
+
+    def _open(self, url: str, theme: str, width: int, height: int, scale: int) -> tuple[str, str]:
+        """A new tab showing `url` once it has set body[data-shown] and drawn: (target, session)."""
         target = self.call("Target.createTarget", url="about:blank")["targetId"]
         s = self.call("Target.attachToTarget", targetId=target, flatten=True)["sessionId"]
         try:
-            self.call("Emulation.setDeviceMetricsOverride", s, width=WIDTH, height=HEIGHT, deviceScaleFactor=1, mobile=False)
+            self.call("Emulation.setDeviceMetricsOverride", s, width=width, height=height, deviceScaleFactor=scale,
+                      mobile=False)
             self.call("Emulation.setEmulatedMedia", s, features=[{"name": "prefers-color-scheme", "value": theme}])
             self.call("Page.navigate", s, url=url)
             deadline = time.monotonic() + READY_TIMEOUT
@@ -166,13 +196,45 @@ class _Chrome:
                 time.sleep(0.25)
             # charts are created in requestAnimationFrame callbacks after the page is drawn
             self._eval(s, "new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => r(true))))")
-            return base64.b64decode(self.call("Page.captureScreenshot", s, format="png")["data"])
-        finally:
+        except BaseException:
             self.call("Target.closeTarget", targetId=target)
+            raise
+        return target, s
+
+    def _full(self, s: str, width: int, scale: int) -> int:
+        """Grow the viewport to the whole page height (the page decides how tall it is); returns it."""
+        tall = int(self._eval(s, "Math.ceil(document.documentElement.scrollHeight)"))
+        self.call("Emulation.setDeviceMetricsOverride", s, width=width, height=tall, deviceScaleFactor=scale,
+                  mobile=False)
+        return tall
 
     def _eval(self, session: str, expression: str):
         return self.call("Runtime.evaluate", session, expression=expression, awaitPromise=True,
                          returnByValue=True).get("result", {}).get("value")
+
+
+def render(page_html: str, width: int = 600, scale: int = 2, theme: str = "dark",
+           tallest: int | None = None, breaks: str = "") -> list[bytes]:
+    """PNGs of a self-contained HTML page (e.g. the alert card), as tall as its content. The page must set
+    body[data-shown] when it is ready. tallest: cut it into slices of at most that many image pixels, each cut
+    at the top of the lowest element matching the CSS selector `breaks` that still fits (else mid-way)."""
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+        page = Path(tmp) / "page.html"
+        page.write_text(page_html, encoding="utf-8")
+        with _Chrome(chrome(), str(Path(tmp) / "profile")) as browser:
+            return browser.slices(page.as_uri(), theme, width, scale, tallest, breaks)
+
+
+def cuts(height: int, tops: list[int], tallest: int) -> list[tuple[int, int]]:
+    """(start, end) of each slice of a `height`-tall page, at most `tallest` each, ending at the lowest of
+    `tops` that fits, or at `tallest` when none does."""
+    out, start = [], 0
+    while height - start > tallest:
+        fit = [t for t in tops if start < t <= start + tallest]
+        end = max(fit) if fit else start + tallest
+        out.append((start, end))
+        start = end
+    return out + [(start, height)]
 
 
 class _Server(ThreadingHTTPServer):
