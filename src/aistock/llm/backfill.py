@@ -89,10 +89,11 @@ def signal_from_row(row: dict, prices: pd.DataFrame | None = None, c: Config = C
                   close, atr, strategies, reasons, as_of=row["date"])
 
 
-def session_signals(day: str, limit: int) -> list[Signal]:
-    """The session's top BUYs, ranked as the scan ranks them (strategies saying BUY, then combined)."""
+def session_signals(day: str, limit: int, symbols: list[str] | None = None) -> list[Signal]:
+    """The session's top BUYs, ranked as the scan ranks them (strategies saying BUY, then combined); only
+    `symbols` when given."""
     rows = pd.read_csv(journal.DAYS / f"{day}.csv", dtype={"buys": str}).to_dict("records")
-    rows = [r for r in rows if r.get("action") == "BUY"]
+    rows = [r for r in rows if r.get("action") == "BUY" and (symbols is None or r["symbol"] in symbols)]
     rows.sort(key=lambda r: (len(str(r.get("buys") or "").split(";")), _num(r.get("combined")) or 0), reverse=True)
     out = []
     for r in rows[:limit]:

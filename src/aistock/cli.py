@@ -210,8 +210,24 @@ def backfill_notes(
     date_: str = typer.Option(None, "--date", help="One session (YYYY-MM-DD); default: every session without notes"),
     sessions: int = typer.Option(None, help="Most sessions to fill this run, newest first"),
     notes_max: int = typer.Option(25, help="Most BUYs to explain per session"),
+    alerted: bool = typer.Option(False, "--alerted", help="Only the stocks the alert card shows that have no "
+                                                          "note yet (session: --date, default the latest)"),
 ):
     """Write LLM notes for journaled sessions that have none, from their journal rows."""
+    if alerted:
+        from aistock import alerts
+
+        s = alerts.summary(date=date_ or None)
+        missing = [b.symbol for b in s.mentioned() if b.symbol not in s.notes] if s else []
+        if not missing:
+            print("Every stock on the alert card has a note.")
+            return
+        print(f"[bold]{s.date}[/bold] alert card: {', '.join(missing)}")
+        written = _print_notes([(x, x.buys[0]) for x in backfill.session_signals(s.date, len(missing), missing)])
+        if written:
+            journal.record_notes(written, source="backfill")
+            print(f"{len(written)} notes logged to {journal.NOTES / f'{s.date}.csv'}")
+        return
     days = [date_] if date_ else backfill.sessions_without_notes()[:sessions]
     if not days:
         print("Every journaled session has notes.")

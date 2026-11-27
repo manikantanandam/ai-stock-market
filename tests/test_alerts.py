@@ -246,3 +246,35 @@ def test_commodities_go_to_telegram_as_a_second_message(tmp_path, monkeypatch):
     out = alerts.send(alerts.summary(root), to_issue=False, to_email=False, c=alerts.commodity_summary(root))
     assert out == ["Telegram: sent (card image)", "Telegram commodities: sent (text)"]
     assert sent == [b"stocks", "🛢 <b>AI Commodities · Wed 25 Nov 2026</b>"]
+
+
+NCOLS = "date,symbol,name,strategy,action,note,source\n"
+
+
+def test_notes_follow_each_card_for_the_stocks_and_contracts_it_shows(tmp_path, monkeypatch):
+    root = commodities(journal(tmp_path))
+    (root / "journal" / "notes").mkdir()
+    (root / "journal" / "notes" / "2026-11-26.csv").write_text(
+        NCOLS + "2026-11-26,C,Gamma,swing,BUY,C <rises>,live\n2026-11-26,C,Gamma,trend,BUY,C again,live\n"
+                "2026-11-26,Z,Zeta,swing,BUY,not on the card,live\n")
+    (root / "journal" / "commodities" / "notes").mkdir()
+    (root / "journal" / "commodities" / "notes" / "2026-11-25.csv").write_text(
+        NCOLS + "2026-11-25,GOLD,Gold,channel,SELL,Gold falls,live\n")
+    s, c = alerts.summary(root), alerts.commodity_summary(root)
+    assert [b.symbol for b in s.mentioned()] == ["C", "A"]  # new first, no repeats
+    assert alerts.stock_notes(s) == [("C · Gamma · +0.60", "C <rises>")]  # first note per symbol; A has none
+    assert alerts.commodity_notes(c) == [("Gold · SELL · −0.40", "Gold falls")]
+    assert "C · Gamma · +0.60" in alerts.plain(s) and "<summary>C · Gamma" in alerts.markdown(s)
+    sent = []
+    monkeypatch.setattr(alerts, "card_png", lambda s: b"png")
+    monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: sent.append("photo"))
+    monkeypatch.setattr(alerts, "telegram", lambda text, token, chat: sent.append(text))
+    assert alerts._telegram(s, None, "t", "c") == "sent (card image) + 1 notes"
+    assert sent == ["photo", "🤖 <b>Notes · Thu 26 Nov 2026</b>\n\n<b>C · Gamma · +0.60</b>\n"
+                             "<blockquote expandable>C &lt;rises&gt;</blockquote>"]
+
+
+def test_notes_are_split_to_fit_telegram():
+    messages = alerts.notes_html("Notes", [(f"S{i}", "x" * 900) for i in range(10)])
+    assert len(messages) == 3 and all(len(m) <= alerts.TELEGRAM_LIMIT for m in messages)
+    assert messages[1].startswith("🤖 <b>Notes</b> (cont.)") and alerts.notes_html("Notes", []) == []

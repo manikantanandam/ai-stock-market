@@ -5,9 +5,10 @@ date through the Send alert workflow).
 Telegram gets the summary as an image card (`card_html`, rendered by headless Chrome, sent with `caption_html`
 holding the links), falling back to `telegram_html` text when no image can be made.
 The commodity session (`commodity_summary`, journal/commodities/days) follows as a second Telegram message
-with its own card (`commodity_card_html`).
+with its own card (`commodity_card_html`). Each card is followed by the saved LLM notes (journal/notes and
+journal/commodities/notes, written by `scan --notes`) of the stocks and contracts it shows (`notes_html`).
 
-`summary` reads the session's journal day file only (no LLM, decision 0001): the BUY signals with each
+`summary` reads the session's journal files only (no LLM call here, decision 0001): the BUY signals with each
 stock's company name, sector, combined score and strategies, which of them are new since the previous session, and
 which BUYs were dropped. Paper accounts are left to the dashboard. Each channel gets its own rendering of the
 same summary: `telegram_html` (a block per new BUY, the top BUYs aligned), `markdown` (tables, for the issue)
@@ -33,6 +34,7 @@ ISSUE_TITLE = "Daily alerts"
 MAX_NEW = 8       # new BUYs listed one per line
 TOP = 5           # strongest BUYs by combined score
 MAX_DROPPED = 8   # dropped symbols on their one line
+TELEGRAM_LIMIT = 4096  # characters per Telegram message
 
 
 @dataclass
@@ -55,6 +57,14 @@ class Summary:
     sectors: list[tuple[str, int]]       # sectors with the most BUYs, most first
     prev_share: float | None = None      # share of scanned stocks saying BUY in the previous session
     prev_sectors: dict[str, int] = field(default_factory=dict)  # BUYs per sector in the previous session
+    notes: dict[str, str] = field(default_factory=dict)  # LLM note per symbol (journal/notes), when one was saved
+
+    def mentioned(self) -> list[Stock]:
+        """The stocks the card shows: the listed new BUYs, then the strongest BUYs not already among them."""
+        shown = {}
+        for b in (self.new[:MAX_NEW] if self.prev else []) + self.buys[:TOP]:
+            shown.setdefault(b.symbol, b)
+        return list(shown.values())
 
 
 def _names(symbols: list[str], limit: int) -> str:
@@ -68,6 +78,14 @@ def _short(name: str) -> str:
         if name.endswith(suffix):
             return name[: -len(suffix)]
     return name
+
+
+def _notes(path: Path) -> dict[str, str]:
+    """The first saved LLM note per symbol in a notes CSV; empty when the session has none."""
+    if not path.exists():
+        return {}
+    df = pd.read_csv(path).dropna(subset=["note"])
+    return {r["symbol"]: r["note"] for _, r in df.drop_duplicates("symbol").iterrows()}
 
 
 def sessions(root: Path = ROOT) -> list[str]:
@@ -102,7 +120,8 @@ def summary(root: Path = ROOT, date: str | None = None) -> Summary | None:
         prev_sectors = by_sector(before[before.action == "BUY"])
     actions = today.action.value_counts().to_dict()
     sectors = list(by_sector(rows).items())
-    return Summary(date, prev, buys, new, dropped, actions, sectors, prev_share, prev_sectors)
+    return Summary(date, prev, buys, new, dropped, actions, sectors, prev_share, prev_sectors,
+                   _notes(root / "journal" / "notes" / f"{date}.csv"))
 
 
 # ---------- rendering: one summary, three formats ----------
@@ -153,6 +172,10 @@ def plain(s: Summary, url: str | None = None) -> str:
         lines += [f"  {b.symbol:<{width}}  {_score(b.combined)}  {b.sector}" for b in s.buys[:TOP]]
     if s.dropped:
         lines += ["", f"Dropped: {_names(s.dropped, MAX_DROPPED)}"]
+    if stock_notes(s):
+        lines += ["", "Notes (LLM, explains the rules' BUY)"]
+        for head, note in stock_notes(s):
+            lines += ["", f"  {head}", f"  {note}"]
     if url:
         lines += ["", f"Dashboard: {url}"]
     return "\n".join(lines)
@@ -472,6 +495,7 @@ class Commodities:
     date: str
     prev: str | None
     contracts: list[Contract]  # actionable first (ACTION_ORDER), then journal order
+    notes: dict[str, str] = field(default_factory=dict)  # LLM note per contract (journal/commodities/notes)
 
 
 def commodity_summary(root: Path = ROOT, date: str | None = None) -> Commodities | None:
@@ -496,7 +520,8 @@ def commodity_summary(root: Path = ROOT, date: str | None = None) -> Commodities
                                   float(r["close"]), old["action"] if old is not None else None,
                                   float(old["close"]) if old is not None else None))
     order = lambda c: ACTION_ORDER.index(c.action) if c.action in ACTION_ORDER else len(ACTION_ORDER)
-    return Commodities(days[-1], prev, sorted(contracts, key=order))
+    return Commodities(days[-1], prev, sorted(contracts, key=order),
+                       _notes(root / "journal" / "commodities" / "notes" / f"{days[-1]}.csv"))
 
 
 def _verdict(c: Contract) -> str:
@@ -595,6 +620,33 @@ def commodity_text(c: Commodities, url: str | None = None) -> str:
         f'\n\n👉 <a href="{e(url)}#journal/commodities/days/{c.date}.csv">Open this session</a>' if url else "")
 
 
+# ---------- LLM notes: a follow-up message after each card ----------
+
+def notes_html(title: str, items: list[tuple[str, str]]) -> list[str]:
+    """Telegram HTML messages holding each (heading, note) under `title`, every note in its own expandable
+    quote; split into as many messages as Telegram's length limit needs. Empty when there are no notes."""
+    e = html.escape
+    blocks = [f"<b>{e(head)}</b>\n<blockquote expandable>{e(note)}</blockquote>" for head, note in items]
+    messages, current = [], f"🤖 <b>{e(title)}</b>"
+    for block in blocks:
+        if len(current) + 2 + len(block) > TELEGRAM_LIMIT:
+            messages.append(current)
+            current = f"🤖 <b>{e(title)}</b> (cont.)"
+        current += "\n\n" + block
+    return messages + [current] if blocks else []
+
+
+def stock_notes(s: Summary) -> list[tuple[str, str]]:
+    """(heading, note) for each stock on the card that has a saved note, in card order."""
+    return [(f"{b.symbol} · {b.name} · {_score(b.combined)}", s.notes[b.symbol])
+            for b in s.mentioned() if b.symbol in s.notes]
+
+
+def commodity_notes(c: Commodities) -> list[tuple[str, str]]:
+    return [(f"{x.name} · {_verdict(x)} · {_score(x.combined)}", c.notes[x.symbol])
+            for x in c.contracts if x.symbol in c.notes]
+
+
 def markdown(s: Summary, url: str | None = None) -> str:
     """GitHub markdown: the issue comment, new and top BUYs as tables."""
     lines = [f"### 📈 AI Stock · {_day(s.date)}", f"🟢 **{s.actions.get('BUY', 0)}** BUY · 🟡 {s.actions.get('WATCH', 0)} WATCH · "
@@ -610,6 +662,9 @@ def markdown(s: Summary, url: str | None = None) -> str:
         lines += [f"| **{b.symbol}** | {_score(b.combined)} | {b.sector} |" for b in s.buys[:TOP]]
     if s.dropped:
         lines += ["", f"**➖ Dropped** {_names(s.dropped, MAX_DROPPED)}"]
+    if stock_notes(s):
+        lines += ["", "**🤖 Notes** (LLM, explains the rules' BUY)", ""]
+        lines += [f"<details><summary>{head}</summary>\n\n{note}\n</details>" for head, note in stock_notes(s)]
     if url:
         lines += ["", f"[Open dashboard →]({url})"]
     return "\n".join(lines)
@@ -639,23 +694,35 @@ def telegram_photo(png: bytes, caption: str, token: str, chat_id: str) -> None:
 
 
 def _telegram(s: Summary, url: str | None, token: str, chat_id: str) -> str:
-    """The card image with a caption holding the links; the text card when no image could be made."""
+    """The card image with a caption holding the links (the text card when no image could be made), then the
+    notes of the stocks it shows."""
     png = card_png(s)
     if png:
         telegram_photo(png, caption_html(s, url), token, chat_id)
-        return "sent (card image)"
-    telegram(telegram_html(s, url), token, chat_id)
-    return "sent (text)"
+        sent = "sent (card image)"
+    else:
+        telegram(telegram_html(s, url), token, chat_id)
+        sent = "sent (text)"
+    return sent + _send_notes(f"Notes · {_day(s.date)}", stock_notes(s), token, chat_id)
+
+
+def _send_notes(title: str, items: list[tuple[str, str]], token: str, chat_id: str) -> str:
+    for text in notes_html(title, items):
+        telegram(text, token, chat_id)
+    return f" + {len(items)} notes" if items else ""
 
 
 def _telegram_commodities(c: Commodities, url: str | None, token: str, chat_id: str) -> str:
-    """The commodity card as its own message after the stocks one; text when no image could be made."""
+    """The commodity card as its own message after the stocks one (text when no image could be made), then
+    each contract's note."""
     png = commodity_png(c)
     if png:
         telegram_photo(png, commodity_caption(c, url), token, chat_id)
-        return "sent (card image)"
-    telegram(commodity_text(c, url), token, chat_id)
-    return "sent (text)"
+        sent = "sent (card image)"
+    else:
+        telegram(commodity_text(c, url), token, chat_id)
+        sent = "sent (text)"
+    return sent + _send_notes(f"Commodity notes · {_day(c.date)}", commodity_notes(c), token, chat_id)
 
 
 def email(text: str, user: str, password: str, to: str, server: str = "smtp.gmail.com", port: int = 465) -> None:

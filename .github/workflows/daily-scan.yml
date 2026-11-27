@@ -152,6 +152,16 @@ jobs:
           COLUMNS: "120"
         run: uv run aistock backfill-notes --sessions 2 --notes-max 25
 
+      # The Daily alert follows each card with the notes of the stocks it shows (new and strongest BUYs);
+      # the scan explains its own top BUYs, so write the card's missing ones (~11 at most, ~30s each).
+      - name: Notes for the alert card
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          NO_COLOR: "1"
+          COLUMNS: "120"
+        run: uv run aistock backfill-notes --alerted
+
       # Manual runs can rewrite notes for chosen sessions, e.g. after the
       # backfill learns new reasons. Each date replaces that session's notes.
       - name: Rewrite notes for chosen sessions
