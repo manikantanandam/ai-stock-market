@@ -15,6 +15,7 @@ from datetime import datetime, time
 from zoneinfo import ZoneInfo
 
 import pandas as pd
+import yfinance as yf
 
 from aistock.data import prices
 
@@ -80,6 +81,26 @@ def get_prices(symbol: str, years: int = 2) -> pd.DataFrame:
     """Daily OHLCV for a commodity in INR per its MCX unit, completed sessions only."""
     c = get(symbol)
     return completed(to_inr(prices.get_prices(c.ticker, years), usd_inr(years), c.factor))
+
+
+def live(now: datetime | None = None) -> dict[str, float]:
+    """Each contract's latest price (INR per MCX unit) in the New York session still trading; contracts with no
+    session in progress are left out. Fetched fresh, not cached: context for the evening alert only, since
+    verdicts use completed sessions."""
+    recent = lambda t: prices._clean(yf.Ticker(t).history(period="5d", auto_adjust=True))
+    try:
+        rate = float(recent(FX).Close.iloc[-1])
+    except Exception:
+        return {}
+    out = {}
+    for symbol, c in CONTRACTS.items():
+        try:
+            df = recent(c.ticker)
+        except Exception:
+            continue
+        if not df.empty and len(completed(df, now)) < len(df):
+            out[symbol] = float(df.Close.iloc[-1]) * rate * c.factor
+    return out
 
 
 def usd_inr(years: int = 2) -> pd.Series:

@@ -1,0 +1,151 @@
+# Commodity futures scan right after the New York close; merges journal/commodities into main via a PR
+# and sends the commodity card to Telegram. A futures day closes at 17:00 New York (21:00 UTC in summer,
+# 22:00 UTC in winter), so 22:17 UTC (03:47 IST) is after the close all year; the 00:47 UTC (06:17 IST)
+# backup re-runs only if main still lacks that session. Both land before an IST morning.
+# GitHub cron avoids :00 for the same reason as daily-scan.yml.
+name: Commodity scan
+
+on:
+  schedule:
+    - cron: "17 22 * * 1-5"
+    - cron: "47 0 * * 2-6"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write  # to dispatch the Tests workflow on the PR branch
+
+concurrency:
+  group: commodity-scan
+  cancel-in-progress: false
+
+jobs:
+  # Scheduled runs skip when main already has the latest session or an earlier
+  # run's journal PR is still open.
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+      expected: ${{ steps.check.outputs.expected }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: journal/commodities
+
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Latest completed New York session: today after 17:00 ET, else the
+          # previous day, rolled back over weekends. On a US holiday the backup
+          # simply scans again.
+          d=$(TZ=America/New_York date +%Y-%m-%d)
+          [ "$(TZ=America/New_York date +%H%M)" -lt 1700 ] && d=$(date -d "$d -1 day" +%Y-%m-%d)
+          while [ "$(date -d "$d" +%u)" -gt 5 ]; do d=$(date -d "$d -1 day" +%Y-%m-%d); done
+          echo "expected=$d" >> "$GITHUB_OUTPUT"
+          latest=$(ls journal/commodities/days | sort | tail -1 | cut -d. -f1)
+          open=$(gh pr list --state open --search "head:commodity-scan/" --json number -q length)
+          run=true
+          if [ "${{ github.event_name }}" = schedule ]; then
+            if [ "$latest" \> "$d" ] || [ "$latest" = "$d" ]; then
+              echo "Journal already has session $latest; skipping"; run=false
+            elif [ "$open" -gt 0 ]; then
+              echo "A commodity-scan PR is still open; skipping"; run=false
+            fi
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+
+  scan:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Cache FinBERT model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-prosusai-finbert
+
+      - name: Install
+        run: uv sync --locked
+
+      # One LLM note per contract (~6 notes, ~1.5 min on CPU); same cache as daily-scan.yml.
+      # If Ollama fails to start, the scan logs a warning and skips notes.
+      - name: Cache Ollama
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/ollama
+            ~/.ollama/models
+          key: ollama-v0.40.15-qwen2.5-3b
+
+      - name: Start Ollama
+        continue-on-error: true
+        run: |
+          if [ ! -x ~/ollama/bin/ollama ]; then
+            mkdir -p ~/ollama
+            curl -fsSL https://github.com/ollama/ollama/releases/download/v0.40.15/ollama-linux-amd64.tar.zst | tar --zstd -x -C ~/ollama
+            find ~/ollama/lib -maxdepth 2 -type d -name 'cuda*' -exec rm -rf {} +
+          fi
+          echo "$HOME/ollama/bin" >> "$GITHUB_PATH"
+          nohup ~/ollama/bin/ollama serve > ollama.log 2>&1 &
+          for i in $(seq 30); do curl -sf localhost:11434 >/dev/null && break; sleep 1; done
+          ~/ollama/bin/ollama pull qwen2.5:3b
+
+      - name: Commodity scan
+        env:
+          NO_COLOR: "1"
+          COLUMNS: "140"
+        run: |
+          uv run aistock commodity scan --notes | tee commodities.txt
+          { echo '## Commodities'; echo '```'; cat commodities.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      # Yahoo can lag after the close; flag a scan whose latest bar is older
+      # than the expected session (also fires on US holidays).
+      - name: Check data freshness
+        env:
+          EXPECTED: ${{ needs.gate.outputs.expected }}
+        run: |
+          session=$(ls journal/commodities/days | sort | tail -1 | cut -d. -f1)
+          if [ "$session" \< "$EXPECTED" ]; then
+            echo "::warning::Scan is as of $session but the latest session should be $EXPECTED (stale Yahoo data or a US holiday)"
+          fi
+
+      # Same PR flow as daily-scan.yml; only journal/commodities changes, so it never
+      # conflicts with the stock journal PR.
+      - name: Merge journal via PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add journal/commodities
+          if git diff --cached --quiet; then
+            echo "Journal unchanged"
+            exit 0
+          fi
+          day=$(ls journal/commodities/days | sort | tail -1 | cut -d. -f1)  # session date
+          branch="commodity-scan/${day}-${{ github.run_id }}"
+          git switch -c "$branch"
+          git commit -m "Commodity scan ${day}"
+          git push -u origin "$branch"
+          gh pr create --base main --head "$branch" --title "Commodity scan ${day}" \
+            --body "Automated commodity journal update from [run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
+          gh workflow run tests.yml --ref "$branch"
+          gh pr merge "$branch" --auto --squash --delete-branch
+
+      # The commodity card alone to Telegram (decision 0017). Allowed to fail: an alert problem must never cost a scan.
+      - name: Commodity alert
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: uv run aistock alert --no-stocks --url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"

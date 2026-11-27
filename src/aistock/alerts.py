@@ -515,6 +515,7 @@ class Contract:
     close: float              # MCX quote units (rupees per `unit`)
     prev_action: str | None = None
     prev_close: float | None = None
+    live: float | None = None  # latest price in the New York session still trading (evening repeat only)
 
 
 @dataclass
@@ -523,6 +524,16 @@ class Commodities:
     prev: str | None
     contracts: list[Contract]  # actionable first (ACTION_ORDER), then journal order
     notes: dict[str, str] = field(default_factory=dict)  # LLM note per contract (journal/commodities/notes)
+    live_at: str | None = None  # when `Contract.live` was fetched, e.g. "16:47 IST"; None without live prices
+
+
+def with_live(c: Commodities, quotes: dict[str, float], at: str) -> Commodities:
+    """The card repeated in the evening: each contract's price now (`quotes`, from the session still trading)
+    beside its close. Context for the MCX evening session only; the verdicts stay those of the close."""
+    for x in c.contracts:
+        x.live = quotes.get(x.symbol)
+    c.live_at = at if any(x.live is not None for x in c.contracts) else None
+    return c
 
 
 def commodity_summary(root: Path = ROOT, date: str | None = None) -> Commodities | None:
@@ -549,6 +560,20 @@ def commodity_summary(root: Path = ROOT, date: str | None = None) -> Commodities
     order = lambda c: ACTION_ORDER.index(c.action) if c.action in ACTION_ORDER else len(ACTION_ORDER)
     return Commodities(days[-1], prev, sorted(contracts, key=order),
                        _notes(root / "journal" / "commodities" / "notes" / f"{days[-1]}.csv"))
+
+
+def _move(now: float, before: float | None) -> str:
+    """A ▲/▼ chip for the change from `before` to `now`; empty without `before`."""
+    if not before:
+        return ""
+    pct = (now / before - 1) * 100
+    kind = "flat" if round(pct, 1) == 0 else "up" if pct > 0 else "down"
+    return f'<span class="chip {kind}">{"▲" if pct > 0 else "▼" if pct < 0 else ""}{abs(pct):.1f}%</span>'
+
+
+def _since(x: Contract) -> str:
+    """The live price and its change since the close, as text; empty without a live price."""
+    return f"now ₹{x.live:,.0f} ({(x.live / x.close - 1) * 100:+.1f}%)" if x.live is not None else ""
 
 
 def _verdict(c: Contract) -> str:
@@ -578,24 +603,25 @@ def commodity_card_html(c: Commodities) -> str:
     for x in c.contracts:
         changed = (f'<span class="chip new">was {e(x.prev_action)}</span>'
                    if x.prev_action is not None and x.prev_action != x.action else "")
-        move = ""
-        if x.prev_close:
-            pct = (x.close / x.prev_close - 1) * 100
-            kind = "flat" if round(pct, 1) == 0 else "up" if pct > 0 else "down"
-            move = f'<span class="chip {kind}">{"▲" if pct > 0 else "▼" if pct < 0 else ""}{abs(pct):.1f}%</span>'
+        move = _move(x.close, x.prev_close)
+        live = (f'<div class="meta live">now ₹{x.live:,.0f} {_move(x.live, x.close)} since the close</div>'
+                if x.live is not None else "")
         pills = "".join(f'<span class="pill" style="background:{STRATEGY_COLOURS.get(n, "#4b5563")}">{e(n)}</span>'
                         for n in x.strategies)
         colour = ACTION_COLOURS.get(x.action, "#4b5563")
         tone = "score" if x.combined >= 0 else "score neg"
         rows.append(f'<div class="citem"><div class="crow"><div><div class="line"><span class="sym">{e(x.name)}</span>{changed}</div>'
-                    f'<div class="meta">{e(x.group)} · ₹{x.close:,.0f} / {e(x.unit)} {move}</div>'
+                    f'<div class="meta">{e(x.group)} · ₹{x.close:,.0f} / {e(x.unit)} {move}</div>{live}'
                     + (f'<div class="pills">{pills}</div>' if pills else "") + "</div>"
                     f'<div class="right"><span class="badge" style="color:{colour};border-color:{colour}">{e(_verdict(x))}</span>'
                     f'<span class="{tone}">{_score(x.combined)}</span></div></div>'
                     + (points_html(c.notes[x.symbol]) if x.symbol in c.notes else "") + "</div>")
     since = f" · vs {e(_day(c.prev)[:-5])}" if c.prev else ""
+    repeat = (f'<div class="repeat">Repeat of the US close · prices now at {e(c.live_at)}, for the MCX evening '
+              "session; verdicts are still those of the close</div>" if c.live_at else "")
     out = [f'<div class="head"><span class="brand">AI COMMODITIES</span><span class="date">{e(_day(c.date))} · futures close</span></div>',
            f'<div class="hero"><span class="big">{len(c.contracts)}</span><span class="sub">contracts{since}</span></div>',
+           repeat,
            f'<div class="legend">{legend}</div>',
            f'<section><div class="panel">{"".join(rows)}</div></section>',
            f'<div class="note">{commodity_note()}</div>']
@@ -616,6 +642,8 @@ COMMODITY_CSS = """
 .right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 .badge { font-size: 12px; font-weight: 800; letter-spacing: .04em; padding: 2px 9px; border: 1.5px solid; border-radius: 7px; }
 .score.neg { color: var(--avoid); background: rgba(239,68,68,.12); }
+.crow .meta.live { font-weight: 700; }
+.repeat { margin-top: 8px; font-size: 13px; color: var(--ink-2); }
 """
 
 
@@ -636,6 +664,8 @@ def commodity_caption(c: Commodities, url: str | None = None) -> str:
     e = html.escape
     act = [x for x in c.contracts if x.action in ("BUY", "SELL", "MIXED", "EXIT")]
     line = f"🛢 <b>AI Commodities · {e(_day(c.date))}</b>"
+    if c.live_at:
+        line += f"\n🔁 Repeat of the US close · prices now at {e(c.live_at)}"
     line += ("\n⚡ " + ", ".join(f"{e(x.name)} {x.action}" for x in act)) if act else " · no new entries or exits"
     if url:
         line += f'\n👉 <a href="{e(url)}#journal/commodities/days/{c.date}.csv">Open this session</a>'
@@ -646,6 +676,7 @@ def commodity_text(c: Commodities, url: str | None = None) -> str:
     """Telegram HTML text when no image can be made: one line per contract."""
     e = html.escape
     rows = [f"<b>{e(x.name)}</b> {e(_verdict(x))} {_score(x.combined)} · ₹{x.close:,.0f}/{e(x.unit)}"
+            + (f" · {_since(x)}" if x.live is not None else "")
             + (f" · <i>{e(', '.join(x.strategies))}</i>" if x.strategies else "") for x in c.contracts]
     return commodity_caption(c, url).split("\n👉")[0] + "\n\n" + "\n".join(rows) + (
         f'\n\n👉 <a href="{e(url)}#journal/commodities/days/{c.date}.csv">Open this session</a>' if url else "")
@@ -818,26 +849,27 @@ def github_issue(text: str, title: str = ISSUE_TITLE) -> str:
     return _gh("issue", "comment", str(number), "--body", text)
 
 
-def send(s: Summary, url: str | None = None, to_telegram: bool = True, to_issue: bool = True,
+def send(s: Summary | None, url: str | None = None, to_telegram: bool = True, to_issue: bool = True,
          to_email: bool = True, c: Commodities | None = None) -> list[str]:
     """Send to each channel that is enabled and configured (secrets in the environment); returns what
     happened, one line per channel. A failing channel is reported and the others still go out. Commodities
-    (`c`) go to Telegram as a second message."""
+    (`c`) go to Telegram as a second message; with no stock session (`s` None) they go alone."""
     env = os.environ.get
     channels = []
     if to_telegram:
-        channels.append(("Telegram", ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"),
-                         lambda: _telegram(s, url, env("TELEGRAM_BOT_TOKEN"), env("TELEGRAM_CHAT_ID"))))
+        if s is not None:
+            channels.append(("Telegram", ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"),
+                             lambda: _telegram(s, url, env("TELEGRAM_BOT_TOKEN"), env("TELEGRAM_CHAT_ID"))))
         if c is not None:
             channels.append(("Telegram commodities", ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"),
                              lambda: _telegram_commodities(c, url, env("TELEGRAM_BOT_TOKEN"), env("TELEGRAM_CHAT_ID"))))
-    if to_email:
+    if to_email and s is not None:
         channels.append(("Email", ("SMTP_USERNAME", "SMTP_PASSWORD"),
                          lambda: email(plain(s, url), env("SMTP_USERNAME"), env("SMTP_PASSWORD"),
                                        env("ALERT_EMAIL_TO") or env("SMTP_USERNAME"),
                                        env("SMTP_SERVER") or "smtp.gmail.com", int(env("SMTP_PORT") or 465))
                          or f"sent to {env('ALERT_EMAIL_TO') or env('SMTP_USERNAME')}"))
-    if to_issue:
+    if to_issue and s is not None:
         channels.append(("GitHub issue", (), lambda: github_issue(markdown(s, url))))
     done = []
     for name, needed, go in channels:
