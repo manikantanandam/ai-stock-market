@@ -402,12 +402,14 @@ def _points(s: Summary, symbol: str) -> str:
     return points_html(s.notes[symbol]) if symbol in s.notes else ""
 
 
-def card_html(s: Summary) -> str:
+def card_html(s: Summary, notes: bool = True) -> str:
     """The alert as a self-contained HTML card (rendered to an image for Telegram, see card_png): breadth with
     its change and a BUY/WATCH/AVOID split bar, hot sectors as tiles, new BUYs grouped under colour-coded
     strategy pills, the strongest BUYs ranked (a row's sector in orange when it is a hot sector), each with the
     saved LLM note as bullet points (once, so a new BUY among the strongest isn't repeated), and a note
-    on what the score means. A tall card goes out in slices (see TALLEST); dropped BUYs go in the caption."""
+    on what the score means. notes=False: the card alone, short enough for one image; with the notes it is
+    tall and goes out in slices (see TALLEST). Dropped BUYs go in the caption."""
+    points = _points if notes else lambda s, symbol: ""
     e = html.escape
     total = sum(s.actions.values()) or 1
     buy, watch, avoid = (s.actions.get(a, 0) for a in ("BUY", "WATCH", "AVOID"))
@@ -434,7 +436,7 @@ def card_html(s: Summary) -> str:
                             for x in strategies)
             rows = "".join(f'<div class="row"><div class="line"><span class="sym">{e(b.symbol)}</span>'
                            f'<span class="meta">{e(b.name)} · {_sector(b.sector, hot)}</span></div>'
-                           f'<span class="score">{_score(b.combined)}</span></div>' + _points(s, b.symbol) for b in group)
+                           f'<span class="score">{_score(b.combined)}</span></div>' + points(s, b.symbol) for b in group)
             groups.append(f'<div class="group"><div class="pills">{pills}<span class="count">×{len(group)}</span></div>{rows}</div>')
         more = f'<div class="sub">+{_more(s.new, MAX_NEW)} more on the dashboard</div>' if _more(s.new, MAX_NEW) else ""
         body = "".join(groups) or f'<div class="sub">No new BUYs since {e(_day(s.prev)[:-5])}</div>'
@@ -447,7 +449,7 @@ def card_html(s: Summary) -> str:
                         + ('<span class="chip new">NEW</span>' if b.symbol in fresh else "")
                         + f'<span class="meta">{e(b.name)} · {_sector(b.sector, hot)}</span></div>'
                         f'<span class="score">{_score(b.combined)}</span></div>'
-                        + ("" if b.symbol in listed else _points(s, b.symbol)) for k, b in enumerate(s.buys[:TOP]))
+                        + ("" if b.symbol in listed else points(s, b.symbol)) for k, b in enumerate(s.buys[:TOP]))
         out.append(f'<section><h2><span>STRONGEST BUYS</span><span>score</span></h2><div class="panel">{ranks}</div></section>')
     out.append(f'<div class="note">{score_note()}<div class="scale"></div>'
                '<div class="ticks"><span>−1 bearish</span><span>0 neutral</span><span>+1 bullish</span></div></div>')
@@ -463,12 +465,13 @@ TALLEST = 2560
 BREAKS = "section, .group, .row, .rank, .citem, .note"
 
 
-def card_png(s: Summary) -> list[bytes] | None:
-    """The card as PNG slices via headless Chrome; None when Chrome isn't available (callers fall back to text)."""
+def card_png(s: Summary, notes: bool = True) -> list[bytes] | None:
+    """The card via headless Chrome: one PNG without the notes, PNG slices with them; None when Chrome isn't
+    available (callers fall back to text)."""
     from aistock.site import screenshots
 
     try:
-        return screenshots.render(card_html(s), tallest=TALLEST, breaks=BREAKS)
+        return screenshots.render(card_html(s, notes), tallest=TALLEST if notes else None, breaks=BREAKS)
     except Exception as err:  # no Chrome, or it failed: the text alert still goes out
         print(f"card image skipped: {type(err).__name__}: {err}")
         return None
@@ -613,11 +616,12 @@ COMMODITY_CSS = """
 
 
 def commodity_png(c: Commodities) -> list[bytes] | None:
-    """The commodity card as PNG slices (see TALLEST); None when Chrome isn't available."""
+    """The commodity card as one PNG (six contracts stay readable after Telegram's shrink); None when Chrome
+    isn't available."""
     from aistock.site import screenshots
 
     try:
-        return screenshots.render(commodity_card_html(c), tallest=TALLEST, breaks=BREAKS)
+        return screenshots.render(commodity_card_html(c))
     except Exception as err:
         print(f"commodity card image skipped: {type(err).__name__}: {err}")
         return None
@@ -741,13 +745,16 @@ def telegram_photo(pngs: list[bytes], caption: str, token: str, chat_id: str) ->
 
 
 def _telegram(s: Summary, url: str | None, token: str, chat_id: str) -> str:
-    """The card image, which carries each stock's note, with a caption holding the links; without an image,
-    the text card followed by the notes as text."""
-    png = card_png(s)
+    """The card image without notes, with a caption holding the links, then the card with each stock's note
+    as an album (when any stock has one); without an image, the text card followed by the notes as text."""
+    png = card_png(s, notes=False)
     if png:
         telegram_photo(png, caption_html(s, url), token, chat_id)
         notes = sum(b.symbol in s.notes for b in s.mentioned())
-        return "sent (card image" + (f", {notes} notes)" if notes else ")")
+        album = card_png(s) if notes else None
+        if album:
+            telegram_photo(album, f"🤖 <b>Notes · {_day(s.date)}</b>", token, chat_id)
+        return "sent (card image" + (f" + {notes} notes album)" if album else ")")
     telegram(telegram_html(s, url), token, chat_id)
     sent = "sent (text)"
     for text in notes_html(f"Notes · {_day(s.date)}", stock_notes(s)):

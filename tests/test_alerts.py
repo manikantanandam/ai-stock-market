@@ -142,7 +142,7 @@ def test_a_failing_channel_does_not_stop_the_others(tmp_path, monkeypatch):
         raise RuntimeError("Telegram refused the photo")
 
     sent = []
-    monkeypatch.setattr(alerts, "card_png", lambda s: [b"png"])
+    monkeypatch.setattr(alerts, "card_png", lambda s, notes=True: [b"png"])
     monkeypatch.setattr(alerts, "telegram_photo", refuse)
     monkeypatch.setattr(alerts, "email", lambda text, user, pw, to, server, port: sent.append((text.splitlines()[0], to)))
     assert alerts.send(alerts.summary(journal(tmp_path)), to_issue=False) == [
@@ -152,7 +152,7 @@ def test_a_failing_channel_does_not_stop_the_others(tmp_path, monkeypatch):
 
 def test_telegram_sends_the_card_image_with_the_links_in_its_caption(tmp_path, monkeypatch):
     got = {}
-    monkeypatch.setattr(alerts, "card_png", lambda s: [b"png"])
+    monkeypatch.setattr(alerts, "card_png", lambda s, notes=True: [b"png"])
     monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: got.update(png=png, caption=caption))
     assert alerts._telegram(alerts.summary(journal(tmp_path)), "https://example.org/", "t", "c") == "sent (card image)"
     assert got["png"] == [b"png"]
@@ -164,7 +164,7 @@ def test_telegram_sends_the_card_image_with_the_links_in_its_caption(tmp_path, m
 
 def test_telegram_falls_back_to_text_without_an_image(tmp_path, monkeypatch):
     got = []
-    monkeypatch.setattr(alerts, "card_png", lambda s: None)
+    monkeypatch.setattr(alerts, "card_png", lambda s, notes=True: None)
     monkeypatch.setattr(alerts, "telegram", lambda text, token, chat: got.append(text))
     assert alerts._telegram(alerts.summary(journal(tmp_path)), None, "t", "c") == "sent (text)"
     assert got[0].startswith("📈 <b>AI STOCK DAILY</b>")
@@ -238,7 +238,7 @@ def test_commodities_go_to_telegram_as_a_second_message(tmp_path, monkeypatch):
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "t")
     monkeypatch.setenv("TELEGRAM_CHAT_ID", "c")
     sent = []
-    monkeypatch.setattr(alerts, "card_png", lambda s: [b"stocks"])
+    monkeypatch.setattr(alerts, "card_png", lambda s, notes=True: [b"stocks"])
     monkeypatch.setattr(alerts, "commodity_png", lambda c: None)  # no image: text
     monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: sent.append(png))
     monkeypatch.setattr(alerts, "telegram", lambda text, token, chat: sent.append(text.splitlines()[0]))
@@ -266,19 +266,22 @@ def test_notes_follow_each_card_for_the_stocks_and_contracts_it_shows(tmp_path, 
     assert alerts.commodity_notes(c) == [("Gold · SELL · −0.40", "Gold falls")]
     assert "C · Gamma · +0.60" in alerts.plain(s) and "<summary>C · Gamma" in alerts.markdown(s)
     sent = []
-    monkeypatch.setattr(alerts, "card_png", lambda s: [b"png"])
-    monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: sent.append("photo"))
+    monkeypatch.setattr(alerts, "card_png", lambda s, notes=True: [b"notes" if notes else b"card"])
+    monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: sent.append((png, caption)))
     monkeypatch.setattr(alerts, "telegram", lambda text, token, chat: sent.append(text))
-    assert alerts._telegram(s, None, "t", "c") == "sent (card image, 1 notes)" and sent == ["photo"]  # in the card
+    # the card alone, then the card with the notes as an album
+    assert alerts._telegram(s, None, "t", "c") == "sent (card image + 1 notes album)"
+    assert [png for png, _ in sent] == [[b"card"], [b"notes"]] and sent[1][1] == "🤖 <b>Notes · Thu 26 Nov 2026</b>"
     assert '<ul class="points"><li>C &lt;rises&gt;</li></ul>' in alerts.card_html(s)
+    assert "points" not in alerts.card_html(s, notes=False).split("<body>")[1]
     sent.clear()
-    monkeypatch.setattr(alerts, "card_png", lambda s: None)  # no Chrome: the text card, then the notes as text
+    monkeypatch.setattr(alerts, "card_png", lambda s, notes=True: None)  # no Chrome: the text card, then the notes as text
     assert alerts._telegram(s, None, "t", "c") == "sent (text) + 1 notes"
     assert sent[1] == ("🤖 <b>Notes · Thu 26 Nov 2026</b>\n\n<b>C · Gamma · +0.60</b>\n"
                        "<blockquote expandable>C &lt;rises&gt;</blockquote>")
     sent.clear()
     monkeypatch.setattr(alerts, "commodity_png", lambda c: [b"png"])
-    assert alerts._telegram_commodities(c, None, "t", "c") == "sent (card image, 1 notes)" and sent == ["photo"]
+    assert alerts._telegram_commodities(c, None, "t", "c") == "sent (card image, 1 notes)" and len(sent) == 1
     assert "<li>Gold falls</li>" in alerts.commodity_card_html(c)
 
 
