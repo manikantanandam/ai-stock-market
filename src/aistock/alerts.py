@@ -6,7 +6,8 @@ Telegram gets the summary as an image card (`card_html`, rendered by headless Ch
 holding the links), falling back to `telegram_html` text when no image can be made.
 The commodity session (`commodity_summary`, journal/commodities/days) follows as a second Telegram message
 with its own card (`commodity_card_html`). Each card is followed by the saved LLM notes (journal/notes and
-journal/commodities/notes, written by `scan --notes`) of the stocks and contracts it shows (`notes_html`).
+journal/commodities/notes, written by `scan --notes`) of the stocks and contracts it shows, as an image of
+each note's gist (`notes_card_html`; `notes_html` text without Chrome).
 
 `summary` reads the session's journal files only (no LLM call here, decision 0001): the BUY signals with each
 stock's company name, sector, combined score and strategies, which of them are new since the previous session, and
@@ -16,6 +17,7 @@ and `plain` (email and the terminal).
 """
 import html
 import json
+import re
 import os
 import smtplib
 import subprocess
@@ -620,7 +622,79 @@ def commodity_text(c: Commodities, url: str | None = None) -> str:
         f'\n\n👉 <a href="{e(url)}#journal/commodities/days/{c.date}.csv">Open this session</a>' if url else "")
 
 
-# ---------- LLM notes: a follow-up message after each card ----------
+# ---------- LLM notes: a follow-up image after each card ----------
+
+@dataclass
+class NoteRow:
+    """One note on the notes card: whose it is and the note itself."""
+    symbol: str
+    meta: str              # name · sector (stocks) or group · verdict (commodities)
+    combined: float
+    note: str
+
+
+# A note's sentence ends at ., ! or ? after a lowercase letter, digit, ")" or "%", so "K.P.R. Mill" stays whole.
+SENTENCE = re.compile(r"(?<=[a-z0-9)%][.!?])\s+(?=[A-Z])")
+
+
+def gist(note: str) -> str:
+    """The note without its opening sentence when that only restates the verdict ("The strategy 'swing' fired a
+    BUY signal for ..."); the card clamps the rest to a few lines."""
+    sentences = SENTENCE.split(note.strip())
+    if len(sentences) > 1 and " fired " in sentences[0]:
+        sentences = sentences[1:]
+    return " ".join(sentences)
+
+
+NOTES_CSS = """
+.item { padding: 7px 0; border-top: 1px solid var(--line); }
+.item:first-child { border-top: none; }
+.gist { margin-top: 2px; font-size: 13px; line-height: 1.4; color: var(--ink-2); display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.score.neg { color: var(--avoid); background: rgba(239,68,68,.12); }
+"""
+
+
+def notes_card_html(title: str, date: str, rows: list[NoteRow]) -> str:
+    """The notes as an HTML card: per stock or contract its symbol and score, then the note's gist in at most
+    two lines (strategies are on the alert card, the full notes on the dashboard)."""
+    e = html.escape
+    items = []
+    for r in rows:
+        items.append(f'<div class="item"><div class="row"><div class="line"><span class="sym">{e(r.symbol)}</span>'
+                     f'<span class="meta">{e(r.meta)}</span></div>'
+                     f'<span class="{"score" if r.combined >= 0 else "score neg"}">{_score(r.combined)}</span></div>'
+                     f'<div class="gist">{e(gist(r.note))}</div></div>')
+    out = [f'<div class="head"><span class="brand">{e(title)}</span><span class="date">{e(_day(date))}</span></div>',
+           f'<section><div class="panel">{"".join(items)}</div></section>',
+           '<div class="foot">Written by a local LLM from the rules\' numbers; it explains, the rules decide.</div>']
+    return ('<!doctype html><html><head><meta charset="utf-8">'
+            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap">'
+            f"<style>{CARD_CSS}{NOTES_CSS}</style></head><body>" + "".join(out)
+            + "<script>document.fonts.ready.then(() => { document.body.dataset.shown = 'card'; });</script></body></html>")
+
+
+def notes_png(title: str, date: str, rows: list[NoteRow]) -> bytes | None:
+    """The notes card as a PNG; None when Chrome isn't available (the notes then go as text)."""
+    from aistock.site import screenshots
+
+    try:
+        return screenshots.render(notes_card_html(title, date, rows))
+    except Exception as err:
+        print(f"notes image skipped: {type(err).__name__}: {err}")
+        return None
+
+
+def stock_note_rows(s: Summary) -> list[NoteRow]:
+    """The notes card's rows: each stock on the alert card that has a saved note, in card order."""
+    return [NoteRow(b.symbol, f"{b.name} · {b.sector}" if b.sector else b.name, b.combined, s.notes[b.symbol]) for b in s.mentioned() if b.symbol in s.notes]
+
+
+def commodity_note_rows(c: Commodities) -> list[NoteRow]:
+    return [NoteRow(x.name, f"{x.group} · {_verdict(x)}", x.combined, c.notes[x.symbol])
+            for x in c.contracts if x.symbol in c.notes]
+
+
 
 def notes_html(title: str, items: list[tuple[str, str]]) -> list[str]:
     """Telegram HTML messages holding each (heading, note) under `title`, every note in its own expandable
@@ -695,7 +769,7 @@ def telegram_photo(png: bytes, caption: str, token: str, chat_id: str) -> None:
 
 def _telegram(s: Summary, url: str | None, token: str, chat_id: str) -> str:
     """The card image with a caption holding the links (the text card when no image could be made), then the
-    notes of the stocks it shows."""
+    notes of the stocks it shows as a second image."""
     png = card_png(s)
     if png:
         telegram_photo(png, caption_html(s, url), token, chat_id)
@@ -703,18 +777,31 @@ def _telegram(s: Summary, url: str | None, token: str, chat_id: str) -> str:
     else:
         telegram(telegram_html(s, url), token, chat_id)
         sent = "sent (text)"
-    return sent + _send_notes(f"Notes · {_day(s.date)}", stock_notes(s), token, chat_id)
+    link = f"{url}#journal/days/{s.date}.csv" if url else None
+    return sent + _send_notes("AI STOCK NOTES", s.date, stock_note_rows(s), stock_notes(s), link, token, chat_id)
 
 
-def _send_notes(title: str, items: list[tuple[str, str]], token: str, chat_id: str) -> str:
-    for text in notes_html(title, items):
+def _send_notes(title: str, date: str, rows: list[NoteRow], items: list[tuple[str, str]], link: str | None,
+                token: str, chat_id: str) -> str:
+    """The notes card as an image whose caption links to the full notes on the session page; the notes as text
+    when no image could be made. Nothing when there are no notes."""
+    if not rows:
+        return ""
+    png = notes_png(title, date, rows)
+    if png:
+        caption = f"🤖 <b>{len(rows)} notes</b> · {html.escape(_day(date))}"
+        if link:
+            caption += f'\n👉 <a href="{html.escape(link)}">Full notes on the dashboard</a>'
+        telegram_photo(png, caption, token, chat_id)
+        return f" + {len(rows)} notes (image)"
+    for text in notes_html(f"Notes · {_day(date)}", items):
         telegram(text, token, chat_id)
-    return f" + {len(items)} notes" if items else ""
+    return f" + {len(rows)} notes"
 
 
 def _telegram_commodities(c: Commodities, url: str | None, token: str, chat_id: str) -> str:
     """The commodity card as its own message after the stocks one (text when no image could be made), then
-    each contract's note."""
+    the contracts' notes as an image."""
     png = commodity_png(c)
     if png:
         telegram_photo(png, commodity_caption(c, url), token, chat_id)
@@ -722,7 +809,9 @@ def _telegram_commodities(c: Commodities, url: str | None, token: str, chat_id: 
     else:
         telegram(commodity_text(c, url), token, chat_id)
         sent = "sent (text)"
-    return sent + _send_notes(f"Commodity notes · {_day(c.date)}", commodity_notes(c), token, chat_id)
+    link = f"{url}#journal/commodities/days/{c.date}.csv" if url else None
+    return sent + _send_notes("AI COMMODITY NOTES", c.date, commodity_note_rows(c), commodity_notes(c), link,
+                              token, chat_id)
 
 
 def email(text: str, user: str, password: str, to: str, server: str = "smtp.gmail.com", port: int = 465) -> None:

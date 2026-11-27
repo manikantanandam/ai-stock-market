@@ -149,7 +149,8 @@ def scan(
     news: str = typer.Option("auto", help="all, candidates (only stocks a strategy could BUY), none; "
                                           "auto = all for <= 60 stocks, else candidates"),
     top: int = typer.Option(15, help="Rows to show"),
-    notes: bool = typer.Option(False, "--notes", help="Add a local-LLM (Ollama) note for each BUY shown"),
+    notes: bool = typer.Option(False, "--notes", help="Add a local-LLM (Ollama) note for each BUY on the alert card "
+                                                     "(new and strongest BUYs; the top BUYs shown while live)"),
     notes_max: int = typer.Option(15, help="Most BUYs to explain with --notes (each takes ~30s on CPU)"),
 ):
     """Run every strategy over a watchlist, list BUYs first, and log to journal/ (day and stock files)."""
@@ -198,7 +199,13 @@ def scan(
     print(f"Stocks: BUY {counts['BUY']}  WATCH {counts['WATCH']}  AVOID {counts['AVOID']}  · "
           f"news for {with_news}/{len(results)} · {logged}")
     if notes:
-        written = _print_notes([(s, s.buys[0]) for s in results[:top] if s.buys][:notes_max])
+        picked = [s for s in results[:top] if s.buys]
+        if phase != "live":  # a logged session: explain the stocks its alert card shows (new and strongest BUYs)
+            from aistock import alerts
+
+            by_symbol = {s.symbol: s for s in results if s.buys}
+            picked = [by_symbol[b.symbol] for b in alerts.summary().mentioned() if b.symbol in by_symbol]
+        written = _print_notes([(s, s.buys[0]) for s in picked][:notes_max])
         if written and phase != "live":
             journal.record_notes(written)
             print(f"Notes logged to {journal.NOTES}")

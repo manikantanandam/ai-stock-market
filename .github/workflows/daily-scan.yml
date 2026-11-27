@@ -94,7 +94,7 @@ jobs:
       - name: Install
         run: uv sync --locked
 
-      # LLM notes on the top BUYs (journal/notes/). Ollama runs on CPU here,
+      # LLM notes on the alert card's BUYs (journal/notes/). Ollama runs on CPU here,
       # ~13s per note (50 notes ~11 min); the binary and model (~2.5GB) are cached between runs.
       # If Ollama fails to start, the scan logs a warning and skips notes.
       - name: Cache Ollama
@@ -153,7 +153,7 @@ jobs:
         run: uv run aistock backfill-notes --sessions 2 --notes-max 25
 
       # The Daily alert follows each card with the notes of the stocks it shows (new and strongest BUYs);
-      # the scan explains its own top BUYs, so write the card's missing ones (~11 at most, ~30s each).
+      # the scan explains those same stocks, so this only fills ones it missed (~13 at most, ~30s each).
       - name: Notes for the alert card
         continue-on-error: true
         timeout-minutes: 15
