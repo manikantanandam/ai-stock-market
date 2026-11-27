@@ -4,6 +4,8 @@ date through the Send alert workflow).
 
 Telegram gets the summary as an image card (`card_html`, rendered by headless Chrome, sent with `caption_html`
 holding the links), falling back to `telegram_html` text when no image can be made.
+The commodity session (`commodity_summary`, journal/commodities/days) follows as a second Telegram message
+with its own card (`commodity_card_html`).
 
 `summary` reads the session's journal day file only (no LLM, decision 0001): the BUY signals with each
 stock's company name, sector, combined score and strategies, which of them are new since the previous session, and
@@ -262,7 +264,8 @@ def telegram_html(s: Summary, url: str | None = None) -> str:
 
 # Strategy colours, shared by every card so a pill means the same thing each day.
 STRATEGY_COLOURS = {"swing": "#3b82f6", "trend": "#10b981", "breakout": "#f59e0b", "leaders": "#a855f7",
-                    "leaders-slope": "#ec4899", "ema-cross": "#06b6d4", "pullback": "#84cc16"}
+                    "leaders-slope": "#ec4899", "ema-cross": "#06b6d4", "pullback": "#84cc16",
+                    "trend-long": "#14b8a6", "channel": "#f97316"}  # the last two are commodity presets
 
 CARD_CSS = """
 :root { --bg: #0f1115; --panel: #171a21; --line: #262a33; --ink: #f2f3f5; --ink-2: #a3a8b3; --ink-3: #6b7280;
@@ -441,6 +444,157 @@ def caption_html(s: Summary, url: str | None = None) -> str:
     return line
 
 
+# ---------- commodities: their own card, sent as a second Telegram message ----------
+
+ACTION_ORDER = ["BUY", "SELL", "MIXED", "EXIT", "HOLD", "WATCH"]  # what to act on first
+ACTION_COLOURS = {"BUY": "#22c55e", "SELL": "#ef4444", "MIXED": "#a855f7", "EXIT": "#f59e0b", "HOLD": "#3b82f6",
+                  "WATCH": "#9ca3af"}
+ACTION_COLUMNS = {"BUY": ["buys"], "SELL": ["sells"], "MIXED": ["buys", "sells"], "EXIT": ["exits"], "HOLD": ["holds"]}
+
+
+@dataclass
+class Contract:
+    symbol: str
+    name: str
+    group: str
+    unit: str
+    action: str               # BUY, SELL, MIXED, EXIT, HOLD or WATCH
+    side: str                 # long / short, "" for WATCH and MIXED
+    strategies: list[str]     # the presets behind the action
+    combined: float
+    close: float              # MCX quote units (rupees per `unit`)
+    prev_action: str | None = None
+    prev_close: float | None = None
+
+
+@dataclass
+class Commodities:
+    date: str
+    prev: str | None
+    contracts: list[Contract]  # actionable first (ACTION_ORDER), then journal order
+
+
+def commodity_summary(root: Path = ROOT, date: str | None = None) -> Commodities | None:
+    """The latest commodity session on or before `date` (default: the latest one), with each contract's action
+    and the previous session's action and close; None if there is none. Futures sessions follow New York, so
+    they can lag the stock session by a day (US holidays)."""
+    days = [p.stem for p in sorted((root / "journal" / "commodities" / "days").glob("*.csv"))]
+    days = [d for d in days if date is None or d <= date]
+    if not days:
+        return None
+    read = lambda d: pd.read_csv(root / "journal" / "commodities" / "days" / f"{d}.csv")
+    today, prev = read(days[-1]), (days[-2] if len(days) > 1 else None)
+    before = read(prev).set_index("symbol") if prev else pd.DataFrame()
+    text = lambda r, col: r.get(col) if isinstance(r.get(col), str) else ""
+    contracts = []
+    for _, r in today.iterrows():
+        names = [x for col in ACTION_COLUMNS.get(r["action"], []) for x in text(r, col).split(";") if x]
+        old = before.loc[r["symbol"]] if r["symbol"] in before.index else None
+        contracts.append(Contract(r["symbol"], text(r, "name") or r["symbol"], text(r, "group"), text(r, "unit"),
+                                  r["action"], text(r, "side") if r["action"] != "MIXED" else "",
+                                  list(dict.fromkeys(x.split(":")[0] for x in names)), float(r["combined"]),
+                                  float(r["close"]), old["action"] if old is not None else None,
+                                  float(old["close"]) if old is not None else None))
+    order = lambda c: ACTION_ORDER.index(c.action) if c.action in ACTION_ORDER else len(ACTION_ORDER)
+    return Commodities(days[-1], prev, sorted(contracts, key=order))
+
+
+def _verdict(c: Contract) -> str:
+    return c.action + (f" {c.side.upper()}" if c.side and c.action in ("EXIT", "HOLD") else "")
+
+
+def commodity_note() -> str:
+    """What the verdicts and the score mean, from the live commodity weights."""
+    from aistock.commodity.signal import Config
+
+    c = Config()
+    return ("<b>BUY / SELL</b> enter long / short at the next open · <b>EXIT</b> a position closed on the latest "
+            "bar · <b>HOLD</b> a position still open · <b>WATCH</b> nothing to do. <b>Score</b> −1 to +1 = "
+            f"{c.w_technical:.0%} technical + {c.w_sentiment:.0%} news sentiment. Prices in rupees per MCX unit, "
+            "from Yahoo futures × USDINR.")
+
+
+def commodity_card_html(c: Commodities) -> str:
+    """The commodity session as an HTML card: verdict counts, then one row per contract (action badge with its
+    side, the strategies behind it, close with its change, score), actionable contracts first."""
+    e = html.escape
+    counts = {a: sum(x.action == a for x in c.contracts) for a in ACTION_ORDER}
+    legend = "".join(f'<span><span class="dot" style="background:{ACTION_COLOURS[a]}"></span><b>{n}</b> {a}</span>'
+                     for a, n in counts.items() if n)
+    rows = []
+    for x in c.contracts:
+        changed = (f'<span class="chip new">was {e(x.prev_action)}</span>'
+                   if x.prev_action is not None and x.prev_action != x.action else "")
+        move = ""
+        if x.prev_close:
+            pct = (x.close / x.prev_close - 1) * 100
+            kind = "flat" if round(pct, 1) == 0 else "up" if pct > 0 else "down"
+            move = f'<span class="chip {kind}">{"▲" if pct > 0 else "▼" if pct < 0 else ""}{abs(pct):.1f}%</span>'
+        pills = "".join(f'<span class="pill" style="background:{STRATEGY_COLOURS.get(n, "#4b5563")}">{e(n)}</span>'
+                        for n in x.strategies)
+        colour = ACTION_COLOURS.get(x.action, "#4b5563")
+        tone = "score" if x.combined >= 0 else "score neg"
+        rows.append(f'<div class="crow"><div><div class="line"><span class="sym">{e(x.name)}</span>{changed}</div>'
+                    f'<div class="meta">{e(x.group)} · ₹{x.close:,.0f} / {e(x.unit)} {move}</div>'
+                    + (f'<div class="pills">{pills}</div>' if pills else "") + "</div>"
+                    f'<div class="right"><span class="badge" style="color:{colour};border-color:{colour}">{e(_verdict(x))}</span>'
+                    f'<span class="{tone}">{_score(x.combined)}</span></div></div>')
+    since = f" · vs {e(_day(c.prev)[:-5])}" if c.prev else ""
+    out = [f'<div class="head"><span class="brand">AI COMMODITIES</span><span class="date">{e(_day(c.date))} · futures close</span></div>',
+           f'<div class="hero"><span class="big">{len(c.contracts)}</span><span class="sub">contracts{since}</span></div>',
+           f'<div class="legend">{legend}</div>',
+           f'<section><div class="panel">{"".join(rows)}</div></section>',
+           f'<div class="note">{commodity_note()}</div>']
+    return ('<!doctype html><html><head><meta charset="utf-8">'
+            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap">'
+            f"<style>{CARD_CSS}{COMMODITY_CSS}</style></head><body>" + "".join(out)
+            + "<script>document.fonts.ready.then(() => { document.body.dataset.shown = 'card'; });</script></body></html>")
+
+
+COMMODITY_CSS = """
+.legend { margin-top: 8px; }
+.crow { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 8px 0;
+  border-top: 1px solid var(--line); }
+.crow:first-child { border-top: none; }
+.crow .meta { margin-top: 2px; }
+.crow .pills { margin: 5px 0 0; }
+.right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.badge { font-size: 12px; font-weight: 800; letter-spacing: .04em; padding: 2px 9px; border: 1.5px solid; border-radius: 7px; }
+.score.neg { color: var(--avoid); background: rgba(239,68,68,.12); }
+"""
+
+
+def commodity_png(c: Commodities) -> bytes | None:
+    """The commodity card as a PNG; None when Chrome isn't available."""
+    from aistock.site import screenshots
+
+    try:
+        return screenshots.render(commodity_card_html(c))
+    except Exception as err:
+        print(f"commodity card image skipped: {type(err).__name__}: {err}")
+        return None
+
+
+def commodity_caption(c: Commodities, url: str | None = None) -> str:
+    """The commodity photo's caption: the session, its actionable contracts, the link to its dashboard page."""
+    e = html.escape
+    act = [x for x in c.contracts if x.action in ("BUY", "SELL", "MIXED", "EXIT")]
+    line = f"🛢 <b>AI Commodities · {e(_day(c.date))}</b>"
+    line += ("\n⚡ " + ", ".join(f"{e(x.name)} {x.action}" for x in act)) if act else " · no new entries or exits"
+    if url:
+        line += f'\n👉 <a href="{e(url)}#journal/commodities/days/{c.date}.csv">Open this session</a>'
+    return line
+
+
+def commodity_text(c: Commodities, url: str | None = None) -> str:
+    """Telegram HTML text when no image can be made: one line per contract."""
+    e = html.escape
+    rows = [f"<b>{e(x.name)}</b> {e(_verdict(x))} {_score(x.combined)} · ₹{x.close:,.0f}/{e(x.unit)}"
+            + (f" · <i>{e(', '.join(x.strategies))}</i>" if x.strategies else "") for x in c.contracts]
+    return commodity_caption(c, url).split("\n👉")[0] + "\n\n" + "\n".join(rows) + (
+        f'\n\n👉 <a href="{e(url)}#journal/commodities/days/{c.date}.csv">Open this session</a>' if url else "")
+
+
 def markdown(s: Summary, url: str | None = None) -> str:
     """GitHub markdown: the issue comment, new and top BUYs as tables."""
     lines = [f"### 📈 AI Stock · {_day(s.date)}", f"🟢 **{s.actions.get('BUY', 0)}** BUY · 🟡 {s.actions.get('WATCH', 0)} WATCH · "
@@ -494,6 +648,16 @@ def _telegram(s: Summary, url: str | None, token: str, chat_id: str) -> str:
     return "sent (text)"
 
 
+def _telegram_commodities(c: Commodities, url: str | None, token: str, chat_id: str) -> str:
+    """The commodity card as its own message after the stocks one; text when no image could be made."""
+    png = commodity_png(c)
+    if png:
+        telegram_photo(png, commodity_caption(c, url), token, chat_id)
+        return "sent (card image)"
+    telegram(commodity_text(c, url), token, chat_id)
+    return "sent (text)"
+
+
 def email(text: str, user: str, password: str, to: str, server: str = "smtp.gmail.com", port: int = 465) -> None:
     """Send `text` as a plain-text email over SMTP with SSL; the subject is its first line."""
     msg = EmailMessage()
@@ -522,14 +686,18 @@ def github_issue(text: str, title: str = ISSUE_TITLE) -> str:
 
 
 def send(s: Summary, url: str | None = None, to_telegram: bool = True, to_issue: bool = True,
-         to_email: bool = True) -> list[str]:
+         to_email: bool = True, c: Commodities | None = None) -> list[str]:
     """Send to each channel that is enabled and configured (secrets in the environment); returns what
-    happened, one line per channel. A failing channel is reported and the others still go out."""
+    happened, one line per channel. A failing channel is reported and the others still go out. Commodities
+    (`c`) go to Telegram as a second message."""
     env = os.environ.get
     channels = []
     if to_telegram:
         channels.append(("Telegram", ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"),
                          lambda: _telegram(s, url, env("TELEGRAM_BOT_TOKEN"), env("TELEGRAM_CHAT_ID"))))
+        if c is not None:
+            channels.append(("Telegram commodities", ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"),
+                             lambda: _telegram_commodities(c, url, env("TELEGRAM_BOT_TOKEN"), env("TELEGRAM_CHAT_ID"))))
     if to_email:
         channels.append(("Email", ("SMTP_USERNAME", "SMTP_PASSWORD"),
                          lambda: email(plain(s, url), env("SMTP_USERNAME"), env("SMTP_PASSWORD"),

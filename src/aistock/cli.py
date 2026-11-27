@@ -326,11 +326,13 @@ def alert(
     email: bool = typer.Option(True, "--email/--no-email", help="Send by email (SMTP_USERNAME, SMTP_PASSWORD; "
                                                                "optional ALERT_EMAIL_TO, SMTP_SERVER, SMTP_PORT)"),
     issue: bool = typer.Option(True, "--issue/--no-issue", help="Comment on the 'Daily alerts' GitHub issue"),
+    commodities: bool = typer.Option(True, "--commodities/--no-commodities",
+                                     help="Also send the commodity session (on or before --date) to Telegram"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Print the message only"),
     url: str = typer.Option("", help="Dashboard link to end the message with"),
 ):
-    """Summary of a session (BUY signals, new and dropped) to Telegram, email and a GitHub issue; channels whose
-    secrets aren't set are skipped. Exits non-zero if a configured channel fails."""
+    """Summary of a session (BUY signals, new and dropped) to Telegram, email and a GitHub issue, plus the
+    commodity card as a second Telegram message; channels whose secrets aren't set are skipped. Exits non-zero if a configured channel fails."""
     from aistock import alerts
 
     try:
@@ -343,7 +345,8 @@ def alert(
     typer.echo(alerts.plain(s, url or None))
     if dry_run:
         return
-    results = alerts.send(s, url or None, telegram, issue, email)
+    c = alerts.commodity_summary(date=s.date) if commodities else None
+    results = alerts.send(s, url or None, telegram, issue, email, c)
     for line in results:
         typer.echo(line)
     if any(": failed (" in line for line in results):

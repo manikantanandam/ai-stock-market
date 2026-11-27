@@ -198,3 +198,51 @@ def test_score_note_follows_the_live_weights(monkeypatch):
 def test_sector_is_highlighted_only_when_hot():
     assert alerts._sector("Healthcare", {"Healthcare"}) == '<span class="hot">Healthcare</span>'
     assert alerts._sector("Energy", {"Healthcare"}) == "Energy"
+
+
+CCOLS = "date,symbol,name,group,unit,action,buys,sells,exits,holds,combined,close,side\n"
+
+
+def commodities(tmp_path):
+    days = tmp_path / "journal" / "commodities" / "days"
+    days.mkdir(parents=True)
+    (days / "2026-11-24.csv").write_text(CCOLS + "2026-11-24,GOLD,Gold,Bullion,10 g,WATCH,,,,,0.1,100,\n"
+                                                 "2026-11-24,CRUDEOIL,Crude oil,Energy,1 bbl,HOLD,,,,trend:long,0.2,50,long\n")
+    (days / "2026-11-25.csv").write_text(CCOLS + "2026-11-25,GOLD,Gold,Bullion,10 g,SELL,,channel:short;trend:short,,,-0.4,98,short\n"
+                                                 "2026-11-25,CRUDEOIL,Crude oil,Energy,1 bbl,HOLD,,,,trend:long,0.3,51,long\n")
+    return tmp_path
+
+
+def test_commodity_summary_takes_the_latest_session_on_or_before_the_date(tmp_path):
+    root = commodities(tmp_path)
+    c = alerts.commodity_summary(root, date="2026-11-26")  # stocks traded on a US holiday
+    assert (c.date, c.prev) == ("2026-11-25", "2026-11-24")
+    gold = c.contracts[0]  # SELL before HOLD
+    assert (gold.symbol, gold.action, gold.side, gold.strategies) == ("GOLD", "SELL", "short", ["channel", "trend"])
+    assert (gold.prev_action, gold.prev_close) == ("WATCH", 100.0)
+    assert alerts.commodity_summary(root, date="2026-11-23") is None
+
+
+def test_commodity_card_and_caption(tmp_path):
+    c = alerts.commodity_summary(commodities(tmp_path))
+    page = alerts.commodity_card_html(c)
+    assert '<span class="chip new">was WATCH</span>' in page and '<span class="chip down">▼2.0%</span>' in page
+    assert ">HOLD LONG</span>" in page and '<span class="score neg">−0.40</span>' in page
+    assert "70% technical + 30% news sentiment" in page
+    assert alerts.commodity_caption(c, "https://example.org/") == (
+        "🛢 <b>AI Commodities · Wed 25 Nov 2026</b>\n⚡ Gold SELL\n"
+        '👉 <a href="https://example.org/#journal/commodities/days/2026-11-25.csv">Open this session</a>')
+
+
+def test_commodities_go_to_telegram_as_a_second_message(tmp_path, monkeypatch):
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "t")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "c")
+    sent = []
+    monkeypatch.setattr(alerts, "card_png", lambda s: b"stocks")
+    monkeypatch.setattr(alerts, "commodity_png", lambda c: None)  # no image: text
+    monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: sent.append(png))
+    monkeypatch.setattr(alerts, "telegram", lambda text, token, chat: sent.append(text.splitlines()[0]))
+    root = commodities(journal(tmp_path))
+    out = alerts.send(alerts.summary(root), to_issue=False, to_email=False, c=alerts.commodity_summary(root))
+    assert out == ["Telegram: sent (card image)", "Telegram commodities: sent (text)"]
+    assert sent == [b"stocks", "🛢 <b>AI Commodities · Wed 25 Nov 2026</b>"]
