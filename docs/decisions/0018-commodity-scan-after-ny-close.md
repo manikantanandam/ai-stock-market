@@ -14,11 +14,14 @@ day's stocks and commodities.
 `commodity-scan.yml` scans commodities at 22:17 UTC weekdays (after the close in both summer and winter
 time), with a 00:47 UTC backup that runs only if main lacks the session. It merges `journal/commodities`
 through its own PR and sends the commodity card alone to Telegram (`aistock alert --no-stocks`). The
-daily stock scan no longer scans commodities and alerts with `--no-commodities`. Pages runs at 23:37 and
-02:07 UTC to publish it.
+daily stock scan no longer scans commodities; its alert repeats that card, marked as a repeat, with each
+contract's price now (`data.commodities.live`, the New York session still trading) and its change since the
+close, for the MCX evening session (17:00 IST). Verdicts stay those of the close: a half-finished bar has no
+backtest. Pages runs at 23:37 and 02:07 UTC to publish it.
 
 ## Consequences
-Two Telegram messages a day at different times: stocks around 17:00 IST, commodities around 04:00 IST.
+The commodity card goes out twice: alone around 04:00 IST, then repeated with live prices under the stock
+card around 17:00 IST.
 The two journal PRs touch different folders, so they don't conflict. Email and the issue carry stocks only.
 
 ## Revisit when

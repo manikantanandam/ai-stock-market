@@ -387,6 +387,13 @@ def alert(
     if dry_run:
         return
     c = alerts.commodity_summary(date=s.date) if commodities else None
+    if c is not None and not date:  # the latest card repeats in the evening with prices from the session trading now
+        from datetime import datetime
+
+        from aistock.data import commodities as futures
+        from aistock.data.prices import IST
+
+        c = alerts.with_live(c, futures.live(), datetime.now(IST).strftime("%H:%M IST"))
     results = alerts.send(s, url or None, telegram, issue, email, c)
     for line in results:
         typer.echo(line)

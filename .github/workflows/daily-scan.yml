@@ -225,7 +225,8 @@ jobs:
 
       # Summary of the session to Telegram and email (when their secrets are set) and the "Daily alerts" issue.
       # Last, and allowed to fail: an alert problem must never cost a scan. Commodities are scanned and
-      # alerted after the New York close by commodity-scan.yml.
+      # alerted after the New York close by commodity-scan.yml; their card repeats here with prices from
+      # the session trading now, for the MCX evening session.
       - name: Daily alert
         continue-on-error: true
         env:
@@ -235,4 +236,4 @@ jobs:
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
-        run: uv run aistock alert --no-commodities --url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+        run: uv run aistock alert --url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"

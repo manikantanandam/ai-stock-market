@@ -248,6 +248,18 @@ def test_commodities_go_to_telegram_as_a_second_message(tmp_path, monkeypatch):
     assert sent == [[b"stocks"], "🛢 <b>AI Commodities · Wed 25 Nov 2026</b>"]
 
 
+def test_the_evening_repeat_shows_prices_now_beside_the_close(tmp_path):
+    c = alerts.with_live(alerts.commodity_summary(commodities(tmp_path)), {"GOLD": 99.0}, "16:47 IST")
+    assert c.live_at == "16:47 IST"
+    page = alerts.commodity_card_html(c)
+    assert "Repeat of the US close · prices now at 16:47 IST" in page
+    assert '<div class="meta live">now ₹99 <span class="chip up">▲1.0%</span> since the close</div>' in page
+    assert page.count('class="meta live"') == 1  # crude has no live price
+    assert alerts.commodity_caption(c).splitlines()[1] == "🔁 Repeat of the US close · prices now at 16:47 IST"
+    assert "Gold</b> SELL −0.40 · ₹98/10 g · now ₹99 (+1.0%)" in alerts.commodity_text(c)
+    assert alerts.with_live(alerts.commodity_summary(tmp_path), {}, "16:47 IST").live_at is None
+
+
 def test_commodities_alone_without_a_stock_session(tmp_path, monkeypatch):
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "t")
     monkeypatch.setenv("TELEGRAM_CHAT_ID", "c")

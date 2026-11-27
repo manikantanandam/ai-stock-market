@@ -41,6 +41,24 @@ def test_completed_drops_a_session_still_trading_in_new_york():
     assert len(commodities.completed(df, datetime(2026, 11, 25, 17, 0, tzinfo=NY))) == 3
 
 
+def test_live_prices_come_only_from_a_session_still_trading(monkeypatch):
+    frames = {"USDINR=X": usd_frame([80, 90], start="2026-11-26"), "GC=F": usd_frame([1, 2], start="2026-11-26"),
+              "SI=F": usd_frame([3], start="2026-11-26")}  # silver: no bar for the session in progress
+
+    class Ticker:
+        def __init__(self, ticker):
+            self.ticker = ticker
+
+        def history(self, **kw):
+            if self.ticker not in frames:
+                raise ValueError("no data")
+            return frames[self.ticker]
+
+    monkeypatch.setattr(commodities.yf, "Ticker", Ticker)
+    quotes = commodities.live(datetime(2026, 11, 27, 6, 17, tzinfo=NY))  # 16:47 IST, Friday's session trading
+    assert quotes == {"GOLD": pytest.approx(2 * 90 * commodities.get("GOLD").factor)}
+
+
 def test_gold_is_quoted_per_10_grams():
     assert commodities.get("gold").factor == pytest.approx(10 / 31.1034768)
     with pytest.raises(ValueError):
