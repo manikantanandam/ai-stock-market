@@ -4,6 +4,7 @@
 # backup re-runs only if the journal on main still lacks the latest session.
 # Journal rows are keyed by the price bar's session date, so a late run still
 # lands on the right day, and a re-run replaces that day's rows.
+# ops/cloudflare dispatches it on time (gated); the schedule below is the fallback.
 name: Daily scan
 
 on:
@@ -12,6 +13,10 @@ on:
     - cron: "47 14 * * 1-5"
   workflow_dispatch:
     inputs:
+      gated:
+        description: "Skip like a scheduled run when main already has the session (set by the Cloudflare trigger)"
+        type: boolean
+        default: false
       backfill_dates:
         description: "Sessions to rewrite notes for, even if they have some (YYYY-MM-DD, comma-separated)"
         required: false
@@ -28,7 +33,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Scheduled runs skip when main already has the latest session or an earlier
+  # Scheduled and gated runs (ops/cloudflare) skip when main already has the latest session or an earlier
   # run's journal PR is still open (a second PR on the same rows would conflict).
   gate:
     runs-on: ubuntu-latest
@@ -54,7 +59,7 @@ jobs:
           latest=$(ls journal/days | sort | tail -1 | cut -d. -f1)
           open=$(gh pr list --state open --search "head:daily-scan/" --json number -q length)
           run=true
-          if [ "${{ github.event_name }}" = schedule ]; then
+          if [ "${{ github.event_name }}" = schedule ] || [ "${{ inputs.gated }}" = true ]; then
             if [ "$latest" \> "$d" ] || [ "$latest" = "$d" ]; then
               echo "Journal already has session $latest; skipping"; run=false
             elif [ "$open" -gt 0 ]; then

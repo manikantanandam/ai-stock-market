@@ -3,6 +3,7 @@
 # 22:00 UTC in winter), so 22:17 UTC (03:47 IST) is after the close all year; the 00:47 UTC (06:17 IST)
 # backup re-runs only if main still lacks that session. Both land before an IST morning.
 # GitHub cron avoids :00 for the same reason as daily-scan.yml.
+# ops/cloudflare dispatches it on time (gated); the schedule below is the fallback.
 name: Commodity scan
 
 on:
@@ -10,6 +11,11 @@ on:
     - cron: "17 22 * * 1-5"
     - cron: "47 0 * * 2-6"
   workflow_dispatch:
+    inputs:
+      gated:
+        description: "Skip like a scheduled run when main already has the session (set by the Cloudflare trigger)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -21,7 +27,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Scheduled runs skip when main already has the latest session or an earlier
+  # Scheduled and gated runs (ops/cloudflare) skip when main already has the latest session or an earlier
   # run's journal PR is still open.
   gate:
     runs-on: ubuntu-latest
@@ -47,7 +53,7 @@ jobs:
           latest=$(ls journal/commodities/days | sort | tail -1 | cut -d. -f1)
           open=$(gh pr list --state open --search "head:commodity-scan/" --json number -q length)
           run=true
-          if [ "${{ github.event_name }}" = schedule ]; then
+          if [ "${{ github.event_name }}" = schedule ] || [ "${{ inputs.gated }}" = true ]; then
             if [ "$latest" \> "$d" ] || [ "$latest" = "$d" ]; then
               echo "Journal already has session $latest; skipping"; run=false
             elif [ "$open" -gt 0 ]; then
