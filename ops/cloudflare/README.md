@@ -6,9 +6,11 @@ GitHub's scheduled workflows often start hours late. This Worker's Cron Triggers
 | Cron (UTC)          | IST   | Workflow             |
 |---------------------|-------|----------------------|
 | `17 11 * * MON-FRI` | 16:47 | `daily-scan.yml`     |
+| `37 12 * * MON-FRI` | 18:07 | `pages.yml`          |
 | `17 22 * * MON-FRI` | 03:47 | `commodity-scan.yml` |
+| `47 22 * * MON-FRI` | 04:17 | `pages.yml`          |
 
-Runs are dispatched with `gated: true`, so they skip when `main` already has the session. The GitHub
+Scan runs are dispatched with `gated: true`, so they skip when `main` already has the session. The GitHub
 schedules stay as a fallback and skip in turn once the Worker's run has landed.
 
 ## Setup (once, free plan)
@@ -22,7 +24,7 @@ schedules stay as a fallback and skip in turn once the Worker's run has landed.
    npx wrangler deploy
    npx wrangler secret put GITHUB_TOKEN   # paste the token
    ```
-3. **Check.** Cloudflare dashboard > Workers > `aistock-dispatch` > Settings > Triggers shows both crons.
+3. **Check.** Cloudflare dashboard > Workers > `aistock-dispatch` > Settings > Triggers shows the four crons.
    To test without waiting, run `npx wrangler dev --test-scheduled` and open
    `http://localhost:8787/__scheduled?cron=17+22+*+*+MON-FRI`: a gated Commodity scan run appears in
    GitHub Actions (it skips if `main` already has the session). Logs: `npx wrangler tail`.

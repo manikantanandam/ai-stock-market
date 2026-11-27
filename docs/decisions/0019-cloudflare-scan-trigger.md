@@ -11,7 +11,8 @@ late. The alerts are only useful on time (stocks before the evening, commodities
 ## Decision
 A Cloudflare Worker (`ops/cloudflare/`, free plan) with Cron Triggers at 11:17 and 22:17 UTC calls GitHub's
 `workflow_dispatch` API for `daily-scan.yml` and `commodity-scan.yml` with `gated: true`. A gated run skips
-like a scheduled one when main already has the session. The GitHub schedules stay as the fallback.
+like a scheduled one when main already has the session. It also dispatches `pages.yml` at 12:37 and
+22:47 UTC, once each scan's journal PR has merged. The GitHub schedules stay as the fallback.
 
 ## Consequences
 One external service and a fine-grained token (Actions: write on this repo only) that expires and must be
