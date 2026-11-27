@@ -12,7 +12,7 @@ push summary and chose both channels.
 (no LLM, 0001). Telegram gets it as an image card (`card_html`, dark theme, Inter font, rendered by the
 same headless Chrome as the PR screenshots via `site.screenshots.render`, sent with sendPhoto); its caption
 holds the tappable links. The card ends with a note on what the score means (weights and per-strategy minimums
-read from `signal.Config` and the presets, so it can't drift) over a −1 to +1 colour scale. Text-card iterations in Telegram HTML never satisfied the user (no text colour,
+read from `signal.Config` and the presets, so it can't drift) over a −1 to +1 colour scale. Sectors among the day's top 3 hot sectors show in orange on the BUY rows, so a BUY riding a strong sector stands out. Text-card iterations in Telegram HTML never satisfied the user (no text colour,
 fixed fonts, little control over spacing), so the image is the design. If no image can be made, the text
 card below goes out instead. The text card: Telegram can't colour text, so colour comes from what it tints: emoji (green-square breadth
 bar, 🟢/🔴 change markers), links (symbols) and quote blocks (each strategy group of new BUYs is its own
