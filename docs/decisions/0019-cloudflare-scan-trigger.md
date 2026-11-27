@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-11-27
-- PR: #56
+- PR: #57
 
 ## Context
 GitHub's cron is best effort: the 11:17 UTC Daily scan of 26 Nov started at 20:12 UTC, almost 9 hours
