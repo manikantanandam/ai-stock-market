@@ -269,15 +269,19 @@ def test_notes_follow_each_card_for_the_stocks_and_contracts_it_shows(tmp_path, 
     monkeypatch.setattr(alerts, "card_png", lambda s: b"png")
     monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: sent.append("photo"))
     monkeypatch.setattr(alerts, "telegram", lambda text, token, chat: sent.append(text))
-    monkeypatch.setattr(alerts, "notes_png", lambda title, date, rows: None)  # no Chrome: notes go as text
-    assert alerts._telegram(s, None, "t", "c") == "sent (card image) + 1 notes"
-    assert sent == ["photo", "🤖 <b>Notes · Thu 26 Nov 2026</b>\n\n<b>C · Gamma · +0.60</b>\n"
-                             "<blockquote expandable>C &lt;rises&gt;</blockquote>"]
+    assert alerts._telegram(s, None, "t", "c") == "sent (card image, 1 notes)" and sent == ["photo"]  # in the card
+    assert '<div class="gist">C &lt;rises&gt;</div>' in alerts.card_html(s)
     sent.clear()
+    monkeypatch.setattr(alerts, "card_png", lambda s: None)  # no Chrome: the text card, then the notes as text
+    assert alerts._telegram(s, None, "t", "c") == "sent (text) + 1 notes"
+    assert sent[1] == ("🤖 <b>Notes · Thu 26 Nov 2026</b>\n\n<b>C · Gamma · +0.60</b>\n"
+                       "<blockquote expandable>C &lt;rises&gt;</blockquote>")
+    sent.clear()
+    monkeypatch.setattr(alerts, "commodity_png", lambda c: b"png")
     monkeypatch.setattr(alerts, "notes_png", lambda title, date, rows: b"png")
     monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: sent.append(caption))
-    assert alerts._telegram(s, "https://x.io/", "t", "c") == "sent (card image) + 1 notes (image)"
-    assert "1 notes" in sent[1] and "https://x.io/#journal/days/2026-11-26.csv" in sent[1]
+    assert alerts._telegram_commodities(c, "https://x.io/", "t", "c") == "sent (card image) + 1 notes (image)"
+    assert "https://x.io/#journal/commodities/days/2026-11-25.csv" in sent[1]
 
 
 def test_notes_card_shows_each_notes_gist():

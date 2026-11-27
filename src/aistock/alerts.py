@@ -5,9 +5,9 @@ date through the Send alert workflow).
 Telegram gets the summary as an image card (`card_html`, rendered by headless Chrome, sent with `caption_html`
 holding the links), falling back to `telegram_html` text when no image can be made.
 The commodity session (`commodity_summary`, journal/commodities/days) follows as a second Telegram message
-with its own card (`commodity_card_html`). Each card is followed by the saved LLM notes (journal/notes and
-journal/commodities/notes, written by `scan --notes`) of the stocks and contracts it shows, as an image of
-each note's gist (`notes_card_html`; `notes_html` text without Chrome).
+with its own card (`commodity_card_html`). The saved LLM notes (journal/notes, journal/commodities/notes,
+written by `scan --notes`) of the stocks and contracts shown go along as each note's gist: under each row of
+the stock card, and as a notes card after the commodity card (`notes_card_html`); as text without Chrome.
 
 `summary` reads the session's journal files only (no LLM call here, decision 0001): the BUY signals with each
 stock's company name, sector, combined score and strategies, which of them are new since the previous session, and
@@ -274,6 +274,7 @@ def telegram_html(s: Summary, url: str | None = None) -> str:
             lines.append(f"<i>+{_more(s.new, MAX_NEW)} more on the dashboard</i>")
     if s.buys:
         fresh = {b.symbol for b in s.new}
+        listed = {b.symbol for b in s.new[:MAX_NEW]} if s.prev is not None else set()
         lines += ["", "🏆 <b>STRONGEST BUYS</b>"]
         lines += [f"{MEDALS[k]} <code>{_score(b.combined)}</code> {_symbol(b, url)}{' 🆕' if b.symbol in fresh else ''}"
                   f" · <i>{e(b.name)}</i>" for k, b in enumerate(s.buys[:TOP])]
@@ -353,6 +354,9 @@ h2 { font-size: 12px; letter-spacing: .1em; color: var(--ink-3); font-weight: 70
 .scale { display: flex; height: 6px; border-radius: 999px; margin: 8px 0 4px;
   background: linear-gradient(90deg, var(--avoid), var(--watch) 50%, var(--buy)); }
 .ticks { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); }
+.gist { margin: 0 0 4px; font-size: 11.5px; line-height: 1.4; color: var(--ink-3); display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rank + .gist { margin-left: 32px; }
 .foot { margin-top: 8px; font-size: 11px; color: var(--ink-3); text-align: right; }
 """
 
@@ -392,10 +396,16 @@ def _sector(sector: str, hot: set[str]) -> str:
     return f'<span class="hot">{html.escape(sector)}</span>' if sector in hot else html.escape(sector)
 
 
+def _gist(s: Summary, symbol: str) -> str:
+    """A stock's saved LLM note under its card row, shortened to its gist (the card clamps it to two lines)."""
+    return f'<div class="gist">{html.escape(gist(s.notes[symbol]))}</div>' if symbol in s.notes else ""
+
+
 def card_html(s: Summary) -> str:
     """The alert as a self-contained HTML card (rendered to an image for Telegram, see card_png): breadth with
     its change and a BUY/WATCH/AVOID split bar, hot sectors as tiles, new BUYs grouped under colour-coded
-    strategy pills, the strongest BUYs ranked (a row's sector in orange when it is a hot sector), and a note
+    strategy pills, the strongest BUYs ranked (a row's sector in orange when it is a hot sector), each with the
+    gist of its saved LLM note (once, so a new BUY among the strongest isn't repeated), and a note
     on what the score means. Kept to about 1 : 1.5 so it
     fills Telegram's preview (taller images get shrunk with bars at the sides); dropped BUYs go in the caption."""
     e = html.escape
@@ -424,18 +434,20 @@ def card_html(s: Summary) -> str:
                             for x in strategies)
             rows = "".join(f'<div class="row"><div class="line"><span class="sym">{e(b.symbol)}</span>'
                            f'<span class="meta">{e(b.name)} · {_sector(b.sector, hot)}</span></div>'
-                           f'<span class="score">{_score(b.combined)}</span></div>' for b in group)
+                           f'<span class="score">{_score(b.combined)}</span></div>' + _gist(s, b.symbol) for b in group)
             groups.append(f'<div class="group"><div class="pills">{pills}<span class="count">×{len(group)}</span></div>{rows}</div>')
         more = f'<div class="sub">+{_more(s.new, MAX_NEW)} more on the dashboard</div>' if _more(s.new, MAX_NEW) else ""
         body = "".join(groups) or f'<div class="sub">No new BUYs since {e(_day(s.prev)[:-5])}</div>'
         out.append(f'<section><h2><span>NEW BUYS</span><span>{len(s.new)}</span></h2>{body}{more}</section>')
     if s.buys:
         fresh = {b.symbol for b in s.new}
+        listed = {b.symbol for b in s.new[:MAX_NEW]} if s.prev is not None else set()
         ranks = "".join(f'<div class="rank"><span class="medal m{k + 1}">{k + 1}</span>'
                         f'<div class="line"><span class="sym">{e(b.symbol)}</span>'
                         + ('<span class="chip new">NEW</span>' if b.symbol in fresh else "")
                         + f'<span class="meta">{e(b.name)} · {_sector(b.sector, hot)}</span></div>'
-                        f'<span class="score">{_score(b.combined)}</span></div>' for k, b in enumerate(s.buys[:TOP]))
+                        f'<span class="score">{_score(b.combined)}</span></div>'
+                        + ("" if b.symbol in listed else _gist(s, b.symbol)) for k, b in enumerate(s.buys[:TOP]))
         out.append(f'<section><h2><span>STRONGEST BUYS</span><span>score</span></h2><div class="panel">{ranks}</div></section>')
     out.append(f'<div class="note">{score_note()}<div class="scale"></div>'
                '<div class="ticks"><span>−1 bearish</span><span>0 neutral</span><span>+1 bullish</span></div></div>')
@@ -649,8 +661,7 @@ def gist(note: str) -> str:
 NOTES_CSS = """
 .item { padding: 7px 0; border-top: 1px solid var(--line); }
 .item:first-child { border-top: none; }
-.gist { margin-top: 2px; font-size: 13px; line-height: 1.4; color: var(--ink-2); display: -webkit-box;
-  -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.gist { margin: 2px 0 0; font-size: 13px; color: var(--ink-2); }
 .score.neg { color: var(--avoid); background: rgba(239,68,68,.12); }
 """
 
@@ -683,11 +694,6 @@ def notes_png(title: str, date: str, rows: list[NoteRow]) -> bytes | None:
     except Exception as err:
         print(f"notes image skipped: {type(err).__name__}: {err}")
         return None
-
-
-def stock_note_rows(s: Summary) -> list[NoteRow]:
-    """The notes card's rows: each stock on the alert card that has a saved note, in card order."""
-    return [NoteRow(b.symbol, f"{b.name} · {b.sector}" if b.sector else b.name, b.combined, s.notes[b.symbol]) for b in s.mentioned() if b.symbol in s.notes]
 
 
 def commodity_note_rows(c: Commodities) -> list[NoteRow]:
@@ -768,17 +774,18 @@ def telegram_photo(png: bytes, caption: str, token: str, chat_id: str) -> None:
 
 
 def _telegram(s: Summary, url: str | None, token: str, chat_id: str) -> str:
-    """The card image with a caption holding the links (the text card when no image could be made), then the
-    notes of the stocks it shows as a second image."""
+    """The card image, which carries each stock's note gist, with a caption holding the links; without an image,
+    the text card followed by the notes as text."""
     png = card_png(s)
     if png:
         telegram_photo(png, caption_html(s, url), token, chat_id)
-        sent = "sent (card image)"
-    else:
-        telegram(telegram_html(s, url), token, chat_id)
-        sent = "sent (text)"
-    link = f"{url}#journal/days/{s.date}.csv" if url else None
-    return sent + _send_notes("AI STOCK NOTES", s.date, stock_note_rows(s), stock_notes(s), link, token, chat_id)
+        notes = sum(b.symbol in s.notes for b in s.mentioned())
+        return "sent (card image" + (f", {notes} notes)" if notes else ")")
+    telegram(telegram_html(s, url), token, chat_id)
+    sent = "sent (text)"
+    for text in notes_html(f"Notes · {_day(s.date)}", stock_notes(s)):
+        telegram(text, token, chat_id)
+    return sent + (f" + {len(stock_notes(s))} notes" if stock_notes(s) else "")
 
 
 def _send_notes(title: str, date: str, rows: list[NoteRow], items: list[tuple[str, str]], link: str | None,
