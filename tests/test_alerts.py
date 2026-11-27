@@ -142,7 +142,7 @@ def test_a_failing_channel_does_not_stop_the_others(tmp_path, monkeypatch):
         raise RuntimeError("Telegram refused the photo")
 
     sent = []
-    monkeypatch.setattr(alerts, "card_png", lambda s: b"png")
+    monkeypatch.setattr(alerts, "card_png", lambda s: [b"png"])
     monkeypatch.setattr(alerts, "telegram_photo", refuse)
     monkeypatch.setattr(alerts, "email", lambda text, user, pw, to, server, port: sent.append((text.splitlines()[0], to)))
     assert alerts.send(alerts.summary(journal(tmp_path)), to_issue=False) == [
@@ -152,10 +152,10 @@ def test_a_failing_channel_does_not_stop_the_others(tmp_path, monkeypatch):
 
 def test_telegram_sends_the_card_image_with_the_links_in_its_caption(tmp_path, monkeypatch):
     got = {}
-    monkeypatch.setattr(alerts, "card_png", lambda s: b"png")
+    monkeypatch.setattr(alerts, "card_png", lambda s: [b"png"])
     monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: got.update(png=png, caption=caption))
     assert alerts._telegram(alerts.summary(journal(tmp_path)), "https://example.org/", "t", "c") == "sent (card image)"
-    assert got["png"] == b"png"
+    assert got["png"] == [b"png"]
     assert got["caption"] == ("📈 <b>AI Stock · Thu 26 Nov 2026</b> · 2 BUYs, 1 new\n"
                               "➖ <i>No longer BUY (1): B</i>\n"
                               '👉 <a href="https://example.org/#journal/days/2026-11-26.csv">Open this session</a>'
@@ -238,14 +238,14 @@ def test_commodities_go_to_telegram_as_a_second_message(tmp_path, monkeypatch):
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "t")
     monkeypatch.setenv("TELEGRAM_CHAT_ID", "c")
     sent = []
-    monkeypatch.setattr(alerts, "card_png", lambda s: b"stocks")
+    monkeypatch.setattr(alerts, "card_png", lambda s: [b"stocks"])
     monkeypatch.setattr(alerts, "commodity_png", lambda c: None)  # no image: text
     monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: sent.append(png))
     monkeypatch.setattr(alerts, "telegram", lambda text, token, chat: sent.append(text.splitlines()[0]))
     root = commodities(journal(tmp_path))
     out = alerts.send(alerts.summary(root), to_issue=False, to_email=False, c=alerts.commodity_summary(root))
     assert out == ["Telegram: sent (card image)", "Telegram commodities: sent (text)"]
-    assert sent == [b"stocks", "🛢 <b>AI Commodities · Wed 25 Nov 2026</b>"]
+    assert sent == [[b"stocks"], "🛢 <b>AI Commodities · Wed 25 Nov 2026</b>"]
 
 
 NCOLS = "date,symbol,name,strategy,action,note,source\n"
@@ -266,7 +266,7 @@ def test_notes_follow_each_card_for_the_stocks_and_contracts_it_shows(tmp_path, 
     assert alerts.commodity_notes(c) == [("Gold · SELL · −0.40", "Gold falls")]
     assert "C · Gamma · +0.60" in alerts.plain(s) and "<summary>C · Gamma" in alerts.markdown(s)
     sent = []
-    monkeypatch.setattr(alerts, "card_png", lambda s: b"png")
+    monkeypatch.setattr(alerts, "card_png", lambda s: [b"png"])
     monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: sent.append("photo"))
     monkeypatch.setattr(alerts, "telegram", lambda text, token, chat: sent.append(text))
     assert alerts._telegram(s, None, "t", "c") == "sent (card image, 1 notes)" and sent == ["photo"]  # in the card
@@ -277,7 +277,7 @@ def test_notes_follow_each_card_for_the_stocks_and_contracts_it_shows(tmp_path, 
     assert sent[1] == ("🤖 <b>Notes · Thu 26 Nov 2026</b>\n\n<b>C · Gamma · +0.60</b>\n"
                        "<blockquote expandable>C &lt;rises&gt;</blockquote>")
     sent.clear()
-    monkeypatch.setattr(alerts, "commodity_png", lambda c: b"png")
+    monkeypatch.setattr(alerts, "commodity_png", lambda c: [b"png"])
     assert alerts._telegram_commodities(c, None, "t", "c") == "sent (card image, 1 notes)" and sent == ["photo"]
     assert "<li>Gold falls</li>" in alerts.commodity_card_html(c)
 

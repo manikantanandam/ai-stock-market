@@ -51,3 +51,9 @@ def test_pages_from_body_ignores_quoted_examples_and_the_bot_section():
     bot = shots.section([("today", "https://x/today.png")], "abc", ["today"])
     assert shots.pages_from_body(f"Summary\n\n{bot}\n") == []
     assert shots.pages_from_body("<!-- screenshots: ... accounts -->") == ["accounts"]
+
+
+def test_cuts_end_each_slice_at_the_lowest_break_that_fits():
+    assert shots.cuts(900, [0, 100, 450, 600, 850], 500) == [(0, 450), (450, 900)]
+    assert shots.cuts(500, [], 500) == [(0, 500)]
+    assert shots.cuts(1100, [], 500) == [(0, 500), (500, 1000), (1000, 1100)]  # no break fits: cut mid-way

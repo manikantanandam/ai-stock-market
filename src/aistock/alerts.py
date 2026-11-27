@@ -407,8 +407,7 @@ def card_html(s: Summary) -> str:
     its change and a BUY/WATCH/AVOID split bar, hot sectors as tiles, new BUYs grouped under colour-coded
     strategy pills, the strongest BUYs ranked (a row's sector in orange when it is a hot sector), each with the
     saved LLM note as bullet points (once, so a new BUY among the strongest isn't repeated), and a note
-    on what the score means. Kept to about 1 : 1.5 so it
-    fills Telegram's preview (taller images get shrunk with bars at the sides); dropped BUYs go in the caption."""
+    on what the score means. A tall card goes out in slices (see TALLEST); dropped BUYs go in the caption."""
     e = html.escape
     total = sum(s.actions.values()) or 1
     buy, watch, avoid = (s.actions.get(a, 0) for a in ("BUY", "WATCH", "AVOID"))
@@ -458,12 +457,18 @@ def card_html(s: Summary) -> str:
             + "<script>document.fonts.ready.then(() => { document.body.dataset.shown = 'card'; });</script></body></html>")
 
 
-def card_png(s: Summary) -> bytes | None:
-    """The card as a PNG via headless Chrome; None when Chrome isn't available (callers fall back to text)."""
+# Telegram shrinks a photo to 2560 px on its longer side, so a tall card would come out narrow and blurry:
+# cards go out as slices at most this tall (at width 1200), cut between rows, sent as one album
+TALLEST = 2560
+BREAKS = "section, .group, .row, .rank, .citem, .note"
+
+
+def card_png(s: Summary) -> list[bytes] | None:
+    """The card as PNG slices via headless Chrome; None when Chrome isn't available (callers fall back to text)."""
     from aistock.site import screenshots
 
     try:
-        return screenshots.render(card_html(s))
+        return screenshots.render(card_html(s), tallest=TALLEST, breaks=BREAKS)
     except Exception as err:  # no Chrome, or it failed: the text alert still goes out
         print(f"card image skipped: {type(err).__name__}: {err}")
         return None
@@ -607,12 +612,12 @@ COMMODITY_CSS = """
 """
 
 
-def commodity_png(c: Commodities) -> bytes | None:
-    """The commodity card as a PNG; None when Chrome isn't available."""
+def commodity_png(c: Commodities) -> list[bytes] | None:
+    """The commodity card as PNG slices (see TALLEST); None when Chrome isn't available."""
     from aistock.site import screenshots
 
     try:
-        return screenshots.render(commodity_card_html(c))
+        return screenshots.render(commodity_card_html(c), tallest=TALLEST, breaks=BREAKS)
     except Exception as err:
         print(f"commodity card image skipped: {type(err).__name__}: {err}")
         return None
@@ -711,14 +716,24 @@ def telegram(text: str, token: str, chat_id: str) -> None:
             raise RuntimeError("Telegram refused the message")
 
 
-def telegram_photo(png: bytes, caption: str, token: str, chat_id: str) -> None:
-    """Send `png` with an HTML `caption` from the bot to the chat (Bot API sendPhoto, multipart upload)."""
+def telegram_photo(pngs: list[bytes], caption: str, token: str, chat_id: str) -> None:
+    """Send the `pngs` with an HTML `caption` from the bot to the chat: one as a photo (Bot API sendPhoto),
+    several as an album with the caption on the first (sendMediaGroup); multipart upload."""
     boundary = uuid.uuid4().hex
     part = lambda name, value, extra="": (f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"{extra}\r\n'
                                           + ("Content-Type: image/png\r\n" if extra else "") + "\r\n").encode() + value + b"\r\n"
-    body = (part("chat_id", chat_id.encode()) + part("caption", caption.encode()) + part("parse_mode", b"HTML")
-            + part("photo", png, '; filename="alert.png"') + f"--{boundary}--\r\n".encode())
-    request = urllib.request.Request(f"https://api.telegram.org/bot{token}/sendPhoto", body,
+    body = part("chat_id", chat_id.encode())
+    if len(pngs) == 1:
+        method = "sendPhoto"
+        body += part("caption", caption.encode()) + part("parse_mode", b"HTML") + part("photo", pngs[0], '; filename="alert.png"')
+    else:
+        method = "sendMediaGroup"
+        media = [{"type": "photo", "media": f"attach://p{k}"} for k in range(len(pngs))]
+        media[0].update(caption=caption, parse_mode="HTML")
+        body += part("media", json.dumps(media).encode())
+        body += b"".join(part(f"p{k}", png, f'; filename="alert{k}.png"') for k, png in enumerate(pngs))
+    body += f"--{boundary}--\r\n".encode()
+    request = urllib.request.Request(f"https://api.telegram.org/bot{token}/{method}", body,
                                      {"Content-Type": f"multipart/form-data; boundary={boundary}"})
     with urllib.request.urlopen(request, timeout=60) as r:
         if not json.load(r).get("ok"):
