@@ -179,6 +179,7 @@ jobs:
               continue
             fi
             uv run aistock backfill-notes --date "$d" --notes-max 25
+            uv run aistock backfill-notes --alerted --date "$d"  # the alert card's stocks the top 25 missed
           done
 
       # Yahoo can lag after the close; flag a scan whose latest bar is older

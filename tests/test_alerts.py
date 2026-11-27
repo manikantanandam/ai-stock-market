@@ -270,7 +270,7 @@ def test_notes_follow_each_card_for_the_stocks_and_contracts_it_shows(tmp_path, 
     monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: sent.append("photo"))
     monkeypatch.setattr(alerts, "telegram", lambda text, token, chat: sent.append(text))
     assert alerts._telegram(s, None, "t", "c") == "sent (card image, 1 notes)" and sent == ["photo"]  # in the card
-    assert '<div class="gist">C &lt;rises&gt;</div>' in alerts.card_html(s)
+    assert '<ul class="points"><li>C &lt;rises&gt;</li></ul>' in alerts.card_html(s)
     sent.clear()
     monkeypatch.setattr(alerts, "card_png", lambda s: None)  # no Chrome: the text card, then the notes as text
     assert alerts._telegram(s, None, "t", "c") == "sent (text) + 1 notes"
@@ -278,22 +278,16 @@ def test_notes_follow_each_card_for_the_stocks_and_contracts_it_shows(tmp_path, 
                        "<blockquote expandable>C &lt;rises&gt;</blockquote>")
     sent.clear()
     monkeypatch.setattr(alerts, "commodity_png", lambda c: b"png")
-    monkeypatch.setattr(alerts, "notes_png", lambda title, date, rows: b"png")
-    monkeypatch.setattr(alerts, "telegram_photo", lambda png, caption, token, chat: sent.append(caption))
-    assert alerts._telegram_commodities(c, "https://x.io/", "t", "c") == "sent (card image) + 1 notes (image)"
-    assert "https://x.io/#journal/commodities/days/2026-11-25.csv" in sent[1]
+    assert alerts._telegram_commodities(c, None, "t", "c") == "sent (card image, 1 notes)" and sent == ["photo"]
+    assert "<li>Gold falls</li>" in alerts.commodity_card_html(c)
 
 
-def test_notes_card_shows_each_notes_gist():
+def test_notes_are_bullet_points_one_per_sentence():
     note = ("The strategy 'swing' fired a BUY signal for KPRMILL (K.P.R. Mill Limited) on an uptrend. "
             "The price is above its 200-day SMA. The stop is at 900.")
-    assert alerts.gist(note) == "The price is above its 200-day SMA. The stop is at 900."
-    assert alerts.gist("Gold is above its SMA. Risk: a reversal.") == "Gold is above its SMA. Risk: a reversal."
-    page = alerts.notes_card_html("AI STOCK NOTES", "2026-11-26",
-                                  [alerts.NoteRow("KPRMILL", "K.P.R. Mill · Consumer Cyclical", 0.61, note),
-                                   alerts.NoteRow("Gold", "Metals · SELL", -0.4, "Gold <falls>.")])
-    assert "KPRMILL" in page and "fired" not in page and "Gold &lt;falls&gt;." in page
-    assert 'class="score neg">−0.40' in page
+    assert alerts.points(note) == ["The strategy 'swing' fired a BUY signal for KPRMILL (K.P.R. Mill Limited) on an "
+                                   "uptrend.", "The price is above its 200-day SMA.", "The stop is at 900."]
+    assert alerts.points_html("Gold <falls>.") == '<ul class="points"><li>Gold &lt;falls&gt;.</li></ul>'
 
 
 def test_notes_are_split_to_fit_telegram():

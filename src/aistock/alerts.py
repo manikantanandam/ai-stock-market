@@ -6,8 +6,8 @@ Telegram gets the summary as an image card (`card_html`, rendered by headless Ch
 holding the links), falling back to `telegram_html` text when no image can be made.
 The commodity session (`commodity_summary`, journal/commodities/days) follows as a second Telegram message
 with its own card (`commodity_card_html`). The saved LLM notes (journal/notes, journal/commodities/notes,
-written by `scan --notes`) of the stocks and contracts shown go along as each note's gist: under each row of
-the stock card, and as a notes card after the commodity card (`notes_card_html`); as text without Chrome.
+written by `scan --notes`) of the stocks and contracts shown go along as bullet points (one per sentence)
+under each row of the stock and commodity cards; as text after the text card without Chrome.
 
 `summary` reads the session's journal files only (no LLM call here, decision 0001): the BUY signals with each
 stock's company name, sector, combined score and strategies, which of them are new since the previous session, and
@@ -354,9 +354,10 @@ h2 { font-size: 12px; letter-spacing: .1em; color: var(--ink-3); font-weight: 70
 .scale { display: flex; height: 6px; border-radius: 999px; margin: 8px 0 4px;
   background: linear-gradient(90deg, var(--avoid), var(--watch) 50%, var(--buy)); }
 .ticks { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); }
-.gist { margin: 0 0 4px; font-size: 11.5px; line-height: 1.4; color: var(--ink-3); display: -webkit-box;
-  -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.rank + .gist { margin-left: 32px; }
+.points { margin: 1px 0 5px; padding-left: 16px; font-size: 11.5px; line-height: 1.4; color: var(--ink-3); }
+.points li { margin-top: 1px; }
+.points li::marker { color: var(--ink-3); }
+.rank + .points { margin-left: 32px; }
 .foot { margin-top: 8px; font-size: 11px; color: var(--ink-3); text-align: right; }
 """
 
@@ -396,16 +397,16 @@ def _sector(sector: str, hot: set[str]) -> str:
     return f'<span class="hot">{html.escape(sector)}</span>' if sector in hot else html.escape(sector)
 
 
-def _gist(s: Summary, symbol: str) -> str:
-    """A stock's saved LLM note under its card row, shortened to its gist (the card clamps it to two lines)."""
-    return f'<div class="gist">{html.escape(gist(s.notes[symbol]))}</div>' if symbol in s.notes else ""
+def _points(s: Summary, symbol: str) -> str:
+    """A stock's saved LLM note under its card row, as bullet points (one per sentence)."""
+    return points_html(s.notes[symbol]) if symbol in s.notes else ""
 
 
 def card_html(s: Summary) -> str:
     """The alert as a self-contained HTML card (rendered to an image for Telegram, see card_png): breadth with
     its change and a BUY/WATCH/AVOID split bar, hot sectors as tiles, new BUYs grouped under colour-coded
     strategy pills, the strongest BUYs ranked (a row's sector in orange when it is a hot sector), each with the
-    gist of its saved LLM note (once, so a new BUY among the strongest isn't repeated), and a note
+    saved LLM note as bullet points (once, so a new BUY among the strongest isn't repeated), and a note
     on what the score means. Kept to about 1 : 1.5 so it
     fills Telegram's preview (taller images get shrunk with bars at the sides); dropped BUYs go in the caption."""
     e = html.escape
@@ -434,7 +435,7 @@ def card_html(s: Summary) -> str:
                             for x in strategies)
             rows = "".join(f'<div class="row"><div class="line"><span class="sym">{e(b.symbol)}</span>'
                            f'<span class="meta">{e(b.name)} · {_sector(b.sector, hot)}</span></div>'
-                           f'<span class="score">{_score(b.combined)}</span></div>' + _gist(s, b.symbol) for b in group)
+                           f'<span class="score">{_score(b.combined)}</span></div>' + _points(s, b.symbol) for b in group)
             groups.append(f'<div class="group"><div class="pills">{pills}<span class="count">×{len(group)}</span></div>{rows}</div>')
         more = f'<div class="sub">+{_more(s.new, MAX_NEW)} more on the dashboard</div>' if _more(s.new, MAX_NEW) else ""
         body = "".join(groups) or f'<div class="sub">No new BUYs since {e(_day(s.prev)[:-5])}</div>'
@@ -447,7 +448,7 @@ def card_html(s: Summary) -> str:
                         + ('<span class="chip new">NEW</span>' if b.symbol in fresh else "")
                         + f'<span class="meta">{e(b.name)} · {_sector(b.sector, hot)}</span></div>'
                         f'<span class="score">{_score(b.combined)}</span></div>'
-                        + ("" if b.symbol in listed else _gist(s, b.symbol)) for k, b in enumerate(s.buys[:TOP]))
+                        + ("" if b.symbol in listed else _points(s, b.symbol)) for k, b in enumerate(s.buys[:TOP]))
         out.append(f'<section><h2><span>STRONGEST BUYS</span><span>score</span></h2><div class="panel">{ranks}</div></section>')
     out.append(f'<div class="note">{score_note()}<div class="scale"></div>'
                '<div class="ticks"><span>−1 bearish</span><span>0 neutral</span><span>+1 bullish</span></div></div>')
@@ -555,7 +556,8 @@ def commodity_note() -> str:
 
 def commodity_card_html(c: Commodities) -> str:
     """The commodity session as an HTML card: verdict counts, then one row per contract (action badge with its
-    side, the strategies behind it, close with its change, score), actionable contracts first."""
+    side, the strategies behind it, close with its change, score) with its saved LLM note as bullet points,
+    actionable contracts first."""
     e = html.escape
     counts = {a: sum(x.action == a for x in c.contracts) for a in ACTION_ORDER}
     legend = "".join(f'<span><span class="dot" style="background:{ACTION_COLOURS[a]}"></span><b>{n}</b> {a}</span>'
@@ -573,11 +575,12 @@ def commodity_card_html(c: Commodities) -> str:
                         for n in x.strategies)
         colour = ACTION_COLOURS.get(x.action, "#4b5563")
         tone = "score" if x.combined >= 0 else "score neg"
-        rows.append(f'<div class="crow"><div><div class="line"><span class="sym">{e(x.name)}</span>{changed}</div>'
+        rows.append(f'<div class="citem"><div class="crow"><div><div class="line"><span class="sym">{e(x.name)}</span>{changed}</div>'
                     f'<div class="meta">{e(x.group)} · ₹{x.close:,.0f} / {e(x.unit)} {move}</div>'
                     + (f'<div class="pills">{pills}</div>' if pills else "") + "</div>"
                     f'<div class="right"><span class="badge" style="color:{colour};border-color:{colour}">{e(_verdict(x))}</span>'
-                    f'<span class="{tone}">{_score(x.combined)}</span></div></div>')
+                    f'<span class="{tone}">{_score(x.combined)}</span></div></div>'
+                    + (points_html(c.notes[x.symbol]) if x.symbol in c.notes else "") + "</div>")
     since = f" · vs {e(_day(c.prev)[:-5])}" if c.prev else ""
     out = [f'<div class="head"><span class="brand">AI COMMODITIES</span><span class="date">{e(_day(c.date))} · futures close</span></div>',
            f'<div class="hero"><span class="big">{len(c.contracts)}</span><span class="sub">contracts{since}</span></div>',
@@ -592,9 +595,10 @@ def commodity_card_html(c: Commodities) -> str:
 
 COMMODITY_CSS = """
 .legend { margin-top: 8px; }
-.crow { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 8px 0;
-  border-top: 1px solid var(--line); }
-.crow:first-child { border-top: none; }
+.citem { border-top: 1px solid var(--line); }
+.citem:first-child { border-top: none; }
+.crow { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 8px 0; }
+.citem .points { margin-top: -2px; }
 .crow .meta { margin-top: 2px; }
 .crow .pills { margin: 5px 0 0; }
 .right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
@@ -634,71 +638,19 @@ def commodity_text(c: Commodities, url: str | None = None) -> str:
         f'\n\n👉 <a href="{e(url)}#journal/commodities/days/{c.date}.csv">Open this session</a>' if url else "")
 
 
-# ---------- LLM notes: a follow-up image after each card ----------
+# ---------- LLM notes: bullet points under each card row ----------
 
-@dataclass
-class NoteRow:
-    """One note on the notes card: whose it is and the note itself."""
-    symbol: str
-    meta: str              # name · sector (stocks) or group · verdict (commodities)
-    combined: float
-    note: str
+# A sentence ends at ., ! or ? before a capital, unless the period closes a one-letter initial ("K.P.R. Mill").
+SENTENCE = re.compile(r"(?<![\s.(][A-Z]\.)(?<=[.!?])\s+(?=[A-Z])")
 
 
-# A note's sentence ends at ., ! or ? after a lowercase letter, digit, ")" or "%", so "K.P.R. Mill" stays whole.
-SENTENCE = re.compile(r"(?<=[a-z0-9)%][.!?])\s+(?=[A-Z])")
+def points(note: str) -> list[str]:
+    """The note's sentences, each a bullet point on the cards; nothing is dropped or shortened."""
+    return [x for x in SENTENCE.split(note.strip()) if x]
 
 
-def gist(note: str) -> str:
-    """The note without its opening sentence when that only restates the verdict ("The strategy 'swing' fired a
-    BUY signal for ..."); the card clamps the rest to a few lines."""
-    sentences = SENTENCE.split(note.strip())
-    if len(sentences) > 1 and " fired " in sentences[0]:
-        sentences = sentences[1:]
-    return " ".join(sentences)
-
-
-NOTES_CSS = """
-.item { padding: 7px 0; border-top: 1px solid var(--line); }
-.item:first-child { border-top: none; }
-.gist { margin: 2px 0 0; font-size: 13px; color: var(--ink-2); }
-.score.neg { color: var(--avoid); background: rgba(239,68,68,.12); }
-"""
-
-
-def notes_card_html(title: str, date: str, rows: list[NoteRow]) -> str:
-    """The notes as an HTML card: per stock or contract its symbol and score, then the note's gist in at most
-    two lines (strategies are on the alert card, the full notes on the dashboard)."""
-    e = html.escape
-    items = []
-    for r in rows:
-        items.append(f'<div class="item"><div class="row"><div class="line"><span class="sym">{e(r.symbol)}</span>'
-                     f'<span class="meta">{e(r.meta)}</span></div>'
-                     f'<span class="{"score" if r.combined >= 0 else "score neg"}">{_score(r.combined)}</span></div>'
-                     f'<div class="gist">{e(gist(r.note))}</div></div>')
-    out = [f'<div class="head"><span class="brand">{e(title)}</span><span class="date">{e(_day(date))}</span></div>',
-           f'<section><div class="panel">{"".join(items)}</div></section>',
-           '<div class="foot">Written by a local LLM from the rules\' numbers; it explains, the rules decide.</div>']
-    return ('<!doctype html><html><head><meta charset="utf-8">'
-            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap">'
-            f"<style>{CARD_CSS}{NOTES_CSS}</style></head><body>" + "".join(out)
-            + "<script>document.fonts.ready.then(() => { document.body.dataset.shown = 'card'; });</script></body></html>")
-
-
-def notes_png(title: str, date: str, rows: list[NoteRow]) -> bytes | None:
-    """The notes card as a PNG; None when Chrome isn't available (the notes then go as text)."""
-    from aistock.site import screenshots
-
-    try:
-        return screenshots.render(notes_card_html(title, date, rows))
-    except Exception as err:
-        print(f"notes image skipped: {type(err).__name__}: {err}")
-        return None
-
-
-def commodity_note_rows(c: Commodities) -> list[NoteRow]:
-    return [NoteRow(x.name, f"{x.group} · {_verdict(x)}", x.combined, c.notes[x.symbol])
-            for x in c.contracts if x.symbol in c.notes]
+def points_html(note: str) -> str:
+    return '<ul class="points">' + "".join(f"<li>{html.escape(x)}</li>" for x in points(note)) + "</ul>"
 
 
 
@@ -774,7 +726,7 @@ def telegram_photo(png: bytes, caption: str, token: str, chat_id: str) -> None:
 
 
 def _telegram(s: Summary, url: str | None, token: str, chat_id: str) -> str:
-    """The card image, which carries each stock's note gist, with a caption holding the links; without an image,
+    """The card image, which carries each stock's note, with a caption holding the links; without an image,
     the text card followed by the notes as text."""
     png = card_png(s)
     if png:
@@ -788,37 +740,18 @@ def _telegram(s: Summary, url: str | None, token: str, chat_id: str) -> str:
     return sent + (f" + {len(stock_notes(s))} notes" if stock_notes(s) else "")
 
 
-def _send_notes(title: str, date: str, rows: list[NoteRow], items: list[tuple[str, str]], link: str | None,
-                token: str, chat_id: str) -> str:
-    """The notes card as an image whose caption links to the full notes on the session page; the notes as text
-    when no image could be made. Nothing when there are no notes."""
-    if not rows:
-        return ""
-    png = notes_png(title, date, rows)
-    if png:
-        caption = f"🤖 <b>{len(rows)} notes</b> · {html.escape(_day(date))}"
-        if link:
-            caption += f'\n👉 <a href="{html.escape(link)}">Full notes on the dashboard</a>'
-        telegram_photo(png, caption, token, chat_id)
-        return f" + {len(rows)} notes (image)"
-    for text in notes_html(f"Notes · {_day(date)}", items):
-        telegram(text, token, chat_id)
-    return f" + {len(rows)} notes"
-
-
 def _telegram_commodities(c: Commodities, url: str | None, token: str, chat_id: str) -> str:
-    """The commodity card as its own message after the stocks one (text when no image could be made), then
-    the contracts' notes as an image."""
+    """The commodity card, which carries each contract's note, as its own message after the stocks one; without
+    an image, the text card followed by the notes as text."""
     png = commodity_png(c)
     if png:
         telegram_photo(png, commodity_caption(c, url), token, chat_id)
-        sent = "sent (card image)"
-    else:
-        telegram(commodity_text(c, url), token, chat_id)
-        sent = "sent (text)"
-    link = f"{url}#journal/commodities/days/{c.date}.csv" if url else None
-    return sent + _send_notes("AI COMMODITY NOTES", c.date, commodity_note_rows(c), commodity_notes(c), link,
-                              token, chat_id)
+        notes = sum(x.symbol in c.notes for x in c.contracts)
+        return "sent (card image" + (f", {notes} notes)" if notes else ")")
+    telegram(commodity_text(c, url), token, chat_id)
+    for text in notes_html(f"Commodity notes · {_day(c.date)}", commodity_notes(c)):
+        telegram(text, token, chat_id)
+    return "sent (text)" + (f" + {len(commodity_notes(c))} notes" if commodity_notes(c) else "")
 
 
 def email(text: str, user: str, password: str, to: str, server: str = "smtp.gmail.com", port: int = 465) -> None:
