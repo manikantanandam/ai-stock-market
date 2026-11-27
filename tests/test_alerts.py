@@ -248,6 +248,19 @@ def test_commodities_go_to_telegram_as_a_second_message(tmp_path, monkeypatch):
     assert sent == [[b"stocks"], "🛢 <b>AI Commodities · Wed 25 Nov 2026</b>"]
 
 
+def test_commodities_alone_without_a_stock_session(tmp_path, monkeypatch):
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "t")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "c")
+    monkeypatch.setenv("SMTP_USERNAME", "u")
+    monkeypatch.setenv("SMTP_PASSWORD", "p")
+    sent = []
+    monkeypatch.setattr(alerts, "commodity_png", lambda c: None)
+    monkeypatch.setattr(alerts, "telegram", lambda text, token, chat: sent.append(text.splitlines()[0]))
+    out = alerts.send(None, c=alerts.commodity_summary(commodities(tmp_path)))
+    assert out == ["Telegram commodities: sent (text)"]  # no stock card, email or issue
+    assert sent == ["🛢 <b>AI Commodities · Wed 25 Nov 2026</b>"]
+
+
 NCOLS = "date,symbol,name,strategy,action,note,source\n"
 
 

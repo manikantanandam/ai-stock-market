@@ -818,26 +818,27 @@ def github_issue(text: str, title: str = ISSUE_TITLE) -> str:
     return _gh("issue", "comment", str(number), "--body", text)
 
 
-def send(s: Summary, url: str | None = None, to_telegram: bool = True, to_issue: bool = True,
+def send(s: Summary | None, url: str | None = None, to_telegram: bool = True, to_issue: bool = True,
          to_email: bool = True, c: Commodities | None = None) -> list[str]:
     """Send to each channel that is enabled and configured (secrets in the environment); returns what
     happened, one line per channel. A failing channel is reported and the others still go out. Commodities
-    (`c`) go to Telegram as a second message."""
+    (`c`) go to Telegram as a second message; with no stock session (`s` None) they go alone."""
     env = os.environ.get
     channels = []
     if to_telegram:
-        channels.append(("Telegram", ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"),
-                         lambda: _telegram(s, url, env("TELEGRAM_BOT_TOKEN"), env("TELEGRAM_CHAT_ID"))))
+        if s is not None:
+            channels.append(("Telegram", ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"),
+                             lambda: _telegram(s, url, env("TELEGRAM_BOT_TOKEN"), env("TELEGRAM_CHAT_ID"))))
         if c is not None:
             channels.append(("Telegram commodities", ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"),
                              lambda: _telegram_commodities(c, url, env("TELEGRAM_BOT_TOKEN"), env("TELEGRAM_CHAT_ID"))))
-    if to_email:
+    if to_email and s is not None:
         channels.append(("Email", ("SMTP_USERNAME", "SMTP_PASSWORD"),
                          lambda: email(plain(s, url), env("SMTP_USERNAME"), env("SMTP_PASSWORD"),
                                        env("ALERT_EMAIL_TO") or env("SMTP_USERNAME"),
                                        env("SMTP_SERVER") or "smtp.gmail.com", int(env("SMTP_PORT") or 465))
                          or f"sent to {env('ALERT_EMAIL_TO') or env('SMTP_USERNAME')}"))
-    if to_issue:
+    if to_issue and s is not None:
         channels.append(("GitHub issue", (), lambda: github_issue(markdown(s, url))))
     done = []
     for name, needed, go in channels:

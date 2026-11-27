@@ -351,12 +351,30 @@ def alert(
     issue: bool = typer.Option(True, "--issue/--no-issue", help="Comment on the 'Daily alerts' GitHub issue"),
     commodities: bool = typer.Option(True, "--commodities/--no-commodities",
                                      help="Also send the commodity session (on or before --date) to Telegram"),
+    stocks: bool = typer.Option(True, "--stocks/--no-stocks",
+                                help="Send the stock session; --no-stocks sends only the commodity card "
+                                     "(the latest session, or the one on or before --date)"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Print the message only"),
     url: str = typer.Option("", help="Dashboard link to end the message with"),
 ):
     """Summary of a session (BUY signals, new and dropped) to Telegram, email and a GitHub issue, plus the
     commodity card as a second Telegram message; channels whose secrets aren't set are skipped. Exits non-zero if a configured channel fails."""
     from aistock import alerts
+
+    if not stocks:
+        c = alerts.commodity_summary(date=date or None)
+        if c is None:
+            print("No commodity session on or before that date")
+            return
+        typer.echo(f"Commodity session {c.date}")
+        if dry_run:
+            return
+        results = alerts.send(None, url or None, telegram, False, False, c)
+        for line in results:
+            typer.echo(line)
+        if any(": failed (" in line for line in results):
+            raise typer.Exit(1)
+        return
 
     try:
         s = alerts.summary(date=date or None)
