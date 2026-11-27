@@ -1,0 +1,14 @@
+# Cloudflare Worker that dispatches the scan workflows on time (dispatch.js). Crons are UTC and must
+# match the keys of WORKFLOWS in dispatch.js. The token is a secret: wrangler secret put GITHUB_TOKEN
+name = "aistock-dispatch"
+main = "dispatch.js"
+compatibility_date = "2025-11-01"
+
+[triggers]
+crons = ["17 11 * * MON-FRI", "37 12 * * MON-FRI", "17 22 * * MON-FRI", "47 22 * * MON-FRI"]
+
+[vars]
+REPO = "manikantanandam/ai-stock-market"
+
+[observability]
+enabled = true

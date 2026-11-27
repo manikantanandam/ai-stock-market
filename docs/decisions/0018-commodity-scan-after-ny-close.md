@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-11-27
-- PR: #
+- PR: #56
 
 ## Context
 The commodity scan ran inside the daily stock scan (11:17 UTC, 16:47 IST). A futures day closes at
