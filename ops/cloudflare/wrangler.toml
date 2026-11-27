@@ -3,6 +3,7 @@
 name = "aistock-dispatch"
 main = "dispatch.js"
 compatibility_date = "2025-11-01"
+workers_dev = false  # cron only: no public URL, so nothing to call from outside
 
 [triggers]
 crons = ["17 11 * * MON-FRI", "37 12 * * MON-FRI", "17 22 * * MON-FRI", "47 22 * * MON-FRI"]
